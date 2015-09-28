@@ -13,7 +13,8 @@ const state110 = Immutable.fromJS({
 			name: "web",
 			screen: 0,
 			width: 800,
-			height: 600
+			height: 600,
+			layout: "tile-right"
 		}
 	},
 	screens: {
@@ -80,6 +81,7 @@ describe('application logic', () => {
 						screen: 0,
 						width: 800,
 						height: 600,
+						layout: "tile-right",
 						children: [1],
 						focusCurrent: 1
 					},
