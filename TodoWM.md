@@ -1,8 +1,6 @@
 * [x] maximize the "Desktop" type window
-* [ ] restructure classes so that there is one Screen for each screen and a separate list of workspaces
-	* window_tree
-	* parent
-* [ ] automatically make space for `_NET_WM_WINDOW_TYPE_DOCK`, such as lxqt-panel
+* [x] restructure classes so that there is one Screen for each screen and a separate list of workspaces
+* [x] automatically make space for `_NET_WM_WINDOW_TYPE_DOCK`, such as lxqt-panel
 * [ ] supply list of windows to wmctrl (`_NET_CLIENT_LIST` or `_WIN_CLIENT_LIST`)
 * [ ] put desktop on all workspaces
 * [ ] refactor Workspace and Workspaces into ES6 classes
