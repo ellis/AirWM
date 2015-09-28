@@ -35,6 +35,7 @@
   "devDependencies": {
     "chai": "^3.3.0",
     "chai-immutable": "^1.3.0",
+    "immutablediff": "^0.4.2",
     "mocha": "^2.3.3",
     "should": "*"
   },

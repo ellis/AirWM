@@ -24,7 +24,6 @@ screens:
     desktopCurrent: 1
 panes:
   5:
-    id: 5
     parent: 1
     xid: 0x141241512
 screenCurrent: ID
