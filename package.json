@@ -25,6 +25,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "babel": "^5.8.23",
+    "ewmh": "^0.3.0",
     "keysym": "0.0.6",
     "lodash": "^3.10.1",
     "winston": "0.8.3",
