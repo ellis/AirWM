@@ -1,7 +1,11 @@
 * [x] maximize the "Desktop" type window
 * [x] restructure classes so that there is one Screen for each screen and a separate list of workspaces
 * [x] automatically make space for `_NET_WM_WINDOW_TYPE_DOCK`, such as lxqt-panel
-* [ ] supply list of windows to wmctrl (`_NET_CLIENT_LIST` or `_WIN_CLIENT_LIST`)
+* [x] supply list of windows to wmctrl (`_NET_CLIENT_LIST` or `_WIN_CLIENT_LIST`)
+* [ ] Container.hide() should also hide desktop and docks
+* [ ] put background and docks onto Screen instead of Workspace
+* [ ] `_NET_CLIENT_LIST_STACKING`
+* [ ] `_NET_ACTIVE_WINDOW`
 * [ ] put desktop on all workspaces
 * [ ] Container: redraw functionality should be moved to Layout objects
 * [ ] Window: the `move` and `moveFocus` functions should perhaps be moved to Container
