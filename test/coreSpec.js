@@ -5,6 +5,8 @@ import diff from 'immutablediff';
 
 import * as core from '../lib/core.js';
 
+const screen0_xidRoot = 100;
+
 describe('application logic', () => {
 
 	describe('setContainers', () => {
@@ -52,12 +54,18 @@ describe('application logic', () => {
 				},
 				screens: {
 					0: {
+						xidRoot: screen0_xidRoot,
 						width: 800,
 						height: 600,
 						desktopCurrent: 0
 					}
 				},
-				screenCurrent: 0
+				desktops: [0],
+				screenCurrent: 0,
+				x11: {
+					focusXid: screen0_xidRoot,
+					desktopId: 0
+				}
 			});
 			const widget1 = {
 				xid: 0x010000d0
@@ -83,13 +91,19 @@ describe('application logic', () => {
 				},
 				screens: {
 					0: {
+						xidRoot: screen0_xidRoot,
 						width: 800,
 						height: 600,
 						desktopCurrent: 0
 					}
 				},
+				desktops: [0],
 				screenCurrent: 0,
 				//focusCurrent: 1
+				x11: {
+					focusXid: screen0_xidRoot,
+					desktopId: 0
+				}
 			});
 			//console.log(diff(nextState, expected1));
 			expect(nextState).to.equal(expected1);
