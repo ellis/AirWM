@@ -1,6 +1,8 @@
 * [x] maximize the "Desktop" type window
-* [ ] automatically make space for `_NET_WM_WINDOW_TYPE_DOCK`, such as lxqt-panel
 * [ ] restructure classes so that there is one Screen for each screen and a separate list of workspaces
+	* window_tree
+	* parent
+* [ ] automatically make space for `_NET_WM_WINDOW_TYPE_DOCK`, such as lxqt-panel
 * [ ] supply list of windows to wmctrl (`_NET_CLIENT_LIST` or `_WIN_CLIENT_LIST`)
 * [ ] put desktop on all workspaces
 * [ ] refactor Workspace and Workspaces into ES6 classes
@@ -11,6 +13,7 @@
 Later:
 * [ ] allow for different desktops on different workspaces
 * [ ] figure out some form of 'show desktop' functionality
+* [ ] rename 'forEachWindow()'
 
 # Ideas
 
@@ -25,7 +28,7 @@ A "DOCK" window ...
 
 # Features I'd like
 
-* Allow for some simple dynamic layouts: tiled (right or down), grid, stacked, tabbed
+* Allow for some simple dynamic layouts: tiled (right or down), grid, stacked, tabbed, full screen
 * Support a traditional floating layout or layer
 * Support manual layout
 * Support dynamic layout
@@ -52,3 +55,4 @@ A "DOCK" window ...
 	* support automatically starting all the programs in the activity
 	* support switching activities by stopping the old programs and starting new ones
 * Allow for restoring workspaces, layouts, frames, and windows
+* Drag-n-drop frames: depending on where the frame is dropped, swap, insert above, create tab, create a new row/col, create a dock

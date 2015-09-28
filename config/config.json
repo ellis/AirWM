@@ -42,44 +42,24 @@
 			"command"  : "SwitchWorkspaceRight"
 		},
 		{
-			"key"      : "h",
-			"modifier" : ["super","shift"],
-			"command"  : "MoveWindowLeft"
-		},
-		{
 			"key"      : "j",
 			"modifier" : ["super","shift"],
-			"command"  : "MoveWindowDown"
+			"command"  : "MoveWindowNext"
 		},
 		{
 			"key"      : "k",
 			"modifier" : ["super","shift"],
-			"command"  : "MoveWindowUp"
-		},
-		{
-			"key"      : "l",
-			"modifier" : ["super","shift"],
-			"command"  : "MoveWindowRight"
-		},
-		{
-			"key"      : "h",
-			"modifier" : ["super"],
-			"command"  : "MoveFocusLeft"
+			"command"  : "MoveWindowPrev"
 		},
 		{
 			"key"      : "j",
 			"modifier" : ["super"],
-			"command"  : "MoveFocusDown"
+			"command"  : "SelectFrameNext"
 		},
 		{
 			"key"      : "k",
 			"modifier" : ["super"],
-			"command"  : "MoveFocusUp"
-		},
-		{
-			"key"      : "l",
-			"modifier" : ["super"],
-			"command"  : "MoveFocusRight"
+			"command"  : "SelectFramePrev"
 		}
 	]
 }
