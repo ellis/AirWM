@@ -7,6 +7,31 @@ import * as core from '../lib/core.js';
 
 const screen0_xidRoot = 100;
 
+const state110 = Immutable.fromJS({
+	widgets: {
+		0: {
+			name: "web",
+			screen: 0,
+			width: 800,
+			height: 600
+		}
+	},
+	screens: {
+		0: {
+			xidRoot: screen0_xidRoot,
+			width: 800,
+			height: 600,
+			desktopCurrent: 0
+		}
+	},
+	desktops: [0],
+	screenCurrent: 0,
+	x11: {
+		focusXid: screen0_xidRoot,
+		desktopId: 0
+	}
+});
+
 describe('application logic', () => {
 
 	describe('setContainers', () => {
@@ -43,34 +68,10 @@ describe('application logic', () => {
 	describe('addXwin', () => {
 		it('adds an X11 window to the state', () => {
 			//console.log(Immutable);
-			const state = Immutable.fromJS({
-				widgets: {
-					0: {
-						name: "web",
-						screen: 0,
-						width: 800,
-						height: 600
-					}
-				},
-				screens: {
-					0: {
-						xidRoot: screen0_xidRoot,
-						width: 800,
-						height: 600,
-						desktopCurrent: 0
-					}
-				},
-				desktops: [0],
-				screenCurrent: 0,
-				x11: {
-					focusXid: screen0_xidRoot,
-					desktopId: 0
-				}
-			});
 			const widget1 = {
-				xid: 0x010000d0
+				xid: 1001
 			};
-			const nextState = core.addWidget(state, widget1);
+			const nextState = core.addWidget(state110, widget1);
 			//console.log(JSON.stringify(nextState.toJS(), null, '\t'));
 			const expected1 = Immutable.fromJS({
 				widgets: {
@@ -80,10 +81,10 @@ describe('application logic', () => {
 						width: 800,
 						height: 600,
 						children: [1],
-						//focusCurrent: 1
+						focusCurrent: 1
 					},
 					1: {
-						xid: 0x010000d0,
+						xid: 1001,
 						//width: 800,
 						//height: 600,
 						parent: 0
@@ -99,9 +100,9 @@ describe('application logic', () => {
 				},
 				desktops: [0],
 				screenCurrent: 0,
-				//focusCurrent: 1
+				focusCurrent: 1,
 				x11: {
-					focusXid: screen0_xidRoot,
+					focusXid: 1001,
 					desktopId: 0
 				}
 			});
