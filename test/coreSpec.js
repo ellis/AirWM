@@ -4,104 +4,8 @@ import {expect} from 'chai';
 import diff from 'immutablediff';
 
 import * as core from '../lib/core.js';
+import * as ex from './exampleStates.js';
 
-const screen0_xidRoot = 100;
-
-const state110 = Immutable.fromJS({
-	widgets: {
-		0: {
-			name: "web",
-			screenId: 0,
-			rc: [0, 0, 800, 600],
-			layout: "tile-right"
-		}
-	},
-	screens: {
-		0: {
-			xidRoot: screen0_xidRoot,
-			width: 800,
-			height: 600,
-			desktopCurrentId: 0
-		}
-	},
-	desktopIds: [0],
-	screenCurrentId: 0,
-	x11: {
-		focusXid: screen0_xidRoot,
-		desktopNum: 0
-	}
-});
-
-const state111 = Immutable.fromJS({
-	widgets: {
-		0: {
-			name: "web",
-			screenId: 0,
-			rc: [0, 0, 800, 600],
-			layout: "tile-right",
-			childIds: [1],
-			focusCurrentId: 1
-		},
-		1: {
-			xid: 1001,
-			rc: [5, 5, 790, 590],
-			parentId: 0
-		}
-	},
-	screens: {
-		0: {
-			xidRoot: screen0_xidRoot,
-			width: 800,
-			height: 600,
-			desktopCurrentId: 0
-		}
-	},
-	desktopIds: [0],
-	screenCurrentId: 0,
-	focusCurrentId: 1,
-	x11: {
-		focusXid: 1001,
-		desktopNum: 0
-	}
-});
-
-const state112 = Immutable.fromJS({
-	widgets: {
-		0: {
-			name: "web",
-			screenId: 0,
-			rc: [0, 0, 800, 600],
-			layout: "tile-right",
-			childIds: [1, 2],
-			focusCurrentId: 1
-		},
-		1: {
-			xid: 1001,
-			parentId: 0,
-			rc: [5, 5, 392, 590]
-		},
-		2: {
-			xid: 1002,
-			parentId: 0,
-			rc: [402, 5, 392, 590]
-		}
-	},
-	screens: {
-		0: {
-			xidRoot: screen0_xidRoot,
-			width: 800,
-			height: 600,
-			desktopCurrentId: 0
-		}
-	},
-	desktopIds: [0],
-	screenCurrentId: 0,
-	focusCurrentId: 1,
-	x11: {
-		focusXid: 1001,
-		desktopNum: 0
-	}
-});
 
 describe('application logic', () => {
 
@@ -115,7 +19,7 @@ describe('application logic', () => {
 			];
 			const screens = [
 				{
-					xidRoot: screen0_xidRoot,
+					xidRoot: ex.screen0_xidRoot,
 					width: 800,
 					height: 600,
 				}
@@ -123,16 +27,15 @@ describe('application logic', () => {
 			const state = core.initialize(desktops, screens);
 			//console.log(state);
 			//console.log(diff(state, state110));
-			expect(state).is.equal(state110);
+			expect(state).is.equal(ex.state110);
 		});
 	});
 
 	describe('addXwin', () => {
-		//console.log(Immutable);
 		const widget1 = {
 			xid: 1001
 		};
-		const state1 = core.addWidget(state110, widget1);
+		const state1 = core.addWidget(ex.state110, widget1);
 		describe('adding first window', () => {
 			let state = state1;
 			it('should set focus to that window', () => {
@@ -145,7 +48,8 @@ describe('application logic', () => {
 			});
 			//console.log(JSON.stringify(nextState.toJS(), null, '\t'));
 			//console.log(diff(nextState, expected1));
-			expect(state).to.equal(state111);
+			console.log(ex);
+			expect(state).to.equal(ex.state111);
 		});
 
 		const widget2 = {
@@ -164,7 +68,7 @@ describe('application logic', () => {
 			});
 			//console.log(JSON.stringify(nextState.toJS(), null, '\t'));
 			//console.log(diff(nextState, expected1));
-			expect(state).to.equal(state112);
+			expect(state).to.equal(ex.state112);
 		});
 	});
 });
