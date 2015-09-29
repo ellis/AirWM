@@ -128,24 +128,43 @@ describe('application logic', () => {
 	});
 
 	describe('addXwin', () => {
-		it('adds an X11 window to the state', () => {
-			//console.log(Immutable);
-			const widget1 = {
-				xid: 1001
-			};
-			const state1 = core.addWidget(state110, widget1);
+		//console.log(Immutable);
+		const widget1 = {
+			xid: 1001
+		};
+		const state1 = core.addWidget(state110, widget1);
+		describe('adding first window', () => {
+			let state = state1;
+			it('should set focus to that window', () => {
+				expect(state.getIn(['focusCurrentId'])).to.equal(1);
+				expect(state.getIn(['widgets', '0', 'focusCurrentId'])).to.equal(1);
+				expect(state.getIn(['x11', 'focusXid'])).to.equal(1001);
+			});
+			it('should add window to the current desktop', () => {
+				expect(state.getIn(['widgets', '0', 'childIds'])).to.equal(List.of(1));
+			});
 			//console.log(JSON.stringify(nextState.toJS(), null, '\t'));
 			//console.log(diff(nextState, expected1));
-			expect(state1).to.equal(state111);
+			expect(state).to.equal(state111);
+		});
 
-
-			const widget2 = {
-				xid: 1002
-			};
-			const state2 = core.addWidget(state1, widget2);
-			console.log(JSON.stringify(state2.toJS(), null, '\t'));
-			console.log(diff(state2, state112));
-			expect(state2).to.equal(state112);
+		const widget2 = {
+			xid: 1002
+		};
+		const state2 = core.addWidget(state1, widget2);
+		describe('adding second window', () => {
+			let state = state2;
+			it('should leave the focus on the first window', () => {
+				expect(state.getIn(['focusCurrentId'])).to.equal(1);
+				expect(state.getIn(['widgets', '0', 'focusCurrentId'])).to.equal(1);
+				expect(state.getIn(['x11', 'focusXid'])).to.equal(1001);
+			});
+			it('should add window to the current desktop', () => {
+				expect(state.getIn(['widgets', '0', 'childIds'])).to.equal(List.of(1, 2));
+			});
+			//console.log(JSON.stringify(nextState.toJS(), null, '\t'));
+			//console.log(diff(nextState, expected1));
+			expect(state).to.equal(state112);
 		});
 	});
 });
