@@ -35,6 +35,28 @@ const state110 = Immutable.fromJS({
 
 describe('application logic', () => {
 
+	describe('initialize', () => {
+		it('initializes the state with desktops and screens', () => {
+			const desktops = [
+				{
+					name: "web",
+					layout: "tile-right"
+				}
+			];
+			const screens = [
+				{
+					xidRoot: screen0_xidRoot,
+					width: 800,
+					height: 600,
+				}
+			];
+			const state = core.initialize(desktops, screens);
+			//console.log(state);
+			//console.log(diff(state, state110));
+			expect(state).is.equal(state110);
+		});
+	});
+
 	describe('setContainers', () => {
 		it('adds the containers to the state', () => {
 			const state = Map();
