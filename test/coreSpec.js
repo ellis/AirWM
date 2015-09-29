@@ -32,6 +32,77 @@ const state110 = Immutable.fromJS({
 	}
 });
 
+const state111 = Immutable.fromJS({
+	widgets: {
+		0: {
+			name: "web",
+			screenId: 0,
+			rc: [0, 0, 800, 600],
+			layout: "tile-right",
+			childIds: [1],
+			focusCurrentId: 1
+		},
+		1: {
+			xid: 1001,
+			rc: [5, 5, 790, 590],
+			parentId: 0
+		}
+	},
+	screens: {
+		0: {
+			xidRoot: screen0_xidRoot,
+			width: 800,
+			height: 600,
+			desktopCurrentId: 0
+		}
+	},
+	desktopIds: [0],
+	screenCurrentId: 0,
+	focusCurrentId: 1,
+	x11: {
+		focusXid: 1001,
+		desktopNum: 0
+	}
+});
+
+const state112 = Immutable.fromJS({
+	widgets: {
+		0: {
+			name: "web",
+			screenId: 0,
+			rc: [0, 0, 800, 600],
+			layout: "tile-right",
+			childIds: [1, 2],
+			focusCurrentId: 1
+		},
+		1: {
+			xid: 1001,
+			parentId: 0,
+			rc: [5, 5, 392, 590]
+		},
+		2: {
+			xid: 1002,
+			parentId: 0,
+			rc: [402, 5, 392, 590]
+		}
+	},
+	screens: {
+		0: {
+			xidRoot: screen0_xidRoot,
+			width: 800,
+			height: 600,
+			desktopCurrentId: 0
+		}
+	},
+	desktopIds: [0],
+	screenCurrentId: 0,
+	focusCurrentId: 1,
+	x11: {
+		focusXid: 1001,
+		desktopNum: 0
+	}
+});
+
 describe('application logic', () => {
 
 	describe('initialize', () => {
@@ -62,42 +133,19 @@ describe('application logic', () => {
 			const widget1 = {
 				xid: 1001
 			};
-			const nextState = core.addWidget(state110, widget1);
+			const state1 = core.addWidget(state110, widget1);
 			//console.log(JSON.stringify(nextState.toJS(), null, '\t'));
-			const expected1 = Immutable.fromJS({
-				widgets: {
-					0: {
-						name: "web",
-						screenId: 0,
-						rc: [0, 0, 800, 600],
-						layout: "tile-right",
-						childIds: [1],
-						focusCurrentId: 1
-					},
-					1: {
-						xid: 1001,
-						rc: [5, 5, 790, 590],
-						parentId: 0
-					}
-				},
-				screens: {
-					0: {
-						xidRoot: screen0_xidRoot,
-						width: 800,
-						height: 600,
-						desktopCurrentId: 0
-					}
-				},
-				desktopIds: [0],
-				screenCurrentId: 0,
-				focusCurrentId: 1,
-				x11: {
-					focusXid: 1001,
-					desktopNum: 0
-				}
-			});
 			//console.log(diff(nextState, expected1));
-			expect(nextState).to.equal(expected1);
+			expect(state1).to.equal(state111);
+
+
+			const widget2 = {
+				xid: 1002
+			};
+			const state2 = core.addWidget(state1, widget2);
+			console.log(JSON.stringify(state2.toJS(), null, '\t'));
+			console.log(diff(state2, state112));
+			expect(state2).to.equal(state112);
 		});
 	});
 });
