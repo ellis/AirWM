@@ -76,8 +76,7 @@ describe('application logic', () => {
 					},
 					1: {
 						xid: 1001,
-						//width: 800,
-						//height: 600,
+						rc: [5, 5, 790, 590],
 						parentId: 0
 					}
 				},
