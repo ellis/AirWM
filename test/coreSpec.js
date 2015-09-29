@@ -48,7 +48,6 @@ describe('application logic', () => {
 			});
 			//console.log(JSON.stringify(nextState.toJS(), null, '\t'));
 			//console.log(diff(nextState, expected1));
-			console.log(ex);
 			expect(state).to.equal(ex.state111);
 		});
 
