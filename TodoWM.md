@@ -1,3 +1,5 @@
+# Todos
+
 * [x] maximize the "Desktop" type window
 * [x] restructure classes so that there is one Screen for each screen and a separate list of workspaces
 * [x] automatically make space for `_NET_WM_WINDOW_TYPE_DOCK`, such as lxqt-panel
@@ -14,6 +16,10 @@ Later:
 * [ ] allow for different desktops on different workspaces
 * [ ] figure out some form of 'show desktop' functionality
 * [ ] rename 'forEachWindow()'
+
+# Notes
+
+* <http://teropa.info/blog/2015/09/10/full-stack-redux-tutorial.html>
 
 # Features I'd like
 

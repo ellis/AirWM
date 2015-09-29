@@ -30,6 +30,7 @@
     "keysym": "0.0.6",
     "lodash": "^3.10.1",
     "redux": "^3.0.2",
+    "socket.io": "^1.3.7",
     "winston": "0.8.3",
     "x11": "1.0.2"
   },
@@ -41,6 +42,7 @@
     "should": "*"
   },
   "scripts": {
+    "start": "babel-node index.js",
     "test": "mocha --compilers js:babel/register --require ./test/test_helper.js --recursive",
     "test:watch": "npm run test -- --watch"
   }
