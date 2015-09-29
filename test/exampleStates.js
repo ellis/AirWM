@@ -39,8 +39,10 @@ export const state111 = fromJS({
 		},
 		1: {
 			xid: 1001,
+			parentId: 0,
 			rc: [5, 5, 790, 590],
-			parentId: 0
+			desktopNum: 0,
+			visible: true
 		}
 	},
 	screens: {
@@ -73,12 +75,16 @@ export const state112 = fromJS({
 		1: {
 			xid: 1001,
 			parentId: 0,
-			rc: [5, 5, 392, 590]
+			rc: [5, 5, 392, 590],
+			desktopNum: 0,
+			visible: true
 		},
 		2: {
 			xid: 1002,
 			parentId: 0,
-			rc: [402, 5, 392, 590]
+			rc: [402, 5, 392, 590],
+			desktopNum: 0,
+			visible: true
 		}
 	},
 	screens: {

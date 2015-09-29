@@ -1,10 +1,10 @@
 # Todos
 
-* [x] maximize the "Desktop" type window
-* [x] restructure classes so that there is one Screen for each screen and a separate list of workspaces
-* [x] automatically make space for `_NET_WM_WINDOW_TYPE_DOCK`, such as lxqt-panel
-* [x] supply list of windows to wmctrl (`_NET_CLIENT_LIST` or `_WIN_CLIENT_LIST`)
-* [ ] Container.hide() should also hide desktop and docks
+* [ ] print state to console after every change, for debugging
+* [ ] catch state changes so that new windows are displayed
+* [ ] maximize the "Desktop" type window
+* [ ] automatically make space for `_NET_WM_WINDOW_TYPE_DOCK`, such as lxqt-panel
+* [ ] supply list of windows to wmctrl (`_NET_CLIENT_LIST` or `_WIN_CLIENT_LIST`)
 * [ ] put background and docks onto Screen instead of Workspace
 * [ ] `_NET_CLIENT_LIST_STACKING`
 * [ ] `_NET_ACTIVE_WINDOW`

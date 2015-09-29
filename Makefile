@@ -1,7 +1,12 @@
-.PHONY:run
-run: lib/airwm.js
+.PHONY: run run2
+
+run:
 	Xephyr :1 -ac -screen 800x600 &
 	DISPLAY=:1 node lib/index.js &
+
+run2:
+	Xephyr :1 -ac -screen 800x600 &
+	DISPLAY=:1 ./node_modules/.bin/babel-node lib/seawm.js &
 
 kill:
 	killall Xephyr

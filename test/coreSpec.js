@@ -46,9 +46,11 @@ describe('application logic', () => {
 			it('should add window to the current desktop', () => {
 				expect(state.getIn(['widgets', '0', 'childIds'])).to.equal(List.of(1));
 			});
-			//console.log(JSON.stringify(nextState.toJS(), null, '\t'));
-			//console.log(diff(nextState, expected1));
-			expect(state).to.equal(ex.state111);
+			it('should equal fully specified state', () => {
+				//console.log(JSON.stringify(nextState.toJS(), null, '\t'));
+				//console.log(diff(nextState, expected1));
+				expect(state).to.equal(ex.state111);
+			});
 		});
 
 		const widget2 = {
@@ -65,9 +67,11 @@ describe('application logic', () => {
 			it('should add window to the current desktop', () => {
 				expect(state.getIn(['widgets', '0', 'childIds'])).to.equal(List.of(1, 2));
 			});
-			//console.log(JSON.stringify(nextState.toJS(), null, '\t'));
-			//console.log(diff(nextState, expected1));
-			expect(state).to.equal(ex.state112);
+			it('should equal fully specified state', () => {
+				//console.log(JSON.stringify(nextState.toJS(), null, '\t'));
+				//console.log(diff(nextState, expected1));
+				expect(state).to.equal(ex.state112);
+			});
 		});
 	});
 });
