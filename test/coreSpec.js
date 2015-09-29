@@ -12,8 +12,7 @@ const state110 = Immutable.fromJS({
 		0: {
 			name: "web",
 			screenId: 0,
-			width: 800,
-			height: 600,
+			rc: [0, 0, 800, 600],
 			layout: "tile-right"
 		}
 	},
@@ -57,37 +56,6 @@ describe('application logic', () => {
 		});
 	});
 
-	describe('setContainers', () => {
-		it('adds the containers to the state', () => {
-			const state = Map();
-			const containers = {
-				0: {
-					name: "web"
-				}
-			};
-			const nextState = core.setContainers(state, containers);
-			expect(nextState).to.equal(Map({
-				containers: Map(containers)
-			}));
-		});
-	});
-
-	describe('setScreens', () => {
-		it('adds the screens to the state', () => {
-			const state = Map();
-			const screens = {
-				0: {
-					width: 800,
-					height: 600
-				}
-			};
-			const nextState = core.setScreens(state, screens);
-			expect(nextState).to.equal(Map({
-				screens: Map(screens)
-			}));
-		});
-	});
-
 	describe('addXwin', () => {
 		it('adds an X11 window to the state', () => {
 			//console.log(Immutable);
@@ -101,8 +69,7 @@ describe('application logic', () => {
 					0: {
 						name: "web",
 						screenId: 0,
-						width: 800,
-						height: 600,
+						rc: [0, 0, 800, 600],
 						layout: "tile-right",
 						childIds: [1],
 						focusCurrentId: 1
