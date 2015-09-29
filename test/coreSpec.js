@@ -11,7 +11,7 @@ const state110 = Immutable.fromJS({
 	widgets: {
 		0: {
 			name: "web",
-			screen: 0,
+			screenId: 0,
 			width: 800,
 			height: 600,
 			layout: "tile-right"
@@ -22,14 +22,14 @@ const state110 = Immutable.fromJS({
 			xidRoot: screen0_xidRoot,
 			width: 800,
 			height: 600,
-			desktopCurrent: 0
+			desktopCurrentId: 0
 		}
 	},
-	desktops: [0],
-	screenCurrent: 0,
+	desktopIds: [0],
+	screenCurrentId: 0,
 	x11: {
 		focusXid: screen0_xidRoot,
-		desktopId: 0
+		desktopNum: 0
 	}
 });
 
@@ -78,18 +78,18 @@ describe('application logic', () => {
 				widgets: {
 					0: {
 						name: "web",
-						screen: 0,
+						screenId: 0,
 						width: 800,
 						height: 600,
 						layout: "tile-right",
-						children: [1],
-						focusCurrent: 1
+						childIds: [1],
+						focusCurrentId: 1
 					},
 					1: {
 						xid: 1001,
 						//width: 800,
 						//height: 600,
-						parent: 0
+						parentId: 0
 					}
 				},
 				screens: {
@@ -97,15 +97,15 @@ describe('application logic', () => {
 						xidRoot: screen0_xidRoot,
 						width: 800,
 						height: 600,
-						desktopCurrent: 0
+						desktopCurrentId: 0
 					}
 				},
-				desktops: [0],
-				screenCurrent: 0,
-				focusCurrent: 1,
+				desktopIds: [0],
+				screenCurrentId: 0,
+				focusCurrentId: 1,
 				x11: {
 					focusXid: 1001,
-					desktopId: 0
+					desktopNum: 0
 				}
 			});
 			//console.log(diff(nextState, expected1));
