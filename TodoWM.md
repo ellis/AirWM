@@ -6,6 +6,7 @@
 * [x] catch state changes so that new windows are displayed
 * [x] handle Win-K
 * [ ] when window is closed, remove it from layout
+* [ ] change commandHandlers() so that it passes actions to store.dispatch()
 * [ ] automatically make space for `_NET_WM_WINDOW_TYPE_DOCK`, such as lxqt-panel
 * [ ] maximize the "Desktop" type window
 * [ ] save state to console after every change, for debugging

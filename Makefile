@@ -12,5 +12,9 @@ miniwm1:
 	Xephyr :1 -ac -screen 800x600 &
 	DISPLAY=:1 ./node_modules/.bin/babel-node src/miniwm1.js &
 
+examplewm:
+	Xephyr :1 -ac -screen 800x600 &
+	DISPLAY=:1 node ./node_modules/x11/examples/windowmanager/wm.js &
+
 kill:
 	killall Xephyr
