@@ -46,7 +46,7 @@ describe('application logic', () => {
 			it('should add window to the current desktop', () => {
 				expect(state.getIn(['widgets', '0', 'childIds'])).to.equal(List.of(1));
 				expect(state.getIn(['widgets', '1', 'parentId'])).to.equal(0);
-				expect(state.getIn(['widgets', '1', 'desktopNum'])).to.equal(0);
+				expect(state.getIn(['x11', 'windowSettings', '1', 'desktopNum'])).to.equal(0);
 			});
 			it('should make the window visible', () => {
 				expect(state.getIn(['widgets', '1', 'visible'])).to.equal(true);
@@ -72,7 +72,7 @@ describe('application logic', () => {
 			it('should add window to the current desktop', () => {
 				expect(state.getIn(['widgets', '0', 'childIds'])).to.equal(List.of(1, 2));
 				expect(state.getIn(['widgets', '2', 'parentId'])).to.equal(0);
-				expect(state.getIn(['widgets', '2', 'desktopNum'])).to.equal(0);
+				expect(state.getIn(['x11', 'windowSettings', '2', 'desktopNum'])).to.equal(0);
 			});
 			it('should make the window visible', () => {
 				expect(state.getIn(['widgets', '2', 'visible'])).to.equal(true);

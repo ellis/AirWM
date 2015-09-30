@@ -43,7 +43,6 @@ export const state111 = fromJS({
 			xid: 1001,
 			parentId: 0,
 			rc: [5, 5, 790, 590],
-			desktopNum: 0,
 			visible: true
 		}
 	},
@@ -64,9 +63,27 @@ export const state111 = fromJS({
 			SetInputFocus: [1001]
 		},
 		windowSettings: {
-			1: {
-				xid: 1001,
-				visible: true
+			"1": {
+				"xid": 1001,
+				"visible": true,
+				"desktopNum": 0,
+				"ChangeWindowAttributes": [
+					1001,
+					{
+						"borderPixel": 0
+					}
+				],
+				"ConfigureWindow": [
+					1001,
+					{
+						x: 5,
+						y: 5,
+						"width": 780,
+						"height": 580,
+						"borderWidth": 5,
+						"stackMode": 0
+					}
+				]
 			}
 		}
 	}
@@ -86,14 +103,12 @@ export const state112 = fromJS({
 			xid: 1001,
 			parentId: 0,
 			rc: [5, 5, 392, 590],
-			desktopNum: 0,
 			visible: true
 		},
 		2: {
 			xid: 1002,
 			parentId: 0,
 			rc: [402, 5, 392, 590],
-			desktopNum: 0,
 			visible: true
 		}
 	},
@@ -114,13 +129,49 @@ export const state112 = fromJS({
 			SetInputFocus: [1001]
 		},
 		windowSettings: {
-			1: {
-				xid: 1001,
-				visible: true
+			"1": {
+				"xid": 1001,
+				"visible": true,
+				"desktopNum": 0,
+				"ChangeWindowAttributes": [
+					1001,
+					{
+						"borderPixel": 0
+					}
+				],
+				"ConfigureWindow": [
+					1001,
+					{
+						"x": 5,
+						"y": 5,
+						"width": 382,
+						"height": 580,
+						"borderWidth": 5,
+						"stackMode": 0
+					}
+				]
 			},
-			2: {
-				xid: 1002,
-				visible: true
+			"2": {
+				"xid": 1002,
+				"visible": true,
+				"desktopNum": 0,
+				"ChangeWindowAttributes": [
+					1002,
+					{
+						"borderPixel": 0
+					}
+				],
+				"ConfigureWindow": [
+					1002,
+					{
+						"x": 402,
+						"y": 5,
+						"width": 382,
+						"height": 580,
+						"borderWidth": 5,
+						"stackMode": 0
+					}
+				]
 			}
 		}
 	}
