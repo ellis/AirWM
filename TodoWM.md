@@ -1,6 +1,8 @@
 # Todos
 
 * [ ] print state to console after every change, for debugging
+* [ ] handle X11 focus changes
+* [ ] move X11 window info to core
 * [ ] catch state changes so that new windows are displayed
 * [ ] maximize the "Desktop" type window
 * [ ] automatically make space for `_NET_WM_WINDOW_TYPE_DOCK`, such as lxqt-panel

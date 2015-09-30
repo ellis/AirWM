@@ -38,4 +38,14 @@ describe('reducer', () => {
 		const state1 = reducer(ex.state110, action);
 		expect(state1).to.equal(ex.state111);
 	});
+
+	it('handles setFocusWidget', () => {
+		const action1 = {
+			type: 'setFocusWidget',
+			id: 2
+		};
+		const state1 = reducer(ex.state112, action1);
+		expect(state1.getIn(['focusCurrentId'])).to.equal(2);
+		expect(state1.getIn(['widgets', '0', 'focusCurrentId'])).to.equal(2);
+	});
 });
