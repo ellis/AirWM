@@ -13,6 +13,7 @@
 * [ ] put desktop on all workspaces
 * [ ] Container: redraw functionality should be moved to Layout objects
 * [ ] Window: the `move` and `moveFocus` functions should perhaps be moved to Container
+* [ ] look into using XCG (or whatever it's called) instead of libx11
 
 Later:
 * [ ] allow for different desktops on different workspaces

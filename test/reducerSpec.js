@@ -48,4 +48,18 @@ describe('reducer', () => {
 		expect(state1.getIn(['focusCurrentId'])).to.equal(2);
 		expect(state1.getIn(['widgets', '0', 'focusCurrentId'])).to.equal(2);
 	});
+
+	it('handles setX11ScreenColors', () => {
+		const action1 = {
+			type: 'setX11ScreenColors',
+			screenId: 0,
+			colors: {
+				'a': 1,
+				'b': 2
+			}
+		};
+		const state1 = reducer(ex.state112, action1);
+		expect(state1.getIn(['x11', 'screens', '0', 'colors', 'a'])).to.equal(1);
+		expect(state1.getIn(['x11', 'screens', '0', 'colors', 'b'])).to.equal(2);
+	});
 });
