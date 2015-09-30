@@ -22,8 +22,10 @@ export const state110 = fromJS({
 	desktopIds: [0],
 	screenCurrentId: 0,
 	x11: {
-		focusXid: screen0_xidRoot,
-		desktopNum: 0
+		desktopNum: 0,
+		wmSettings: {
+			SetInputFocus: [screen0_xidRoot]
+		}
 	}
 });
 
@@ -57,8 +59,16 @@ export const state111 = fromJS({
 	screenCurrentId: 0,
 	focusCurrentId: 1,
 	x11: {
-		focusXid: 1001,
-		desktopNum: 0
+		desktopNum: 0,
+		wmSettings: {
+			SetInputFocus: [1001]
+		},
+		windowSettings: {
+			1: {
+				xid: 1001,
+				visible: true
+			}
+		}
 	}
 });
 
@@ -99,7 +109,19 @@ export const state112 = fromJS({
 	screenCurrentId: 0,
 	focusCurrentId: 1,
 	x11: {
-		focusXid: 1001,
-		desktopNum: 0
+		desktopNum: 0,
+		wmSettings: {
+			SetInputFocus: [1001]
+		},
+		windowSettings: {
+			1: {
+				xid: 1001,
+				visible: true
+			},
+			2: {
+				xid: 1002,
+				visible: true
+			}
+		}
 	}
 });

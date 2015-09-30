@@ -26,7 +26,7 @@ describe('application logic', () => {
 			];
 			const state = core.initialize(desktops, screens);
 			//console.log(state);
-			//console.log(diff(state, state110));
+			//console.log(diff(state, ex.state110));
 			expect(state).is.equal(ex.state110);
 		});
 	});
@@ -41,7 +41,7 @@ describe('application logic', () => {
 			it('should set focus to that window', () => {
 				expect(state.getIn(['focusCurrentId'])).to.equal(1);
 				expect(state.getIn(['widgets', '0', 'focusCurrentId'])).to.equal(1);
-				expect(state.getIn(['x11', 'focusXid'])).to.equal(1001);
+				expect(state.getIn(['x11', 'wmSettings', 'SetInputFocus'])).to.equal(List.of(1001));
 			});
 			it('should add window to the current desktop', () => {
 				expect(state.getIn(['widgets', '0', 'childIds'])).to.equal(List.of(1));
@@ -52,8 +52,8 @@ describe('application logic', () => {
 				expect(state.getIn(['widgets', '1', 'visible'])).to.equal(true);
 			});
 			it('should equal fully specified state', () => {
-				//console.log(JSON.stringify(nextState.toJS(), null, '\t'));
-				//console.log(diff(nextState, expected1));
+				//console.log(JSON.stringify(state.toJS(), null, '\t'));
+				//console.log(diff(state, ex.state111));
 				expect(state).to.equal(ex.state111);
 			});
 		});
@@ -67,7 +67,7 @@ describe('application logic', () => {
 			it('should leave the focus on the first window', () => {
 				expect(state.getIn(['focusCurrentId'])).to.equal(1);
 				expect(state.getIn(['widgets', '0', 'focusCurrentId'])).to.equal(1);
-				expect(state.getIn(['x11', 'focusXid'])).to.equal(1001);
+				expect(state.getIn(['x11', 'wmSettings', 'SetInputFocus'])).to.equal(List.of(1001));
 			});
 			it('should add window to the current desktop', () => {
 				expect(state.getIn(['widgets', '0', 'childIds'])).to.equal(List.of(1, 2));
@@ -78,8 +78,8 @@ describe('application logic', () => {
 				expect(state.getIn(['widgets', '2', 'visible'])).to.equal(true);
 			});
 			it('should equal fully specified state', () => {
-				//console.log(JSON.stringify(nextState.toJS(), null, '\t'));
-				//console.log(diff(nextState, expected1));
+				//console.log(JSON.stringify(state.toJS(), null, '\t'));
+				//console.log(diff(state, ex.state112));
 				expect(state).to.equal(ex.state112);
 			});
 		});
