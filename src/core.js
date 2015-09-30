@@ -3,6 +3,7 @@ import assert from 'assert';
 import {List, Map, fromJS} from 'immutable';
 import Immutable from 'immutable';
 //import diff from 'immutablediff';
+import x11 from 'x11';
 
 export const empty = Map();
 
@@ -230,13 +231,18 @@ function updateX11(state) {
 					: screenX11.getIn(['colors', 'normal'], 0);
 				const rc = w.get('rc', List([0, 0, 0, 0])).toJS();
 				const windowType = w.get('windowType');
+				const eventType = _.get({
+					'DESKTOP': undefined,
+					'DOCK': undefined,
+				}, windowType, x11.eventMask.EnterWindow);
 
 				info.desktopNum = state.get('desktopIds').indexOf(desktopId);
 				info.ChangeWindowAttributes = [
 					xid,
-					{
-						borderPixel: color
-					}
+					_.merge({}, {
+						borderPixel: color,
+						eventMask: x11.eventMask.EnterWindow
+					})
 				];
 				info.ConfigureWindow = [
 					xid,

@@ -4,7 +4,7 @@ import assert from 'assert';
 import {List, Map, fromJS} from 'immutable';
 var fs = require("fs");
 import EWMH from 'ewmh';
-var x11	= require('x11');
+import x11 from 'x11';
 var exec   = require('child_process').exec;
 var keysym = require('keysym');
 
