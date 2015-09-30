@@ -165,16 +165,18 @@ var commandHandler = function(command) {
 				}
 				break;
 			}
-			case "SelectFramePrev":
-				if( global.focus_window !== null ) {
-					const ws = screens[0].workspace.getWindowList();
-					const i = ws.indexOf(global.focus_window);
-					if (i >= 0) {
-						const j = (i == 0) ? ws.length - 1 : i - 1;
-						ws[j].focus();
-					}
+			case "SelectFramePrev": {
+				const state = store.getState().toJS();
+				if (state.focusCurrentId >= 0) {
+					const desktopId = state.screens[state.screenCurrentId.toString()].desktopCurrentId;
+					const childIds = state.widgets[desktopId.toString()].childIds;
+					const i = childIds.indexOf(state.focusCurrentId);
+					assert(i >= 0);
+					const j = (i == 0) ? childIds.length - 1 : i - 1;
+					store.dispatch({type: 'setFocusWidget', id: childIds[j]});
 				}
 				break;
+			}
 			case "SwitchWorkspaceRight":
 				workspaces.moveRight();
 				break;

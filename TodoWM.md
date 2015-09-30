@@ -4,9 +4,9 @@
 * [x] move 'desktopNum' to updateX11
 * [x] handle X11 focus changes
 * [x] catch state changes so that new windows are displayed
+* [x] handle Win-K
 * [ ] when window is closed, remove it from layout
 * [ ] automatically make space for `_NET_WM_WINDOW_TYPE_DOCK`, such as lxqt-panel
-* [ ] handle Win-K
 * [ ] maximize the "Desktop" type window
 * [ ] save state to console after every change, for debugging
 * [ ] supply list of windows to wmctrl (`_NET_CLIENT_LIST` or `_WIN_CLIENT_LIST`)
