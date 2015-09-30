@@ -8,8 +8,8 @@ var exec   = require('child_process').exec;
 var keysym = require('keysym');
 
 // Custom libraries
-var conversion = require('./conversion');
-var logger	 = require('./logger').logger;
+var conversion = require('../lib/conversion');
+var logger	 = require('../lib/logger').logger;
 import {empty} from './core.js';
 import makeStore from './store.js';
 

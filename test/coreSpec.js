@@ -3,7 +3,7 @@ import Immutable from 'immutable';
 import {expect} from 'chai';
 import diff from 'immutablediff';
 
-import * as core from '../lib/core.js';
+import * as core from '../src/core.js';
 import * as ex from './exampleStates.js';
 
 

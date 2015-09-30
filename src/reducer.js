@@ -3,7 +3,7 @@ import assert from 'assert';
 import {List, Map} from 'immutable';
 import Immutable from 'immutable';
 
-import * as core from '../lib/core.js';
+import * as core from './core.js';
 
 
 export default function reducer(state = core.empty, action) {

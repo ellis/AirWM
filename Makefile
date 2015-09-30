@@ -6,7 +6,7 @@ run:
 
 run2:
 	Xephyr :1 -ac -screen 800x600 &
-	DISPLAY=:1 ./node_modules/.bin/babel-node lib/seawm.js &
+	DISPLAY=:1 ./node_modules/.bin/babel-node src/seawm.js &
 
 kill:
 	killall Xephyr

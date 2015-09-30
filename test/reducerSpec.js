@@ -3,7 +3,7 @@ import Immutable from 'immutable';
 import {expect} from 'chai';
 import diff from 'immutablediff';
 
-import reducer from '../lib/reducer.js';
+import reducer from '../src/reducer.js';
 import * as ex from './exampleStates.js';
 
 describe('reducer', () => {

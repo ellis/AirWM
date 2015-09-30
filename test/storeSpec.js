@@ -3,9 +3,9 @@ import Immutable from 'immutable';
 import {expect} from 'chai';
 import diff from 'immutablediff';
 
-import makeStore from '../lib/store.js';
+import makeStore from '../src/store.js';
 import * as ex from './exampleStates.js';
-import {empty} from '../lib/core.js';
+import {empty} from '../src/core.js';
 
 describe('store', () => {
 	it('is a Redux store configured with the correct reducer', () => {
