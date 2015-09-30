@@ -1,6 +1,7 @@
 # Todos
 
 * [ ] move X11 window info to core
+* [ ] move 'desktopNum' to updateX11
 * [ ] print state to console after every change, for debugging
 * [ ] handle X11 focus changes
 * [ ] catch state changes so that new windows are displayed
