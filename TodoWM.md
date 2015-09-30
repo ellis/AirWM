@@ -20,9 +20,11 @@ Later:
 * [ ] allow for different desktops on different workspaces
 * [ ] figure out some form of 'show desktop' functionality
 * [ ] rename 'forEachWindow()'
+* [ ] check out features at <http://awesome.naquadah.org/>
 
 # Notes
 
+* <http://seasonofcode.com/posts/how-x-window-managers-work-and-how-to-write-one-part-i.html>
 * <http://teropa.info/blog/2015/09/10/full-stack-redux-tutorial.html>
 
 # Features I'd like

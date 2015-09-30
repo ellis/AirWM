@@ -1,5 +1,6 @@
 // External libraries
 import _ from 'lodash';
+import assert from 'assert';
 import {List, Map, fromJS} from 'immutable';
 var fs = require("fs");
 import EWMH from 'ewmh';
@@ -24,14 +25,23 @@ var programs	= config.startup_applications;
 var keybindings = config.keybindings;
 var ks2kc;
 
+/*
 function forEachWindow(fn) {
-	const state = store.getState().toJS();
-	for (let w of state.widgets) {
-		if (w.xid) {
-			fn(w);
+	try {
+		const state = store.getState().toJS();
+		for (let w of state.widgets) {
+			if (w.has('xid')) {
+				fn(w);
+			}
 		}
 	}
+	catch (e) {
+		logger.error("forEachWindow: ERROR");
+		logger.error(e.message);
+		logger.error(e.stack);
+	}
 }
+*/
 
 var changeWindowAttributeErrorHandler = function(err) {
 	if( err.error === 10 ) {
@@ -43,28 +53,35 @@ var changeWindowAttributeErrorHandler = function(err) {
 }
 
 var grabKeyBindings = function(ks2kc, display) {
-	logger.debug("Grabbing all the keybindings which are configured to have actions in the config.js file.");
-	keybindings.forEach(function(keyConfiguration){
-		var keyCode = ks2kc[keysym.fromName(keyConfiguration.key).keysym];
-		keyConfiguration.mod = 0;
-		for( var i in keyConfiguration.modifier ) {
-			keyConfiguration.mod = ( keyConfiguration.mod | conversion.translateModifiers(keyConfiguration.modifier[i]) );
-		}
-		logger.debug("Grabbing key '%s'.", keyCode);
-		// Grab the key with each combination of capslock(2), numlock(16) and scrollock (128)
-		var combination = [0,2,16,18,128,130,144,146];
-		for( var code in combination ) {
-			if( (keyConfiguration.mod&combination[code]) !== 0 ) continue;
-			global.X.GrabKey(
-				display.screen[0].root,
-				0, // Don't report events to the window
-				keyConfiguration.mod | combination[code],
-				keyCode,
-				1, // async pointer mode
-				1  // async keyboard mode
-			);
-		}
-	});
+	logger.info("Grabbing all the keybindings which are configured to have actions in the config.js file.");
+	try {
+		keybindings.forEach(function(keyConfiguration){
+			var keyCode = ks2kc[keysym.fromName(keyConfiguration.key).keysym];
+			keyConfiguration.mod = 0;
+			for( var i in keyConfiguration.modifier ) {
+				keyConfiguration.mod = ( keyConfiguration.mod | conversion.translateModifiers(keyConfiguration.modifier[i]) );
+			}
+			logger.debug("Grabbing key '%s'.", keyCode);
+			// Grab the key with each combination of capslock(2), numlock(16) and scrollock (128)
+			var combination = [0,2,16,18,128,130,144,146];
+			for( var code in combination ) {
+				if( (keyConfiguration.mod&combination[code]) !== 0 ) continue;
+				global.X.GrabKey(
+					display.screen[0].root,
+					0, // Don't report events to the window
+					keyConfiguration.mod | combination[code],
+					keyCode,
+					1, // async pointer mode
+					1  // async keyboard mode
+				);
+			}
+		});
+	}
+	catch (e) {
+		logger.error("grabKeyBindings: ERROR");
+		logger.error(e.message);
+		logger.error(e.stack);
+	}
 }
 
 var errorHandler = function(err){
@@ -76,10 +93,12 @@ function widgetDestroy(w) {
 	global.X.DestroyWindow(w.xid);
 }
 
+/*
 var closeAllWindows = function(close_id) {
 	logger.info("Closing all windows.");
 	forEachWindow(widgetDestroy);
 }
+*/
 
 /*
 // when all windows have been closed, set the focus to the root window
@@ -93,79 +112,83 @@ var setFocusToRootIfNecessary = function(){
 
 var commandHandler = function(command) {
 	logger.info("Launching airwm-command: '%s'.", command);
-	if (!_.isArray(command))
-		command = [command];
-	switch(command[0]){
-		case "Shutdown":
-			closeAllWindows();
-			process.exit(0);
-			break;
-		case "CloseWindow": {
-			const state = store.getState().toJS();
-			if (state.focusCurrentId) {
-				const w = state.widgets[state.focusCurrentId.toString()];
-				widgetDestroy(w);
+	try {
+		if (!_.isArray(command))
+			command = [command];
+		switch(command[0]){
+			case "Shutdown":
+				closeAllWindows();
+				process.exit(0);
+				break;
+			case "CloseWindow": {
+				const state = store.getState().toJS();
+				if (state.focusCurrentId) {
+					const w = state.widgets[state.focusCurrentId.toString()];
+					widgetDestroy(w);
+				}
+				break;
 			}
-			break;
+			case "SwitchTilingMode":
+				if( global.focus_window !== null ) {
+					global.focus_window.parent.switchTilingMode();
+				}
+				break;
+			case "MoveWindowLeft":
+				if( global.focus_window !== null ) {
+					global.focus_window.moveLeft();
+				}
+				break;
+			case "MoveWindowDown":
+				if( global.focus_window !== null ) {
+					global.focus_window.moveDown();
+				}
+				break;
+			case "MoveWindowUp":
+				if( global.focus_window !== null ) {
+					global.focus_window.moveUp();
+				}
+				break;
+			case "MoveWindowRight":
+				if( global.focus_window !== null ) {
+					global.focus_window.moveRight();
+				}
+				break;
+			case "SelectFrameNext": {
+				const state = store.getState().toJS();
+				if (state.focusCurrentId >= 0) {
+					const desktopId = state.screens[state.screenCurrentId.toString()].desktopCurrentId;
+					const childIds = state.widgets[desktopId.toString()].childIds;
+					const i = childIds.indexOf(state.focusCurrentId);
+					assert(i >= 0);
+					const j = (i + 1) % childIds.length;
+					store.dispatch({type: 'setFocusWidget', id: childIds[j]});
+				}
+				break;
+			}
+			case "SelectFramePrev":
+				if( global.focus_window !== null ) {
+					const ws = screens[0].workspace.getWindowList();
+					const i = ws.indexOf(global.focus_window);
+					if (i >= 0) {
+						const j = (i == 0) ? ws.length - 1 : i - 1;
+						ws[j].focus();
+					}
+				}
+				break;
+			case "SwitchWorkspaceRight":
+				workspaces.moveRight();
+				break;
+			case "SwitchWorkspaceLeft":
+				workspaces.moveLeft();
+				break;
+			default:
+				break;
 		}
-		case "SwitchTilingMode":
-			if( global.focus_window !== null ) {
-				global.focus_window.parent.switchTilingMode();
-			}
-			break;
-		case "MoveWindowLeft":
-			if( global.focus_window !== null ) {
-				global.focus_window.moveLeft();
-			}
-			break;
-		case "MoveWindowDown":
-			if( global.focus_window !== null ) {
-				global.focus_window.moveDown();
-			}
-			break;
-		case "MoveWindowUp":
-			if( global.focus_window !== null ) {
-				global.focus_window.moveUp();
-			}
-			break;
-		case "MoveWindowRight":
-			if( global.focus_window !== null ) {
-				global.focus_window.moveRight();
-			}
-			break;
-		case "SelectFrameNext":
-			console.log("YP")
-			if( global.focus_window !== null ) {
-				console.log(1);
-				const ws = screens[0].workspace.getWindowList();
-				console.log(2);
-				const i = ws.indexOf(global.focus_window);
-				console.log(3);
-				if (i >= 0) {
-					console.log(3);
-					const j = (i + 1) % ws.length;
-					ws[j].focus();
-				}
-			}
-			break;
-		case "SelectFramePrev":
-			if( global.focus_window !== null ) {
-				const ws = screens[0].workspace.getWindowList();
-				const i = ws.indexOf(global.focus_window);
-				if (i >= 0) {
-					const j = (i == 0) ? ws.length - 1 : i - 1;
-					ws[j].focus();
-				}
-			}
-			break;
-		case "SwitchWorkspaceRight":
-			workspaces.moveRight();
-			break;
-		case "SwitchWorkspaceLeft":
-			workspaces.moveLeft();
-			break;
-		default:
-			break;
+	}
+	catch (e) {
+		logger.error("commandHandler: ERROR");
+		logger.error(e.message);
+		logger.error(e.stack);
 	}
 }
 
@@ -175,7 +198,7 @@ var execHandler = function(program) {
 }
 
 var keyPressHandler = function(ev){
-	logger.debug("KeyPressHandler is going through all possible keybindings.");
+	logger.info("KeyPressHandler is going through all possible keybindings.");
 	for(var i = 0; i < keybindings.length; ++i){
 		var binding =  keybindings[i];
 		// Check if this is the binding which we are seeking.
@@ -192,7 +215,7 @@ var keyPressHandler = function(ev){
 }
 
 var destroyNotifyHandler = function(ev){
-	logger.debug("DestroyNotifier got triggered, removing the window that got destroyed.");
+	logger.info("DestroyNotifier got triggered, removing the window that got destroyed.");
 	forEachWindow(function(window) {
 		if( window.xid === ev.wid ) {
 			window.parent.destroyChild(window);
@@ -266,182 +289,182 @@ var eventHandler = function(ev){
 }
 
 function handleFocusEvent(ev) {
-	let state = store.getState();
-	var id;
-	state.get('widgets').forEach((w, key) => {
-		if (w.xid === ev.wid) {
-			id = parseInt(key);
-			return false;
+	try {
+		let state = store.getState();
+		var id;
+		state.get('widgets').forEach((w, key) => {
+			if (w.get('xid') === ev.wid) {
+				id = parseInt(key);
+				return false;
+			}
+		});
+		if (id >= 0) {
+			store.dispatch({type: 'setFocusWidget', id: id});
 		}
-	});
-	if (id >= 0) {
-		store.dispatch({type: 'setFocusWidget', id: id});
+	} catch (e) {
+		logger.error("handleFocusEvent: ERROR:")
+		logger.error(e.message());
+		logger.error(e.stack());
 	}
 }
 
 //creates the logDir directory when it doesn't exist (otherwise Winston fails)
-var initLogger = function (logDir){
+function initLogger(logDir) {
 	if(!fs.existsSync(logDir))
 		fs.mkdirSync(logDir);
 }
 
-function getWidgetDesktopId(state, w, id = -1) {
-	if (w.hasOwnProperty('screenId'))
-		return id;
-	else if (w.hasOwnProperty('parentId'))
-		return getWidgetDesktopId(state, state.widgets[w.parentId.toString()], w.parentId);
-	else
-		return -1;
-}
-
-function getWidgetScreenId(state, w) {
-	if (w.hasOwnProperty('screenId'))
-		return w.screenId;
-	else if (w.hasOwnProperty('parentId'))
-		return getWidgetScreenId(state, state.widgets[w.parentId.toString()]);
-	else
-		return -1;
-}
-
 let statePrev = empty;
 function handleStateChange() {
-	const state = store.getState();
-	let windowSettingsPrev = statePrev.getIn(['x11', 'windowSettings'], Map());
-	state.getIn(['x11', 'windowSettings'], Map()).forEach((settings1, key) => {
-		windowSettingsPrev = windowSettingsPrev.delete(key);
-		const settings0 = statePrev.getIn(['x11', 'windowSettings', key], Map());
-		const xid = settings1.get('xid');
+	try {
+		const state = store.getState();
+		let windowSettingsPrev = statePrev.getIn(['x11', 'windowSettings'], Map());
+		state.getIn(['x11', 'windowSettings'], Map()).forEach((settings1, key) => {
+			windowSettingsPrev = windowSettingsPrev.delete(key);
+			const settings0 = statePrev.getIn(['x11', 'windowSettings', key], Map());
+			const xid = settings1.get('xid');
 
-		const ChangeWindowAttributes = settings1.get('ChangeWindowAttributes');
-		if (ChangeWindowAttributes !== settings0.get('ChangeWindowAttributes')) {
-			global.X.ChangeWindowAttributes.apply(global.X, ChangeWindowAttributes.toJS());
+			const ChangeWindowAttributes = settings1.get('ChangeWindowAttributes');
+			if (ChangeWindowAttributes !== settings0.get('ChangeWindowAttributes')) {
+				global.X.ChangeWindowAttributes.apply(global.X, ChangeWindowAttributes.toJS());
+			}
+
+			const ConfigureWindow = settings1.get('ConfigureWindow');
+			if (ConfigureWindow !== settings0.get('ConfigureWindow')) {
+				global.X.ConfigureWindow.apply(global.X, ConfigureWindow.toJS());
+			}
+
+			const visible = settings1.get('visible');
+			if (visible !== settings0.get('visible')) {
+				if (visible)
+					global.X.MapWindow(xid);
+				else
+					global.X.UnmapWindow(xid);
+			}
+		});
+
+		const SetInputFocus = state.getIn(['x11', 'wmSettings', 'SetInputFocus']);
+		if (SetInputFocus && SetInputFocus !== statePrev.getIn(['x11', 'wmSettings', 'SetInputFocus'])) {
+			console.log("SetInputFocus:", SetInputFocus);
+			global.X.SetInputFocus.apply(global.X, SetInputFocus.toJS());
 		}
 
-		const ConfigureWindow = settings1.get('ConfigureWindow');
-		if (ConfigureWindow !== settings0.get('ConfigureWindow')) {
-			global.X.ConfigureWindow.apply(global.X, ConfigureWindow.toJS());
-		}
+		windowSettingsPrev.forEach((settings, key) => {
+			const xid = settings.get('xid');
+			global.X.DestroyWindow(xid);
+		});
 
-		const visible = settings1.get('visible');
-		if (visible !== settings0.get('visible')) {
-			if (visible)
-				global.X.MapWindow(xid);
-			else
-				global.X.UnmapWindow(xid);
-		}
-	});
-
-	const SetInputFocus = state.getIn(['x11', 'wmSettings', 'SetInputFocus']);
-	if (SetInputFocus && SetInputFocus !== statePrev.getIn(['x11', 'wmSettings', 'SetInputFocus'])) {
-		console.log("SetInputFocus:", SetInputFocus);
-		global.X.SetInputFocus.apply(global.X, SetInputFocus.toJS());
+		statePrev = state;
+	} catch (e) {
+		logger.error("handleStateChange: ERROR:")
+		logger.error(e.message());
+		logger.error(e.stack());
 	}
-
-	windowSettingsPrev.forEach((settings, key) => {
-		const xid = settings.get('xid');
-		global.X.DestroyWindow(xid);
-	});
-
-	statePrev = state;
 }
 
 var airClientCreator = function(err, display) {
 	initLogger('logs');
 	logger.info("Initializing AirWM client.");
-	// Set the connection to the X server in global namespace
-	// as a hack since almost every file uses it
-	global.X = display.client;
+	try {
+		// Set the connection to the X server in global namespace
+		// as a hack since almost every file uses it
+		global.X = display.client;
 
-	const action1 = {
-		type: 'initialize',
-		desktops: [
-			{
-				name: "web",
-				layout: "tile-right"
+		const action1 = {
+			type: 'initialize',
+			desktops: [
+				{
+					name: "web",
+					layout: "tile-right"
+				}
+			],
+			screens: _.map(display.screen, (screen) => { return {
+				xidRoot: screen.root,
+				width: screen.pixel_width,
+				height: screen.pixel_height
+			}; })
+		};
+		store.dispatch(action1);
+
+		_.forEach(display.screen, (screen, i) => {
+			global.X.AllocColor( screen.default_colormap, 0x5E00, 0x9D00, 0xC800, function(err, color) {
+				store.dispatch({type: 'setX11ScreenColors', screenId: i, colors: {focus: color.pixel}});
+			});
+			global.X.AllocColor( screen.default_colormap, 0xDC00, 0xF000, 0xF700, function(err, color) {
+				store.dispatch({type: 'setX11ScreenColors', screenId: i, colors: {normal: color.pixel}});
+			});
+			global.X.AllocColor( screen.default_colormap, 0x0C00, 0x2C00, 0x5200, function(err, color) {
+				store.dispatch({type: 'setX11ScreenColors', screenId: i, colors: {alert: color.pixel}});
+			});
+		});
+
+
+		const min_keycode = display.min_keycode;
+		const max_keycode = display.max_keycode;
+		X.GetKeyboardMapping(min_keycode, max_keycode-min_keycode, function(err, key_list) {
+			ks2kc = conversion.buildKeyMap(key_list,min_keycode);
+
+			// Grab all key combinations which are specified in the configuration file.
+			grabKeyBindings(ks2kc,display);
+		});
+
+		ewmh = new EWMH(display.client, display.screen[0].root);
+
+		const eventMask = {
+			eventMask: x11.eventMask.SubstructureNotify   |
+					   x11.eventMask.SubstructureRedirect |
+					   x11.eventMask.ResizeRedirect
+		}
+
+		// By adding the substructure redirect you become the window manager.
+		logger.info("Registering AirWM as the current Window Manager.");
+		global.X.ChangeWindowAttributes(display.screen[0].root, eventMask, changeWindowAttributeErrorHandler);
+
+		ewmh.on('CurrentDesktop', function(d) {
+			console.log('Client requested current desktop to be: ' + d);
+			//screens[0].setWorkspace(d);
+		});
+
+		const SUPPORTED_ATOMS = [
+			'_NET_CURRENT_DESKTOP',
+			'_NET_NUMBER_OF_DESKTOPS',
+			'_NET_SUPPORTED',
+			//'_NET_WM_STATE_FULLSCREEN',
+			//'_NET_SUPPORTING_WM_CHECK',
+			//'_NET_WM_NAME',
+			//'_NET_WM_STRUT',
+			'_NET_WM_STATE',
+			'_NET_WM_STRUT_PARTIAL',
+			'_NET_WM_WINDOW_TYPE',
+			'_NET_WM_WINDOW_TYPE_DESKTOP',
+			'_NET_WM_WINDOW_TYPE_DOCK',
+			// _NET_WM_WINDOW_TYPE_TOOLBAR, _NET_WM_WINDOW_TYPE_MENU, _NET_WM_WINDOW_TYPE_UTILITY, _NET_WM_WINDOW_TYPE_SPLASH, _NET_WM_WINDOW_TYPE_DIALOG, _NET_WM_WINDOW_TYPE_DROPDOWN_MENU, _NET_WM_WINDOW_TYPE_POPUP_MENU, _NET_WM_WINDOW_TYPE_TOOLTIP, _NET_WM_WINDOW_TYPE_NOTIFICATION, _NET_WM_WINDOW_TYPE_COMBO, _NET_WM_WINDOW_TYPE_DND,
+			'_NET_WM_WINDOW_TYPE_NORMAL',
+		];
+		ewmh.set_supported(SUPPORTED_ATOMS, err => {
+			if (err) {
+				throw err;
 			}
-		],
-		screens: _.map(display.screen, (screen) => { return {
-			xidRoot: screen.root,
-			width: screen.pixel_width,
-			height: screen.pixel_height
-		}; })
-	};
-	console.log(action1);
-	store.dispatch(action1);
-
-	_.forEach(display.screen, (screen, i) => {
-		global.X.AllocColor( screen.default_colormap, 0x5E00, 0x9D00, 0xC800, function(err, color) {
-			store.dispatch({type: 'setX11ScreenColors', screenId: i, colors: {focus: color.pixel}});
 		});
-		global.X.AllocColor( screen.default_colormap, 0xDC00, 0xF000, 0xF700, function(err, color) {
-			store.dispatch({type: 'setX11ScreenColors', screenId: i, colors: {normal: color.pixel}});
+
+		ewmh.set_number_of_desktops(2, function(err) {
+			if (err) {
+				throw err;
+			}
+			ewmh.set_current_desktop(0);
 		});
-		global.X.AllocColor( screen.default_colormap, 0x0C00, 0x2C00, 0x5200, function(err, color) {
-			store.dispatch({type: 'setX11ScreenColors', screenId: i, colors: {alert: color.pixel}});
-		});
-	});
 
+		store.subscribe(handleStateChange);
 
-	const min_keycode = display.min_keycode;
-	const max_keycode = display.max_keycode;
-	X.GetKeyboardMapping(min_keycode, max_keycode-min_keycode, function(err, key_list) {
-		ks2kc = conversion.buildKeyMap(key_list,min_keycode);
-
-		// Grab all key combinations which are specified in the configuration file.
-		grabKeyBindings(ks2kc,display);
-	});
-
-	ewmh = new EWMH(display.client, display.screen[0].root);
-
-	const eventMask = {
-		eventMask: x11.eventMask.SubstructureNotify   |
-				   x11.eventMask.SubstructureRedirect |
-				   x11.eventMask.ResizeRedirect
+		// Load the programs that should get started and start them
+		logger.info("Launching startup applications.");
+		programs.forEach(execHandler);
 	}
-
-	// By adding the substructure redirect you become the window manager.
-	logger.info("Registering AirWM as the current Window Manager.");
-	global.X.ChangeWindowAttributes(display.screen[0].root, eventMask, changeWindowAttributeErrorHandler);
-
-	ewmh.on('CurrentDesktop', function(d) {
-		console.log('Client requested current desktop to be: ' + d);
-		//screens[0].setWorkspace(d);
-	});
-
-	const SUPPORTED_ATOMS = [
-		'_NET_CURRENT_DESKTOP',
-		'_NET_NUMBER_OF_DESKTOPS',
-		'_NET_SUPPORTED',
-		//'_NET_WM_STATE_FULLSCREEN',
-		//'_NET_SUPPORTING_WM_CHECK',
-		//'_NET_WM_NAME',
-		//'_NET_WM_STRUT',
-		'_NET_WM_STATE',
-		'_NET_WM_STRUT_PARTIAL',
-		'_NET_WM_WINDOW_TYPE',
-		'_NET_WM_WINDOW_TYPE_DESKTOP',
-		'_NET_WM_WINDOW_TYPE_DOCK',
-		// _NET_WM_WINDOW_TYPE_TOOLBAR, _NET_WM_WINDOW_TYPE_MENU, _NET_WM_WINDOW_TYPE_UTILITY, _NET_WM_WINDOW_TYPE_SPLASH, _NET_WM_WINDOW_TYPE_DIALOG, _NET_WM_WINDOW_TYPE_DROPDOWN_MENU, _NET_WM_WINDOW_TYPE_POPUP_MENU, _NET_WM_WINDOW_TYPE_TOOLTIP, _NET_WM_WINDOW_TYPE_NOTIFICATION, _NET_WM_WINDOW_TYPE_COMBO, _NET_WM_WINDOW_TYPE_DND,
-		'_NET_WM_WINDOW_TYPE_NORMAL',
-	];
-	ewmh.set_supported(SUPPORTED_ATOMS, err => {
-		if (err) {
-			throw err;
-		}
-	});
-
-	ewmh.set_number_of_desktops(2, function(err) {
-		if (err) {
-			throw err;
-		}
-		ewmh.set_current_desktop(0);
-	});
-
-	store.subscribe(handleStateChange);
-
-	// Load the programs that should get started and start them
-	logger.info("Launching startup applications.");
-	programs.forEach(execHandler);
+	catch (e) {
+		logger.error("airClientCreator: ERROR:")
+		logger.error(e.message());
+		logger.error(e.stack());
+	}
 }
 
 x11.createClient(airClientCreator).on('error', errorHandler).on('event', eventHandler);
