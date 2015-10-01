@@ -103,34 +103,47 @@ export function widget_remove(state, action) {
 	assert(state);
 	assert(_.isNumber(id));
 
-	const w = state.getIn('widgets', id.toString());
+	const w = state.getIn(['widgets', id.toString()]);
+	//console.log(w)
+
+	// Remove widget from desktop focus
+	const desktopId = getWidgetDesktopId(state, w);
+	if (desktopId >= 0) {
+		const focusCurrentId = state.getIn(['widgets', desktopId.toString(), 'focusCurrentId']);
+		if (focusCurrentId === id) {
+			state = focus_moveNext(state, {id});
+			// If desktop didn't have any other widget to focus on, remove focus ID
+			if (state.getIn(['widgets', desktopId.toString(), 'focusCurrentId']) === id) {
+				state = state.deleteIn(['widgets', desktopId.toString(), 'focusCurrentId']);
+				// Also check global focus:
+				if (state.get('focusCurrentId') === id) {
+					state = state.delete('focusCurrentId');
+				}
+			}
+		}
+	}
+
 	// Remove widget from parent
 	const parentId = w.get('parentId');
 	const screenId = w.get('screenId');
-	if (parentId) {
+	if (parentId >= 0) {
 		state = state.updateIn(
 			['widgets', parentId.toString(), 'childIds'],
 			List(),
 			childIds => childIds.delete(childIds.indexOf(id))
 		);
 	}
-	else if (screenId) {
+	else if (screenId >= 0) {
 		// TODO: handle screen widgets
 	}
 
-	// Remove widget from current focus
-	if (state.get('focusCurrentId') === id) {
-		state = focus_moveNext(state, {});
-	}
+	// Remove from widgets
+	state = state.
+		deleteIn(['widgets', id.toString()]).
+		deleteIn(['x11', 'windowSettings', id.toString()]);
 
-	// Remove widget from desktop focus
-	const desktopId = getWidgetDesktopId(state, w);
-	if (desktopId) {
-		const focusCurrentId = state.getIn(['widgets', desktopId.toString(), 'focusCurrentId']);
-		if (focusCurrentId === id) {
-			state = focus_moveNext(state, {id});
-		}
-	}
+	state = updateLayout(state);
+	state = updateX11(state);
 
 	return state;
 }

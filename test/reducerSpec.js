@@ -89,6 +89,28 @@ describe('reducer', () => {
 
 	});
 
+	describe('widget.remove', () => {
+		const action1 = {
+			type: 'widget.remove',
+			id: 2
+		};
+		it('handles removing last, unfocused widget', () => {
+			const state = reducer(ex.state112, action1);
+			//console.log(JSON.stringify(state.toJS(), null, '\t'));
+			//console.log(diff(state, ex.state111));
+			expect(state).to.equal(ex.state111);
+		});
+
+		it('handles removing last, focused widget', () => {
+			const actionA = {type: 'focus.moveTo', id: 2};
+			const state1 = reducer(ex.state112, actionA);
+			const state = reducer(state1, action1);
+			//console.log(JSON.stringify(state.toJS(), null, '\t'));
+			//console.log(diff(state, ex.state111));
+			expect(state).to.equal(ex.state111);
+		});
+	});
+
 	describe('focus.moveNext', () => {
 		const action = {
 			type: 'focus.moveNext'
