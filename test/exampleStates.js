@@ -70,7 +70,8 @@ export const state111 = fromJS({
 				"ChangeWindowAttributes": [
 					1001,
 					{
-						"borderPixel": 0
+						"borderPixel": 0,
+						eventMask: 16
 					}
 				],
 				"ConfigureWindow": [
@@ -136,7 +137,8 @@ export const state112 = fromJS({
 				"ChangeWindowAttributes": [
 					1001,
 					{
-						"borderPixel": 0
+						"borderPixel": 0,
+						eventMask: 16
 					}
 				],
 				"ConfigureWindow": [
@@ -158,7 +160,8 @@ export const state112 = fromJS({
 				"ChangeWindowAttributes": [
 					1002,
 					{
-						"borderPixel": 0
+						"borderPixel": 0,
+						eventMask: 16
 					}
 				],
 				"ConfigureWindow": [

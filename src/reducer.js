@@ -11,11 +11,11 @@ export default function reducer(state = core.empty, action) {
 		case 'initialize':
 			return core.initialize(action.desktops, action.screens);
 		case 'focus.moveNext':
-			return core.focus_moveNext(state, action.id);
+			return core.focus_moveNext(state, action);
 		case 'focus.movePrev':
-			return core.focus_movePrev(state);
+			return core.focus_movePrev(state, action);
 		case 'focus.moveTo':
-			return core.focus_moveTo(state);
+			return core.focus_moveTo(state, action);
 		case 'widget.add':
 			return core.widget_add(state, action);
 		case 'widget.remove':

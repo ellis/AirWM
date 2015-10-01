@@ -120,42 +120,23 @@ export function widget_remove(state, action) {
 
 	// Remove widget from current focus
 	if (state.get('focusCurrentId') === id) {
-		state = focus_moveNext(state);
-	)
+		state = focus_moveNext(state, {});
+	}
 
 	// Remove widget from desktop focus
 	const desktopId = getWidgetDesktopId(state, w);
 	if (desktopId) {
 		const focusCurrentId = state.getIn(['widgets', desktopId.toString(), 'focusCurrentId']);
 		if (focusCurrentId === id) {
-			state = state.deleteIn(
-			['widgets', desktopId.toString(), 'focusCurrentId']
-		)
+			state = focus_moveNext(state, {id});
+		}
 	}
-
-	const screen = state.getIn(['screens', screenId.toString()]);
-	const desktopId = screen.get('desktopCurrentId');
-	const widgets0 = state.get('widgets');
-	const id = widgets0.count();
-	const w1 = Map(w).merge({
-		parentId: desktopId,
-		visible: true
-	});
-	//console.log(1)
-	//console.log(state.get('widgets'));
-	state = state.updateIn(
-		['widgets', desktopId.toString(), 'childIds'],
-		List(),
-		childIds => childIds.push(id)
-	).setIn(['widgets', id.toString()], w1);
-	state = updateFocus(state, id);
-	state = updateLayout(state);
-	state = updateX11(state);
 
 	return state;
 }
 
-function focus_moveTo(state, id) {
+export function focus_moveTo(state, action) {
+	const id = action.id;
 	assert(_.isNumber(id));
 
 	const key = id.toString();
@@ -191,7 +172,7 @@ function focus_moveTo(state, id) {
 	return state;
 }
 
-function focus_moveNext(state, action) {
+export function focus_moveNext(state, action) {
 	const id = _.get(action, 'id', state.get('focusCurrentId'));
 	if (id >= 0) {
 		const w = state.getIn(['widgets', id.toString()]);
@@ -206,7 +187,7 @@ function focus_moveNext(state, action) {
 	}
 }
 
-function focus_movePrev(state) {
+export function focus_movePrev(state) {
 	const id = _.get(action, 'id', state.get('focusCurrentId'));
 	if (id >= 0) {
 		const w = state.getIn(['widgets', id.toString()]);

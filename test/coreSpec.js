@@ -1,4 +1,4 @@
-import {List, Map} from 'immutable';
+/*import {List, Map} from 'immutable';
 import Immutable from 'immutable';
 import {expect} from 'chai';
 import diff from 'immutablediff';
@@ -9,33 +9,11 @@ import * as ex from './exampleStates.js';
 
 describe('application logic', () => {
 
-	describe('initialize', () => {
-		it('initializes the state with desktops and screens', () => {
-			const desktops = [
-				{
-					name: "web",
-					layout: "tile-right"
-				}
-			];
-			const screens = [
-				{
-					xidRoot: ex.screen0_xidRoot,
-					width: 800,
-					height: 600,
-				}
-			];
-			const state = core.initialize(desktops, screens);
-			//console.log(state);
-			//console.log(diff(state, ex.state110));
-			expect(state).is.equal(ex.state110);
-		});
-	});
-
 	describe('addXwin', () => {
 		const widget1 = {
 			xid: 1001
 		};
-		const state1 = core.addWidget(ex.state110, widget1);
+		const state1 = core.widget_add(ex.state110, {widget: widget1});
 		describe('adding first window', () => {
 			let state = state1;
 			it('should set focus to that window', () => {
@@ -85,3 +63,4 @@ describe('application logic', () => {
 		});
 	});
 });
+*/
