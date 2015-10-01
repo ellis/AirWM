@@ -7,8 +7,11 @@
 * [x] handle Win-K
 * [x] when window is closed, remove it from layout
 * [x] allow for passing keyboard bindings to store.dispatch()
-* [ ] automatically make space for `_NET_WM_WINDOW_TYPE_DOCK`, such as lxqt-panel
+* [x] automatically make space for `_NET_WM_WINDOW_TYPE_DOCK`, such as lxqt-panel
+* [ ] core: desktop.raise
 * [ ] implement more commandHandlers() as actions
+* [ ] switch desktops with Win-1..9
+* [ ] test multiple docks and different dock gravities
 * [ ] maximize the "Desktop" type window
 * [ ] save state to console after every change, for debugging
 * [ ] supply list of windows to wmctrl (`_NET_CLIENT_LIST` or `_WIN_CLIENT_LIST`)
@@ -16,6 +19,7 @@
 * [ ] put background and docks onto Screen instead of Workspace
 * [ ] `_NET_CLIENT_LIST_STACKING`
 * [ ] `_NET_ACTIVE_WINDOW`
+* [ ] handleStateChange: don't call DestroyWindow on a window that was already destroyed
 
 Later:
 * [ ] allow for different desktops on different workspaces
