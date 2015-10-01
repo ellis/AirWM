@@ -80,20 +80,40 @@ export function widget_add(state, action) {
 
 	const screenId = state.get('screenCurrentId');
 	const screen = state.getIn(['screens', screenId.toString()]);
-	const desktopId = screen.get('desktopCurrentId');
 	const widgets0 = state.get('widgets');
 	const id = state.get('widgetIdNext');
-	const w1 = Map(w).merge({
-		parentId: desktopId,
-		visible: true
-	});
-	//console.log(1)
-	//console.log(state.get('widgets'));
-	state = state.updateIn(
-		['widgets', desktopId.toString(), 'childIds'],
-		List(),
-		childIds => childIds.push(id)
-	).setIn(['widgets', id.toString()], w1).set('widgetIdNext', id + 1);
+	let w1 = Map(w);
+	if (w.type === 'dock') {
+		w1 = w1.merge({
+			screenId: screenId,
+			visible: true
+		});
+		// Add dock to screen
+		state = state.updateIn(
+			['screens', screenId.toString(), 'dockIds'],
+			List(),
+			dockIds => dockIds.push(id)
+		);
+	}
+	else {
+		const desktopId = screen.get('desktopCurrentId');
+		w1 = w1.merge({
+			parentId: desktopId,
+			visible: true
+		});
+		//console.log(1)
+		//console.log(state.get('widgets'));
+		// Add widget to desktop
+		state = state.updateIn(
+			['widgets', desktopId.toString(), 'childIds'],
+			List(),
+			childIds => childIds.push(id)
+		);
+	}
+
+	// Add widget and increment widgetIdNext
+	state = state.setIn(['widgets', id.toString()], w1).set('widgetIdNext', id + 1);
+
 	state = updateFocus(state, id);
 	state = updateLayout(state);
 	state = updateX11(state);
