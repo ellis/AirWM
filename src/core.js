@@ -34,7 +34,7 @@ export function initialize(desktops, screens) {
 	desktops = _.cloneDeep(desktops);
 	// Add default desktops if necessary
 	while (desktops.length < screens.length) {
-		desktops.push({layout: "tile-right"});
+		desktops.push({type: "desktop", layout: "tile-right"});
 	}
 
 	// TODO: allow for initial assignment of desktops to screens rather
@@ -48,6 +48,8 @@ export function initialize(desktops, screens) {
 	for (let i = screens.length; i < desktops.length; i++) {
 		delete desktops[i].screenId;
 	}
+
+	desktops.forEach(w => { w.type = "desktop"; });
 
 	let state = Immutable.fromJS({
 		widgets: _.zipObject(_.range(0, desktops.length), desktops),

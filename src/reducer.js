@@ -9,6 +9,9 @@ import * as core from './core.js';
 
 export default function reducer(state = core.empty, action) {
 	switch (action.type) {
+		case '@@redux/INIT':
+			// do nothing
+			break;
 		case 'initialize':
 			return core.initialize(action.desktops, action.screens);
 		case 'focus.moveNext':

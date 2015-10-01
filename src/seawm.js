@@ -5,6 +5,7 @@ import {List, Map, fromJS} from 'immutable';
 var fs = require("fs");
 import EWMH from 'ewmh';
 import x11 from 'x11';
+import x11prop from 'x11-prop';
 var exec   = require('child_process').exec;
 var keysym = require('keysym');
 
@@ -216,10 +217,31 @@ var destroyNotifyHandler = function(ev){
  * X11 event to add a new window
  */
 function mapRequestHandler(ev) {
-	store.dispatch({
-		type: 'widget.add',
-		widget: {
-			xid: ev.wid
+	const dispatch = function(widgetType) {
+		store.dispatch({
+			type: 'widget.add',
+			widget: {
+				type: widgetType,
+				xid: ev.wid
+			}
+		});
+	};
+
+	x11prop.get_property(global.X, ev.wid, '_NET_WM_WINDOW_TYPE', 'ATOM', (err, atomId) => {
+		if (err) throw err;
+		console.log("atomId: "+JSON.stringify(atomId));
+		if (atomId > 0) {
+			global.X.GetAtomName(atomId, function(err, name) {
+				console.log("name: "+name)
+				if (err) throw err;
+				const widgetType = ({
+					'_NET_WM_WINDOW_TYPE_DOCK': 'dock'
+				}[name] || "window");
+				dispatch(widgetType);
+			});
+		}
+		else {
+			dispatch("window");
 		}
 	});
 	/*

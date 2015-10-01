@@ -5,6 +5,7 @@ export const screen0_xidRoot = 100;
 export const state110 = fromJS({
 	widgets: {
 		0: {
+			type: "desktop",
 			name: "web",
 			screenId: 0,
 			rc: [0, 0, 800, 600],
@@ -33,6 +34,7 @@ export const state110 = fromJS({
 export const state111 = fromJS({
 	widgets: {
 		0: {
+			type: "desktop",
 			name: "web",
 			screenId: 0,
 			rc: [0, 0, 800, 600],
@@ -41,6 +43,7 @@ export const state111 = fromJS({
 			focusCurrentId: 1
 		},
 		1: {
+			type: "window",
 			xid: 1001,
 			parentId: 0,
 			rc: [5, 5, 790, 590],
@@ -95,6 +98,7 @@ export const state111 = fromJS({
 export const state112 = fromJS({
 	widgets: {
 		0: {
+			type: "desktop",
 			name: "web",
 			screenId: 0,
 			rc: [0, 0, 800, 600],
@@ -103,12 +107,14 @@ export const state112 = fromJS({
 			focusCurrentId: 1
 		},
 		1: {
+			type: "window",
 			xid: 1001,
 			parentId: 0,
 			rc: [5, 5, 392, 590],
 			visible: true
 		},
 		2: {
+			type: "window",
 			xid: 1002,
 			parentId: 0,
 			rc: [402, 5, 392, 590],

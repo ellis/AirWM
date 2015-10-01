@@ -32,6 +32,7 @@ describe('reducer', () => {
 		const action1 = {
 			type: 'widget.add',
 			widget: {
+				type: 'window',
 				xid: 1001
 			}
 		};
@@ -64,6 +65,7 @@ describe('reducer', () => {
 		const action2 = {
 			type: 'widget.add',
 			widget: {
+				type: 'window',
 				xid: 1002
 			}
 		};
@@ -98,6 +100,7 @@ describe('reducer', () => {
 			const action3 = {
 				type: 'widget.add',
 				widget: {
+					type: 'window',
 					xid: 1003
 				}
 			};
