@@ -379,7 +379,7 @@ function updateX11(state) {
 					? screenX11.getIn(['colors', 'focus'], 0)
 					: screenX11.getIn(['colors', 'normal'], 0);
 				const rc = w.get('rc', List([0, 0, 0, 0])).toJS();
-				const eventType = _.get({
+				const eventMask = _.get({
 					'desktop': undefined,
 					'dock': undefined,
 				}, windowType, x11.eventMask.EnterWindow);
@@ -389,7 +389,7 @@ function updateX11(state) {
 					xid,
 					_.merge({}, {
 						borderPixel: color,
-						eventMask: x11.eventMask.EnterWindow
+						eventMask: eventMask
 					})
 				];
 				info.ConfigureWindow = [
@@ -403,6 +403,11 @@ function updateX11(state) {
 						stackMode: (windowType === 'DESKTOP') ? 1 : 0
 					}
 				];
+				/*if (windowType === 'dock') {
+					console.log("dockInfo:")
+					console.log(w)
+					console.log(info.ConfigureWindow[1])
+				}*/
 			}
 
 			state = state.mergeIn(['x11', 'windowSettings', key], fromJS(info));

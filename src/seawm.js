@@ -236,12 +236,12 @@ function mapRequestHandler(ev) {
 			console.log("addXwinDock: "+props["_NET_WM_STRUT_PARTIAL"]);
 			//console.log([left, right, top, bottom]);
 			if (top > 0) {
-				action.dockGravity = "top";
-				action.dockSize = top;
+				action.widget.dockGravity = "top";
+				action.widget.dockSize = top;
 			}
 			else if (bottom > 0) {
-				action.dockGravity = "bottom";
-				action.dockSize = bottom;
+				action.widget.dockGravity = "bottom";
+				action.widget.dockSize = bottom;
 			}
 		}
 
