@@ -89,6 +89,54 @@ describe('reducer', () => {
 
 	});
 
+	describe('focus.moveNext', () => {
+		const action = {
+			type: 'focus.moveNext'
+		};
+		it('handle situation with no windows (no change)', () => {
+			const state1 = reducer(ex.state110, action);
+			expect(state1).to.equal(ex.state110);
+		});
+		it('handle situation with single window (no change)', () => {
+			const state1 = reducer(ex.state111, action);
+			expect(state1).to.equal(ex.state111);
+		});
+		it('handle situation with two windows', () => {
+			const state1 = reducer(ex.state112, action);
+			expect(state1.getIn(['focusCurrentId'])).to.equal(2);
+			expect(state1.getIn(['widgets', '0', 'focusCurrentId'])).to.equal(2);
+		});
+		it('handle situation with two windows, called twice (no change)', () => {
+			const state1 = reducer(ex.state112, action);
+			const state2 = reducer(state1, action);
+			expect(state2).to.equal(ex.state112);
+		});
+	});
+
+	describe('focus.movePrev', () => {
+		const action = {
+			type: 'focus.movePrev'
+		};
+		it('handle situation with no windows (no change)', () => {
+			const state1 = reducer(ex.state110, action);
+			expect(state1).to.equal(ex.state110);
+		});
+		it('handle situation with single window (no change)', () => {
+			const state1 = reducer(ex.state111, action);
+			expect(state1).to.equal(ex.state111);
+		});
+		it('handle situation with two windows', () => {
+			const state1 = reducer(ex.state112, action);
+			expect(state1.getIn(['focusCurrentId'])).to.equal(2);
+			expect(state1.getIn(['widgets', '0', 'focusCurrentId'])).to.equal(2);
+		});
+		it('handle situation with two windows, called twice (no change)', () => {
+			const state1 = reducer(ex.state112, action);
+			const state2 = reducer(state1, action);
+			expect(state2).to.equal(ex.state112);
+		});
+	});
+
 	it('handles focus.moveTo', () => {
 		const action1 = {
 			type: 'focus.moveTo',

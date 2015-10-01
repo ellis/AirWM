@@ -173,33 +173,32 @@ export function focus_moveTo(state, action) {
 }
 
 export function focus_moveNext(state, action) {
-	const id = _.get(action, 'id', state.get('focusCurrentId'));
-	if (id >= 0) {
-		const w = state.getIn(['widgets', id.toString()]);
-		const desktopId = getWidgetDesktopId(state, w);
-		if (desktopId) {
-			const childIds = state.getIn(['widgets', desktopId.toString(), 'childIds'], List());
-			const i = childIds.indexOf(id);
-			assert(i >= 0);
-			const j = (i + 1) % childIds.count();
-			return setFocusWidget(state, childIds.get(j));
-		}
-	}
+	return focus_moveDir(state, action, true);
 }
 
-export function focus_movePrev(state) {
+export function focus_movePrev(state, action) {
+	return focus_moveDir(state, action, false);
+}
+
+function focus_moveDir(state, action, next) {
 	const id = _.get(action, 'id', state.get('focusCurrentId'));
+	//console.log({id})
 	if (id >= 0) {
 		const w = state.getIn(['widgets', id.toString()]);
 		const desktopId = getWidgetDesktopId(state, w);
-		if (desktopId) {
+		//console.log({desktopId})
+		if (desktopId >= 0) {
 			const childIds = state.getIn(['widgets', desktopId.toString(), 'childIds'], List());
 			const i = childIds.indexOf(id);
 			assert(i >= 0);
-			const j = (i == 0) ? childIds.length - 1 : i - 1;
-			return setFocusWidget(state, childIds.get(j));
+			const j = (next)
+				? (i + 1) % childIds.count()
+				: (i == 0) ? childIds.count() - 1 : i - 1;
+			//console.log({childIds, i, j})
+			return focus_moveTo(state, {id: childIds.get(j)});
 		}
 	}
+	return state;
 }
 
 function getWidgetDesktopId(state, w, id = -1) {
