@@ -286,9 +286,32 @@ function updateLayout(state) {
 	//console.log(state)
 	// For each screen, update desktop dimensions
 	state.get('screens').forEach((screen, screenId) => {
+		// Screen dimensions
+		const rc = [0, 0, screen.get('width'), screen.get('height')];
+		// Dock layout
+		screen.get('dockIds', List()).forEach(id => {
+			const w = state.getIn(['widgets', id.toString()]);
+			const gravity = w.get('dockGravity', 'bottom');
+			const size = w.get('dockSize', 50);
+			let rc2;
+			switch (gravity) {
+				case 'left':
+				case 'right':
+				case 'top':
+					rc2 = [rc[0], rc[1], rc[2], size];
+					rc[1] += size;
+					rc[3] -= size;
+					break;
+				default:
+					rc2 = [rc[0], rc[3] - size + 1, rc[2], size];
+					rc[3] -= size;
+					break;
+			}
+			state = state.setIn(['widgets', id.toString(), 'rc'], rc2);
+		});
+		// Desktop layout
 		const desktopId = screen.get('desktopCurrentId');
-		const state1 = state.setIn(['widgets', desktopId.toString(), 'rc'], List.of(0, 0, screen.get('width'), screen.get('height')));
-		state = state1
+		state = state.setIn(['widgets', desktopId.toString(), 'rc'], List(rc));
 	});
 
 	// For each visible desktop, update child dimensions
@@ -344,12 +367,14 @@ function updateX11(state) {
 			if (info.visible) {
 				const desktopId = getWidgetDesktopId(state, w);
 				const desktop = state.getIn(['widgets', desktopId.toString()]);
-				const screenId = desktop.get('screenId');
+				const screenId = (desktop) ? desktop.get('screenId') : w.get('screenId');
 				const screenX11 = state.getIn(['x11', 'screens', screenId.toString()], Map());
 				const borderWidth = 5;
 				const color = (hasFocus)
 					? screenX11.getIn(['colors', 'focus'], 0)
 					: screenX11.getIn(['colors', 'normal'], 0);
+				console.log(w.get('rc'))
+				console.log(w.get('rc', List([0, 0, 0, 0])))
 				const rc = w.get('rc', List([0, 0, 0, 0])).toJS();
 				const windowType = w.get('windowType');
 				const eventType = _.get({

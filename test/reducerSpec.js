@@ -122,6 +122,38 @@ describe('reducer', () => {
 			});
 		});
 
+		// TODO: when adding dock with no wondows, dock should not receive focus
+
+		describe('add docks (with single window)', () => {
+			const actionB = {
+				type: 'widget.add',
+				widget: {
+					type: 'dock',
+					dockGravity: 'bottom',
+					dockSize: 10,
+					xid: 2002
+				}
+			};
+			const stateB = reducer(ex.state111, actionB);
+			describe("add bottom dock", () => {
+				//console.log(JSON.stringify(state.toJS(), null, '\t'));
+				//console.log(diff(state, ex.state111));
+				it('should increment widgetIdNext', () => {
+					expect(state.getIn(['widgetIdNext'])).to.equal(3);
+				});
+				it('should leave the focus on the first window', () => {
+					expect(state.getIn(['focusCurrentId'])).to.equal(1);
+					expect(state.getIn(['widgets', '0', 'focusCurrentId'])).to.equal(1);
+				});
+				it('should add window to the current screen', () => {
+					expect(state.getIn(['widgets', '0', 'childIds'])).to.equal(List.of(1));
+					expect(state.hasIn(['widgets', '2', 'parentId'])).to.equal(false);
+					expect(state.getIn(['widgets', '2', 'screenId'])).to.equal(0);
+					expect(state.getIn(['screens', '0', 'dockIds'])).to.equal(List.of(2));
+					//expect(state.getIn(['x11', 'windowSettings', '2', 'desktopNum'])).to.equal(0);
+				});
+			});
+		});
 	});
 
 	describe('widget.remove', () => {
