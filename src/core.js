@@ -358,31 +358,16 @@ function updateLayout(state) {
 		state = state.setIn(['widgets', desktopId.toString(), 'rc'], List(rc));
 	});
 
+	const layoutEngines = {
+		'tile-right': (desktopId) => layout_tileRight(state, desktopId),
+		'default': (desktopId) => layout_mainLeft(state, desktopId)
+	}
 	// For each visible desktop, update child dimensions
 	state.get('screens').forEach((screen, screenId) => {
 		const desktopId = screen.get('desktopCurrentId');
 		const desktop = state.getIn(['widgets', desktopId.toString()]);
-		if (true || desktop.get('layout', 'tile-right') === 'tile-right') {
-			const childIds = desktop.get('childIds', List());
-			let n = childIds.count();
-			if (n > 0) {
-				let [x, y, w, h] = desktop.get('rc');
-				const padding = 5;
-				x += padding;
-				w -= 2 * padding;
-				y += padding;
-				h -= 2 * padding;
-				const w2 = parseInt((w - (n - 1) * padding) / n);
-				childIds.forEach((childId, i) => {
-					const x2 = x + i * (w2 + padding);
-					state = state.
-						setIn(['widgets', childId.toString(), 'rc'], List.of(
-							x2, y, w2, h
-						)).
-						setIn(['widgets', childId.toString(), 'visible'], true);
-				});
-			}
-		}
+		//state = layoutEngines[desktop.get('layout', 'default')](state, desktopId);
+		state = layout_mainLeft(state, desktopId);
 	});
 
 	// For all non-visible desktops, hide the windows
@@ -399,6 +384,72 @@ function updateLayout(state) {
 		}
 	});
 
+	return state;
+}
+
+function layout_tileRight(state, desktopId) {
+	const desktop = state.getIn(['widgets', desktopId.toString()]);
+	const childIds = desktop.get('childIds', List());
+	let n = childIds.count();
+	if (n > 0) {
+		let [x, y, w, h] = desktop.get('rc');
+		const padding = 5;
+		x += padding;
+		w -= 2 * padding;
+		y += padding;
+		h -= 2 * padding;
+		const w2 = parseInt((w - (n - 1) * padding) / n);
+		childIds.forEach((childId, i) => {
+			const x2 = x + i * (w2 + padding);
+			state = state.
+				setIn(['widgets', childId.toString(), 'rc'], List.of(
+					x2, y, w2, h
+				)).
+				setIn(['widgets', childId.toString(), 'visible'], true);
+		});
+	}
+	return state;
+}
+
+function layout_mainLeft(state, desktopId) {
+	const desktop = state.getIn(['widgets', desktopId.toString()]);
+	const childIds = desktop.get('childIds', List());
+	let n = childIds.count();
+	if (n == 1) {
+		let [x, y, w, h] = desktop.get('rc');
+		const padding = 5;
+		x += padding;
+		w -= 2 * padding;
+		y += padding;
+		h -= 2 * padding;
+		const childId = childIds.get(0);
+		state = state.
+			setIn(['widgets', childId.toString(), 'rc'], List.of(x, y, w, h)).
+			setIn(['widgets', childId.toString(), 'visible'], true);
+	}
+	else if (n > 1) {
+		let [x, y, w, h] = desktop.get('rc');
+		const padding = 5;
+		x += padding;
+		w -= 2 * padding;
+		y += padding;
+		h -= 2 * padding;
+		const w2 = parseInt((w - 1 * padding) / 2);
+		// Dimensions for main window, takes up left half of screen
+		const mainId = childIds.get(0);
+		state = state.
+			setIn(['widgets', mainId.toString(), 'rc'], List.of(x, y, w2, h)).
+			setIn(['widgets', mainId.toString(), 'visible'], true);
+		// Remaining children take up right half of screen
+		const x2 = x + (w2 + padding);
+		const h2 = parseInt((h - (n-2)*padding) / (n - 1));
+		childIds.shift().forEach((childId, i) => {
+			const y2 = y + i * (h2 + padding);
+			state = state.
+				setIn(['widgets', childId.toString(), 'rc'], List.of(x2, y2, w2, h2)).
+				setIn(['widgets', childId.toString(), 'visible'], true);
+		});
+	}
 	return state;
 }
 
@@ -468,7 +519,7 @@ function updateX11(state) {
 	const focusXid = (focusCurrentId >= 0)
 		? state.getIn(['widgets', focusCurrentKey, 'xid'])
 		: state.getIn(['screens', screenCurrentId.toString(), 'xidRoot']);
-	console.log({focusCurrentId, focusCurrentKey, focusXid, screenCurrentId});
+	//console.log({focusCurrentId, focusCurrentKey, focusXid, screenCurrentId});
 	state = state.updateIn(['x11', 'wmSettings', 'SetInputFocus'], l => {
 		if (l) return l.set(0, focusXid);
 		else return List.of(focusXid);
