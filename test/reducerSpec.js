@@ -93,7 +93,7 @@ describe('reducer', () => {
 			});
 		});
 
-		it('handles removing first widget (of two), then adding a thrid', () => {
+		describe('removing first window, then adding a thrid', () => {
 			const actionA = {type: 'widget.remove', id: 1};
 			const action3 = {
 				type: 'widget.add',
@@ -105,11 +105,18 @@ describe('reducer', () => {
 			const state = reducer(state1, action3);
 			//console.log(JSON.stringify(state.toJS(), null, '\t'));
 			//console.log(diff(state, ex.state111));
-			expect(state.getIn(['widgetIdNext'])).to.equal(4);
-			expect(state.getIn(['focusCurrentId'])).to.equal(2);
-			expect(state.getIn(['widgets', '0', 'focusCurrentId'])).to.equal(2);
-			expect(state.getIn(['widgets', '0', 'childIds'])).to.equal(List.of(2, 3));
-			expect(state.getIn(['widgets', '3', 'parentId'])).to.equal(0);
+			it('should increment widgetIdNext', () => {
+				expect(state.getIn(['widgetIdNext'])).to.equal(4);
+			});
+			it('should leave the focus on the second window', () => {
+				expect(state.getIn(['focusCurrentId'])).to.equal(2);
+				expect(state.getIn(['widgets', '0', 'focusCurrentId'])).to.equal(2);
+			});
+			it('should add window to the current desktop', () => {
+				expect(state.getIn(['widgets', '0', 'childIds'])).to.equal(List.of(2, 3));
+				expect(state.getIn(['widgets', '3', 'parentId'])).to.equal(0);
+				expect(state.getIn(['x11', 'windowSettings', '3', 'desktopNum'])).to.equal(0);
+			});
 		});
 
 	});
