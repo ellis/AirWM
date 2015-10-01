@@ -52,6 +52,7 @@ export function initialize(desktops, screens) {
 	let state = Immutable.fromJS({
 		widgets: _.zipObject(_.range(0, desktops.length), desktops),
 		screens: _.zipObject(_.range(0, screens.length), screens),
+		widgetIdNext: desktops.length,
 		desktopIds: _.range(0, desktops.length),
 		screenCurrentId: 0,
 		x11: {
@@ -79,7 +80,7 @@ export function widget_add(state, action) {
 	const screen = state.getIn(['screens', screenId.toString()]);
 	const desktopId = screen.get('desktopCurrentId');
 	const widgets0 = state.get('widgets');
-	const id = widgets0.count();
+	const id = state.get('widgetIdNext');
 	const w1 = Map(w).merge({
 		parentId: desktopId,
 		visible: true
@@ -90,7 +91,7 @@ export function widget_add(state, action) {
 		['widgets', desktopId.toString(), 'childIds'],
 		List(),
 		childIds => childIds.push(id)
-	).setIn(['widgets', id.toString()], w1);
+	).setIn(['widgets', id.toString()], w1).set('widgetIdNext', id + 1);
 	state = updateFocus(state, id);
 	state = updateLayout(state);
 	state = updateX11(state);

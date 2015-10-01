@@ -19,6 +19,7 @@ export const state110 = fromJS({
 			desktopCurrentId: 0
 		}
 	},
+	widgetIdNext: 1,
 	desktopIds: [0],
 	screenCurrentId: 0,
 	x11: {
@@ -54,6 +55,7 @@ export const state111 = fromJS({
 			desktopCurrentId: 0
 		}
 	},
+	widgetIdNext: 2,
 	desktopIds: [0],
 	screenCurrentId: 0,
 	focusCurrentId: 1,
@@ -121,6 +123,7 @@ export const state112 = fromJS({
 			desktopCurrentId: 0
 		}
 	},
+	widgetIdNext: 3,
 	desktopIds: [0],
 	screenCurrentId: 0,
 	focusCurrentId: 1,
