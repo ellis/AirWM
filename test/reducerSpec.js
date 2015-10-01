@@ -69,6 +69,15 @@ describe('reducer', () => {
 					expect(state.getIn(['x11', 'wmSettings', 'SetInputFocus', 0])).to.equal(ex.screen0_xidRoot);
 				});
 			});
+
+			describe('switch back to desktop 1', () => {
+				const state2 = reducer(state1, {type: 'desktop.raise', num: 0});
+				it('should be the same as before', () => {
+					//console.log(JSON.stringify(state2.toJS(), null, '\t'));
+					//console.log(diff(state2, state121));
+					expect(state2).to.equal(state121.setIn(['widgets', '1', 'rc'], List.of(0, 0, 800, 600)));
+				});
+			});
 		});
 	});
 

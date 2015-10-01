@@ -99,9 +99,9 @@ export function desktop_raise(state, action) {
 			// Update the focus window
 			const focusCurrentId = state.getIn(['widgets', desktopId.toString(), 'focuseCurrentId']);
 			if (focusCurrentId >= 0)
-				state.setIn(['widgets', desktopId.toString(), 'focuseCurrentId'], focuseCurrentId);
+				state.setIn(['focuseCurrentId'], focuseCurrentId);
 			else
-				state.deleteIn(['widgets', desktopId.toString(), 'focuseCurrentId']);
+				state.deleteIn(['focuseCurrentId']);
 
 			state = updateFocus(state);
 			state = updateLayout(state);
@@ -312,10 +312,15 @@ function updateFocus(state, wid) {
 			.setIn(['widgets', desktopId.toString(), 'focusCurrentId'], wid)
 			.setIn(['focusCurrentId'], wid);
 	}
+	// Else if current desktop has a focus widget
+	else if (desktop0.has('focusCurrentId')) {
+		return state
+			.setIn(['focusCurrentId'], desktop0.get('focusCurrentId'));
+	}
 	// Else, set focus to root of current screen
 	else {
 		return state
-			.deleteIn(['widgets', desktopId.toString(), 'focusCurrentId'])
+			//.deleteIn(['widgets', desktopId.toString(), 'focusCurrentId'])
 			.deleteIn(['focusCurrentId']);
 	}
 }

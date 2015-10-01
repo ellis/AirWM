@@ -9,10 +9,11 @@
 * [x] allow for passing keyboard bindings to store.dispatch()
 * [x] automatically make space for `_NET_WM_WINDOW_TYPE_DOCK`, such as lxqt-panel
 * [ ] core: desktop.raise
+* [ ] switch desktops with Win-1..9
 * [ ] widget.add: maybe add 'desktopNum' parameter?
 * [ ] remove 'xid' from first element of 'x11' settings lists
+* [ ] use 'activate' for 'focus.move*' => 'window.active*', and 'desktop.activate'
 * [ ] implement more commandHandlers() as actions
-* [ ] switch desktops with Win-1..9
 * [ ] test multiple docks and different dock gravities
 * [ ] maximize the "Desktop" type window
 * [ ] save state to console after every change, for debugging
