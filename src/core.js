@@ -369,16 +369,20 @@ function updateX11(state) {
 				const desktop = state.getIn(['widgets', desktopId.toString()]);
 				const screenId = (desktop) ? desktop.get('screenId') : w.get('screenId');
 				const screenX11 = state.getIn(['x11', 'screens', screenId.toString()], Map());
-				const borderWidth = 5;
+				const windowType = w.get('type');
+				const borderWidth = _.get({
+					'desktop': 0,
+					'dock': 0,
+					'window': 5,
+				}, windowType, 1);
 				const color = (hasFocus)
 					? screenX11.getIn(['colors', 'focus'], 0)
 					: screenX11.getIn(['colors', 'normal'], 0);
 				const rc = w.get('rc', List([0, 0, 0, 0])).toJS();
-				const windowType = w.get('windowType');
 				const eventType = _.get({
-					'DESKTOP': undefined,
-					'DOCK': undefined,
-				}, windowType, x11.eventMask.EnterWindow | x11.eventMask.VisibilityChange);
+					'desktop': undefined,
+					'dock': undefined,
+				}, windowType, x11.eventMask.EnterWindow);
 
 				info.desktopNum = state.get('desktopIds').indexOf(desktopId);
 				info.ChangeWindowAttributes = [

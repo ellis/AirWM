@@ -136,6 +136,7 @@ describe('reducer', () => {
 			};
 			const stateB = reducer(ex.state111, actionB);
 			describe("add bottom dock", () => {
+				const state = stateB;
 				//console.log(JSON.stringify(state.toJS(), null, '\t'));
 				//console.log(diff(state, ex.state111));
 				it('should increment widgetIdNext', () => {
@@ -150,7 +151,13 @@ describe('reducer', () => {
 					expect(state.hasIn(['widgets', '2', 'parentId'])).to.equal(false);
 					expect(state.getIn(['widgets', '2', 'screenId'])).to.equal(0);
 					expect(state.getIn(['screens', '0', 'dockIds'])).to.equal(List.of(2));
-					//expect(state.getIn(['x11', 'windowSettings', '2', 'desktopNum'])).to.equal(0);
+					expect(state.getIn(['x11', 'windowSettings', '2', 'desktopNum'])).to.equal(-1);
+				});
+				it('should have proper dimensions/configuration', () => {
+					expect(state.getIn(['widgets', '2', 'rc'])).to.equal(List.of(0, 591, 800, 10));
+					expect(state.getIn(['x11', 'windowSettings', '2', 'ConfigureWindow', 1])).to.equal(Map({
+						x: 0, y: 591, width: 800, height: 10, borderWidth: 0, stackMode: 0
+					}));
 				});
 			});
 		});
