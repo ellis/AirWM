@@ -2,6 +2,7 @@ import _ from 'lodash';
 import assert from 'assert';
 import {List, Map} from 'immutable';
 import Immutable from 'immutable';
+import {logger} from '../lib/logger.js';
 
 import * as core from './core.js';
 
@@ -22,6 +23,9 @@ export default function reducer(state = core.empty, action) {
 			return core.widget_remove(state, action);
 		case 'setX11ScreenColors':
 			return core.setX11ScreenColors(state, action.screenId, action.colors);
+		default:
+			logger.error("reducer: unknown action:")
+			logger.error(JSON.stringify(action));
 	}
 	return state;
 }

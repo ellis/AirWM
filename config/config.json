@@ -54,12 +54,12 @@
 		{
 			"key"      : "j",
 			"modifier" : ["super"],
-			"command"  : "SelectFrameNext"
+			"action"   : {"type": "focus.moveNext"}
 		},
 		{
 			"key"      : "k",
 			"modifier" : ["super"],
-			"command"  : "SelectFramePrev"
+			"action"   : {"type": "focus.movePrev"}
 		}
 	]
 }

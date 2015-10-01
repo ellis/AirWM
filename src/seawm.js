@@ -156,30 +156,6 @@ var commandHandler = function(command) {
 					global.focus_window.moveRight();
 				}
 				break;
-			case "SelectFrameNext": {
-				const state = store.getState().toJS();
-				if (state.focusCurrentId >= 0) {
-					const desktopId = state.screens[state.screenCurrentId.toString()].desktopCurrentId;
-					const childIds = state.widgets[desktopId.toString()].childIds;
-					const i = childIds.indexOf(state.focusCurrentId);
-					assert(i >= 0);
-					const j = (i + 1) % childIds.length;
-					store.dispatch({type: 'setFocusWidget', id: childIds[j]});
-				}
-				break;
-			}
-			case "SelectFramePrev": {
-				const state = store.getState().toJS();
-				if (state.focusCurrentId >= 0) {
-					const desktopId = state.screens[state.screenCurrentId.toString()].desktopCurrentId;
-					const childIds = state.widgets[desktopId.toString()].childIds;
-					const i = childIds.indexOf(state.focusCurrentId);
-					assert(i >= 0);
-					const j = (i == 0) ? childIds.length - 1 : i - 1;
-					store.dispatch({type: 'setFocusWidget', id: childIds[j]});
-				}
-				break;
-			}
 			case "SwitchWorkspaceRight":
 				workspaces.moveRight();
 				break;
@@ -214,6 +190,9 @@ var keyPressHandler = function(ev){
 				} else if(binding.hasOwnProperty("program")){
 					execHandler(binding.program);
 				}
+				else if (binding.hasOwnProperty("action")) {
+					store.dispatch(binding.action);
+				}
 			}
 		}
 	}
@@ -221,19 +200,16 @@ var keyPressHandler = function(ev){
 
 var destroyNotifyHandler = function(ev){
 	logger.info("DestroyNotifier got triggered, removing the window that got destroyed.");
-	forEachWindow(function(window) {
-		if( window.xid === ev.wid ) {
-			window.parent.destroyChild(window);
-			if( global.focus_window === window ) {
-				var w = null;
-				forEachWindow(function(window) {
-					w = window;
-				});
-				if( w !== null ) w.focus();
-			}
+	store.getState().get('widgets').forEach((w, key) => {
+		if (w.get('xid') === ev.wid) {
+			const action = {
+				type: "widget.remove",
+				id: parseInt(key)
+			};
+			store.dispatch(action);
+			return false;
 		}
 	});
-	setFocusToRootIfNecessary();
 }
 
 /**
@@ -241,7 +217,7 @@ var destroyNotifyHandler = function(ev){
  */
 function mapRequestHandler(ev) {
 	store.dispatch({
-		type: 'addWidget',
+		type: 'widget.add',
 		widget: {
 			xid: ev.wid
 		}
@@ -304,7 +280,7 @@ function handleFocusEvent(ev) {
 			}
 		});
 		if (id >= 0) {
-			store.dispatch({type: 'setFocusWidget', id: id});
+			store.dispatch({type: 'focus.moveTo', id: id});
 		}
 	} catch (e) {
 		logger.error("handleFocusEvent: ERROR:")
@@ -432,7 +408,7 @@ var airClientCreator = function(err, display) {
 		/*
 		NOTE: Using EWMH stops the client from receiving a bunch of messages.
 		I think that it's probably overwriting the eventMask.
-		
+
 		ewmh = new EWMH(display.client, display.screen[0].root);
 
 		const SUPPORTED_ATOMS = [
