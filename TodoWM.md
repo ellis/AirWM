@@ -8,28 +8,48 @@
 * [x] when window is closed, remove it from layout
 * [x] allow for passing keyboard bindings to store.dispatch()
 * [x] automatically make space for `_NET_WM_WINDOW_TYPE_DOCK`, such as lxqt-panel
-* [ ] core: desktop.raise
-* [ ] switch desktops with Win-1..9
-* [ ] widget.add: maybe add 'desktopNum' parameter?
+* [x] core: desktop.raise
+* [?] switch desktops with Win-1..9
+* [ ] create "Tall" layout engine
+* [ ] actions: send window to desktop
+* [ ] actions: close window
+* [ ] actions: move windows in childIds order
+* [ ] ewmh: get ewmh to work without blocking lots of window events
+* [ ] ewmh: desktop count
+* [ ] ewmh: desktop switching
+* [ ] ewmh: `_NET_CLIENT_LIST`
+* [ ] ewmh: `_NET_CLIENT_LIST_STACKING`
+* [ ] ewmh: get xfce and lxqt panels to recognize windows
+* [ ] implement more commandHandlers() as actions
+* [ ] recognize and maximize the "Desktop" type window
+* [ ] save state to console after every change, for debugging
+* [ ] only have mouse follow cursor when the user moves the mouse
+
+Testing:
+* [ ] test 'desktop.raise' more thoroughly
+* [ ] test multiple docks and different dock gravities
+
+Refactoring:
 * [ ] remove 'xid' from first element of 'x11' settings lists
 * [ ] use 'activate' for 'focus.move*' => 'window.active*', and 'desktop.activate'
-* [ ] implement more commandHandlers() as actions
-* [ ] test multiple docks and different dock gravities
-* [ ] maximize the "Desktop" type window
-* [ ] save state to console after every change, for debugging
-* [ ] supply list of windows to wmctrl (`_NET_CLIENT_LIST` or `_WIN_CLIENT_LIST`)
-* [ ] only have mouse follow cursor when the user moves the mouse
-* [ ] put background and docks onto Screen instead of Workspace
-* [ ] `_NET_CLIENT_LIST_STACKING`
-* [ ] `_NET_ACTIVE_WINDOW`
 * [ ] handleStateChange: don't call DestroyWindow on a window that was already destroyed
 
 Later:
+* [ ] config: allow for loading a js file instead of just JSON
+* [ ] config: add desktop config, accept a number, a list of strings, or JSON widget objects
+* [ ] widget.add: maybe add 'desktopNum' parameter?
 * [ ] allow for different desktops on different workspaces
 * [ ] figure out some form of 'show desktop' functionality
 * [ ] check out features at <http://awesome.naquadah.org/>
 * [ ] consider <https://github.com/anko/hudkit> for decorations
 * [ ] consider <https://github.com/anko/basedwm> for socket interface
+* [ ] look into using 'async', perhaps look at x11-props code
+* [ ] cli command interface
+* [ ] HUD command interface
+
+Multi-screen todos:
+* [ ] test showing a dock on each screen
+* [ ] allow for dynamic plugging in of a screen
 
 # Notes
 
