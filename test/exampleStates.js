@@ -188,3 +188,88 @@ export const state112 = fromJS({
 		}
 	}
 });
+
+export const state240 = fromJS({
+	widgets: {
+		0: {
+			type: "desktop",
+			name: "1",
+			screenId: 0,
+			rc: [0, 0, 800, 600],
+			layout: "tile-right"
+		},
+		1: {
+			type: "desktop",
+			name: "2",
+			screenId: 1,
+			rc: [0, 0, 800, 600],
+			layout: "tile-right"
+		},
+		2: {
+			type: "desktop",
+			name: "3",
+			layout: "tile-right"
+		},
+		3: {
+			type: "desktop",
+			name: "4",
+			layout: "tile-right"
+		},
+		4: {
+			type: "dock",
+			xid: 2004,
+			screenId: 0,
+			dockGravity: "bottom",
+			dockSize: "20",
+			rc: [0, 590, 0, 800]
+		}
+	},
+	screens: {
+		0: {
+			xidRoot: screen0_xidRoot,
+			width: 800,
+			height: 600,
+			desktopCurrentId: 0
+		},
+		1: {
+			xidRoot: screen0_xidRoot + 1,
+			width: 800,
+			height: 600,
+			desktopCurrentId: 1
+		}
+	},
+	widgetIdNext: 5,
+	desktopIds: [0, 1, 2, 3],
+	screenCurrentId: 0,
+	x11: {
+		desktopNum: 0,
+		wmSettings: {
+			SetInputFocus: [screen0_xidRoot]
+		},
+		windowSettings: {
+			"4": {
+				"xid": 1002,
+				"visible": true,
+				"desktopNum": 0,
+				"ChangeWindowAttributes": [
+					1002,
+					{
+						"borderPixel": 0,
+						eventMask: 16
+					}
+				],
+				"ConfigureWindow": [
+					1002,
+					{
+						"x": 402,
+						"y": 5,
+						"width": 382,
+						"height": 580,
+						"borderWidth": 5,
+						"stackMode": 0
+					}
+				]
+			}
+		}
+	}
+});

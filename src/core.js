@@ -73,6 +73,33 @@ export function setX11ScreenColors(state, screenId, colors) {
 	return state.mergeIn(['x11', 'screens', screenId.toString(), 'colors'], Map(colors));
 }
 
+export function desktop_raise(state, action) {
+	const desktopNum = action.num;
+	const desktopId = state.get('desktopIds').get(desktopNum);
+	if (desktopId >= 0) {
+		const screenId = state.get('screenCurrentId');
+		const desktopCurrentId = state.getIn(['screens', screenId.toString(), 'desktopCurrentId']);
+		// If a desktop change is requested for the current screen.
+		if (desktopId !== desktopCurrentId) {
+			state = state
+				.setIn(['screens', screenId.toString(), 'desktopCurrentId'], desktopId)
+				.setIn(['widgets', desktopId.toString(), 'screenId'], screenId)
+				.deleteIn(['widgets', desktopCurrentId.toString(), 'screenId']);
+			// If any other screens were showing the selected desktop,
+			// put the desktop on that screen that had been on this one.
+			const screenKey = screenId.toString();
+			state.get('screens').forEach((screen, key) => {
+				if (key !== screenKey && desktopId === screen.get('desktopCurrentId')) {
+					state = state
+						.setIn(['screens', key, 'desktopCurrentId'], desktopCurrentId)
+						.setIn(['widgets', desktopCurrentId.toString(), screenId], parseInt(key));
+				}
+			});
+		}
+	}
+	return state;
+}
+
 export function widget_add(state, action) {
 	const w = action.widget;
 	assert(state);

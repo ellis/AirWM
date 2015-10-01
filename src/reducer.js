@@ -12,6 +12,8 @@ export default function reducer(state = core.empty, action) {
 		case '@@redux/INIT':
 			// do nothing
 			break;
+		case 'desktop.raise':
+			return core.desktop_raise(state, action);
 		case 'initialize':
 			return core.initialize(action.desktops, action.screens);
 		case 'focus.moveNext':

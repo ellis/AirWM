@@ -28,6 +28,18 @@ describe('reducer', () => {
 		expect(state).is.equal(ex.state110);
 	});
 
+	describe('desktop.raise', () => {
+		describe('raise an non-visible desktop', () => {
+			const state = reducer(ex.state240, {type: 'desktop.raise', num: 2});
+			it('shows that desktop', () => {
+				expect(state.getIn(['screens', '0', 'desktopCurrentId'])).to.equal(2);
+				expect(state.getIn(['widgets', '2', 'screenId'])).to.equal(0);
+			});
+			// it('hides windows on previous desktop')
+			// it('shows windows on current desktop')
+		});
+	});
+
 	describe('widget.add', () => {
 		const action1 = {
 			type: 'widget.add',

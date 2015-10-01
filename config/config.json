@@ -6,6 +6,7 @@
 		"lxqt-panel"
 	],
 	"keybindings" : [
+		{ "key": "1", "modifier": ["super"], "action": {"type": "desktop.raise", "num": 0}},
 		{
 			"key"      : "d",
 			"modifier" : ["super"],
