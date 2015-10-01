@@ -307,7 +307,7 @@ function updateLayout(state) {
 					rc[3] -= size;
 					break;
 			}
-			state = state.setIn(['widgets', id.toString(), 'rc'], rc2);
+			state = state.setIn(['widgets', id.toString(), 'rc'], List(rc2));
 		});
 		// Desktop layout
 		const desktopId = screen.get('desktopCurrentId');
@@ -373,8 +373,6 @@ function updateX11(state) {
 				const color = (hasFocus)
 					? screenX11.getIn(['colors', 'focus'], 0)
 					: screenX11.getIn(['colors', 'normal'], 0);
-				console.log(w.get('rc'))
-				console.log(w.get('rc', List([0, 0, 0, 0])))
 				const rc = w.get('rc', List([0, 0, 0, 0])).toJS();
 				const windowType = w.get('windowType');
 				const eventType = _.get({
