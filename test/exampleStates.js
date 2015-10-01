@@ -300,7 +300,7 @@ export const state240 = fromJS({
 			desktopCurrentId: 0
 		},
 		1: {
-			xidRoot: screen0_xidRoot + 1,
+			xidRoot: screen1_xidRoot,
 			width: 800,
 			height: 600,
 			desktopCurrentId: 1
