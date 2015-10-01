@@ -5,9 +5,10 @@
 * [x] handle X11 focus changes
 * [x] catch state changes so that new windows are displayed
 * [x] handle Win-K
-* [ ] when window is closed, remove it from layout
-* [ ] change commandHandlers() so that it passes actions to store.dispatch()
+* [x] when window is closed, remove it from layout
+* [x] allow for passing keyboard bindings to store.dispatch()
 * [ ] automatically make space for `_NET_WM_WINDOW_TYPE_DOCK`, such as lxqt-panel
+* [ ] implement more commandHandlers() as actions
 * [ ] maximize the "Desktop" type window
 * [ ] save state to console after every change, for debugging
 * [ ] supply list of windows to wmctrl (`_NET_CLIENT_LIST` or `_WIN_CLIENT_LIST`)
@@ -20,6 +21,8 @@ Later:
 * [ ] allow for different desktops on different workspaces
 * [ ] figure out some form of 'show desktop' functionality
 * [ ] check out features at <http://awesome.naquadah.org/>
+* [ ] consider <https://github.com/anko/hudkit> for decorations
+* [ ] consider <https://github.com/anko/basedwm> for socket interface
 
 # Notes
 
