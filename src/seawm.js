@@ -90,7 +90,10 @@ var errorHandler = function(err){
 }
 
 function widgetDestroy(w) {
-	global.X.DestroyWindow(w.xid);
+	const xid = w.get('xid');
+	if (xid) {
+		global.X.DestroyWindow(xid);
+	}
 }
 
 /*
@@ -410,22 +413,27 @@ var airClientCreator = function(err, display) {
 			grabKeyBindings(ks2kc,display);
 		});
 
-		ewmh = new EWMH(display.client, display.screen[0].root);
-
 		const eventMask = {
-			eventMask: x11.eventMask.SubstructureNotify   |
-					   x11.eventMask.SubstructureRedirect |
-					   x11.eventMask.ResizeRedirect
+			eventMask:
+				x11.eventMask.ButtonPress |
+				x11.eventMask.EnterWindow |
+				x11.eventMask.LeaveWindow |
+				x11.eventMask.SubstructureNotify |
+				x11.eventMask.SubstructureRedirect |
+				x11.eventMask.StructureNotify |
+				x11.eventMask.PropertyChange |
+				x11.eventMask.ResizeRedirect
 		}
 
 		// By adding the substructure redirect you become the window manager.
-		logger.info("Registering AirWM as the current Window Manager.");
+		logger.info("Registering SeaWM as the current Window Manager.");
 		global.X.ChangeWindowAttributes(display.screen[0].root, eventMask, changeWindowAttributeErrorHandler);
 
-		ewmh.on('CurrentDesktop', function(d) {
-			console.log('Client requested current desktop to be: ' + d);
-			//screens[0].setWorkspace(d);
-		});
+		/*
+		NOTE: Using EWMH stops the client from receiving a bunch of messages.
+		I think that it's probably overwriting the eventMask.
+		
+		ewmh = new EWMH(display.client, display.screen[0].root);
 
 		const SUPPORTED_ATOMS = [
 			'_NET_CURRENT_DESKTOP',
@@ -456,6 +464,12 @@ var airClientCreator = function(err, display) {
 			ewmh.set_current_desktop(0);
 		});
 
+		ewmh.on('CurrentDesktop', function(d) {
+			console.log('Client requested current desktop to be: ' + d);
+			//screens[0].setWorkspace(d);
+		});
+		*/
+
 		store.subscribe(handleStateChange);
 
 		// Load the programs that should get started and start them
@@ -469,4 +483,4 @@ var airClientCreator = function(err, display) {
 	}
 }
 
-x11.createClient(airClientCreator).on('error', errorHandler).on('event', eventHandler);
+x11.createClient({debug: true}, airClientCreator).on('error', errorHandler).on('event', eventHandler);

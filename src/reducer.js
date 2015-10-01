@@ -10,10 +10,16 @@ export default function reducer(state = core.empty, action) {
 	switch (action.type) {
 		case 'initialize':
 			return core.initialize(action.desktops, action.screens);
-		case 'addWidget':
-			return core.addWidget(state, action.widget);
-		case 'setFocusWidget':
-			return core.setFocusWidget(state, action.id);
+		case 'focus.moveNext':
+			return core.focus_moveNext(state, action.id);
+		case 'focus.movePrev':
+			return core.focus_movePrev(state);
+		case 'focus.moveTo':
+			return core.focus_moveTo(state);
+		case 'widget.add':
+			return core.widget_add(state, action);
+		case 'widget.remove':
+			return core.widget_remove(state, action);
 		case 'setX11ScreenColors':
 			return core.setX11ScreenColors(state, action.screenId, action.colors);
 	}

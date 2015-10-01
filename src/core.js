@@ -7,6 +7,23 @@ import x11 from 'x11';
 
 export const empty = Map();
 
+/*
+export const actions = {
+	'focus.moveTo': {
+		build: function(id) { return {type: 'focus.moveTo', id: id}; },
+		run: function(state, params) { return focus_moveTo(state, params.id); }
+	},
+	'focus.moveNext': {
+		build: function() { return {type: 'focus.moveNext'}; },
+		run: function(state, params) { return focus_moveNext(state); }
+	},
+	'focus.movePrev': {
+		build: function() { return {type: 'focus.movePrev'}; },
+		run: function(state, params) { return focus_moveNext(state); }
+	}
+}
+*/
+
 export function initialize(desktops, screens) {
 	assert(_.isArray(desktops));
 	assert(_.isArray(screens));
@@ -53,7 +70,8 @@ export function setX11ScreenColors(state, screenId, colors) {
 	return state.mergeIn(['x11', 'screens', screenId.toString(), 'colors'], Map(colors));
 }
 
-export function addWidget(state, w) {
+export function widget_add(state, action) {
+	const w = action.widget;
 	assert(state);
 	assert(w);
 
@@ -80,7 +98,64 @@ export function addWidget(state, w) {
 	return state;
 }
 
-export function setFocusWidget(state, id) {
+export function widget_remove(state, action) {
+	const id = action.id;
+	assert(state);
+	assert(_.isNumber(id));
+
+	const w = state.getIn('widgets', id.toString());
+	// Remove widget from parent
+	const parentId = w.get('parentId');
+	const screenId = w.get('screenId');
+	if (parentId) {
+		state = state.updateIn(
+			['widgets', parentId.toString(), 'childIds'],
+			List(),
+			childIds => childIds.delete(childIds.indexOf(id))
+		);
+	}
+	else if (screenId) {
+		// TODO: handle screen widgets
+	}
+
+	// Remove widget from current focus
+	if (state.get('focusCurrentId') === id) {
+		state = focus_moveNext(state);
+	)
+
+	// Remove widget from desktop focus
+	const desktopId = getWidgetDesktopId(state, w);
+	if (desktopId) {
+		const focusCurrentId = state.getIn(['widgets', desktopId.toString(), 'focusCurrentId']);
+		if (focusCurrentId === id) {
+			state = state.deleteIn(
+			['widgets', desktopId.toString(), 'focusCurrentId']
+		)
+	}
+
+	const screen = state.getIn(['screens', screenId.toString()]);
+	const desktopId = screen.get('desktopCurrentId');
+	const widgets0 = state.get('widgets');
+	const id = widgets0.count();
+	const w1 = Map(w).merge({
+		parentId: desktopId,
+		visible: true
+	});
+	//console.log(1)
+	//console.log(state.get('widgets'));
+	state = state.updateIn(
+		['widgets', desktopId.toString(), 'childIds'],
+		List(),
+		childIds => childIds.push(id)
+	).setIn(['widgets', id.toString()], w1);
+	state = updateFocus(state, id);
+	state = updateLayout(state);
+	state = updateX11(state);
+
+	return state;
+}
+
+function focus_moveTo(state, id) {
 	assert(_.isNumber(id));
 
 	const key = id.toString();
@@ -114,6 +189,36 @@ export function setFocusWidget(state, id) {
 	state = updateX11(state);
 
 	return state;
+}
+
+function focus_moveNext(state, action) {
+	const id = _.get(action, 'id', state.get('focusCurrentId'));
+	if (id >= 0) {
+		const w = state.getIn(['widgets', id.toString()]);
+		const desktopId = getWidgetDesktopId(state, w);
+		if (desktopId) {
+			const childIds = state.getIn(['widgets', desktopId.toString(), 'childIds'], List());
+			const i = childIds.indexOf(id);
+			assert(i >= 0);
+			const j = (i + 1) % childIds.count();
+			return setFocusWidget(state, childIds.get(j));
+		}
+	}
+}
+
+function focus_movePrev(state) {
+	const id = _.get(action, 'id', state.get('focusCurrentId'));
+	if (id >= 0) {
+		const w = state.getIn(['widgets', id.toString()]);
+		const desktopId = getWidgetDesktopId(state, w);
+		if (desktopId) {
+			const childIds = state.getIn(['widgets', desktopId.toString(), 'childIds'], List());
+			const i = childIds.indexOf(id);
+			assert(i >= 0);
+			const j = (i == 0) ? childIds.length - 1 : i - 1;
+			return setFocusWidget(state, childIds.get(j));
+		}
+	}
 }
 
 function getWidgetDesktopId(state, w, id = -1) {
@@ -234,7 +339,7 @@ function updateX11(state) {
 				const eventType = _.get({
 					'DESKTOP': undefined,
 					'DOCK': undefined,
-				}, windowType, x11.eventMask.EnterWindow);
+				}, windowType, x11.eventMask.EnterWindow | x11.eventMask.VisibilityChange);
 
 				info.desktopNum = state.get('desktopIds').indexOf(desktopId);
 				info.ChangeWindowAttributes = [

@@ -161,9 +161,15 @@ function clientCreator(err, display) {
 		});
 
 		const eventMask = {
-			eventMask: x11.eventMask.SubstructureNotify   |
-					   x11.eventMask.SubstructureRedirect |
-					   x11.eventMask.ResizeRedirect
+			eventMask:
+				x11.eventMask.ButtonPress |
+				x11.eventMask.EnterWindow |
+				x11.eventMask.LeaveWindow |
+				x11.eventMask.SubstructureNotify |
+				x11.eventMask.SubstructureRedirect |
+				x11.eventMask.StructureNotify |
+				x11.eventMask.PropertyChange |
+				x11.eventMask.ResizeRedirect
 		}
 
 		// By adding the substructure redirect you become the window manager.
