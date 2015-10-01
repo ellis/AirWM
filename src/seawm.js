@@ -14,6 +14,7 @@ var conversion = require('../lib/conversion');
 var logger	 = require('../lib/logger').logger;
 import {empty} from './core.js';
 import makeStore from './store.js';
+import getWindowProperties from '../lib/getWindowProperties.js';
 
 const store = makeStore();
 
@@ -217,33 +218,36 @@ var destroyNotifyHandler = function(ev){
  * X11 event to add a new window
  */
 function mapRequestHandler(ev) {
-	const dispatch = function(widgetType) {
-		store.dispatch({
+	getWindowProperties(global.X, ev.wid).then(props => {
+		const widgetType = ({
+			'_NET_WM_WINDOW_TYPE_DOCK': 'dock'
+		}[props['_NET_WM_WINDOW_TYPE']] || "window");
+
+		const action = {
 			type: 'widget.add',
 			widget: {
 				type: widgetType,
 				xid: ev.wid
 			}
-		});
-	};
+		};
 
-	x11prop.get_property(global.X, ev.wid, '_NET_WM_WINDOW_TYPE', 'ATOM', (err, atomId) => {
-		if (err) throw err;
-		console.log("atomId: "+JSON.stringify(atomId));
-		if (atomId > 0) {
-			global.X.GetAtomName(atomId, function(err, name) {
-				console.log("name: "+name)
-				if (err) throw err;
-				const widgetType = ({
-					'_NET_WM_WINDOW_TYPE_DOCK': 'dock'
-				}[name] || "window");
-				dispatch(widgetType);
-			});
+		if (widgetType === 'dock') {
+			let [left, right, top, bottom, left_start_y, left_end_y, right_start_y, right_end_y, top_start_x, top_end_x, bottom_start_x, bottom_end_x] = props["_NET_WM_STRUT_PARTIAL"];
+			console.log("addXwinDock: "+props["_NET_WM_STRUT_PARTIAL"]);
+			//console.log([left, right, top, bottom]);
+			if (top > 0) {
+				action.dockGravity = "top";
+				action.dockSize = top;
+			}
+			else if (bottom > 0) {
+				action.dockGravity = "bottom";
+				action.dockSize = bottom;
+			}
 		}
-		else {
-			dispatch("window");
-		}
+
+		store.dispatch(action);
 	});
+
 	/*
 	ewmh.update_window_list(xids, err => {
 		if (err) {
