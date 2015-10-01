@@ -380,10 +380,10 @@ var airClientCreator = function(err, display) {
 		const action1 = {
 			type: 'initialize',
 			desktops: [
-				{
-					name: "web",
-					layout: "tile-right"
-				}
+				{name: "web", layout: "tile-right"},
+				{name: "text", layout: "tile-right"},
+				{name: "cli", layout: "tile-right"},
+				{name: "prog", layout: "tile-right"},
 			],
 			screens: _.map(display.screen, (screen) => { return {
 				xidRoot: screen.root,

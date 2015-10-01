@@ -13,6 +13,10 @@ export default function reducer(state = core.empty, action) {
 			// do nothing
 			break;
 		case 'desktop.raise':
+			//console.log(action);
+			//state = core.desktop_raise(state, action);
+			//console.log(JSON.stringify(state.toJS(), null, '\t'));
+			//return state;
 			return core.desktop_raise(state, action);
 		case 'initialize':
 			return core.initialize(action.desktops, action.screens);

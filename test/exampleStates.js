@@ -1,6 +1,7 @@
 import {fromJS} from 'immutable';
 
 export const screen0_xidRoot = 100;
+export const screen1_xidRoot = 101;
 
 export const state110 = fromJS({
 	widgets: {
@@ -189,6 +190,73 @@ export const state112 = fromJS({
 	}
 });
 
+export const state120 = fromJS({
+	widgets: {
+		0: {
+			type: "desktop",
+			name: "1",
+			screenId: 0,
+			rc: [0, 0, 800, 600],
+			layout: "tile-right"
+		},
+		1: {
+			type: "desktop",
+			name: "2",
+			layout: "tile-right"
+		},
+		2: {
+			type: "dock",
+			xid: 2002,
+			screenId: 0,
+			dockGravity: "bottom",
+			dockSize: "20",
+			rc: [0, 590, 0, 800]
+		}
+	},
+	screens: {
+		0: {
+			xidRoot: screen0_xidRoot,
+			width: 800,
+			height: 600,
+			desktopCurrentId: 0
+		}
+	},
+	widgetIdNext: 3,
+	desktopIds: [0, 1],
+	screenCurrentId: 0,
+	x11: {
+		desktopNum: 0,
+		wmSettings: {
+			SetInputFocus: [screen0_xidRoot]
+		},
+		windowSettings: {
+			"2": {
+				"xid": 2000,
+				"visible": true,
+				"desktopNum": -1,
+				"ChangeWindowAttributes": [
+					2000,
+					{
+						"borderPixel": 0,
+						eventMask: 16
+					}
+				],
+				"ConfigureWindow": [
+					2000,
+					{
+						"x": 0,
+						"y": 590,
+						"width": 800,
+						"height": 10,
+						"borderWidth": 0,
+						"stackMode": 0
+					}
+				]
+			}
+		}
+	}
+});
+
 export const state240 = fromJS({
 	widgets: {
 		0: {
@@ -217,7 +285,7 @@ export const state240 = fromJS({
 		},
 		4: {
 			type: "dock",
-			xid: 2004,
+			xid: 2000,
 			screenId: 0,
 			dockGravity: "bottom",
 			dockSize: "20",
@@ -248,24 +316,24 @@ export const state240 = fromJS({
 		},
 		windowSettings: {
 			"4": {
-				"xid": 1002,
+				"xid": 2000,
 				"visible": true,
-				"desktopNum": 0,
+				"desktopNum": -1,
 				"ChangeWindowAttributes": [
-					1002,
+					2000,
 					{
 						"borderPixel": 0,
 						eventMask: 16
 					}
 				],
 				"ConfigureWindow": [
-					1002,
+					2000,
 					{
-						"x": 402,
-						"y": 5,
-						"width": 382,
-						"height": 580,
-						"borderWidth": 5,
+						"x": 0,
+						"y": 590,
+						"width": 800,
+						"height": 10,
+						"borderWidth": 0,
 						"stackMode": 0
 					}
 				]

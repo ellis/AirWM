@@ -7,6 +7,9 @@
 	],
 	"keybindings" : [
 		{ "key": "1", "modifier": ["super"], "action": {"type": "desktop.raise", "num": 0}},
+		{ "key": "2", "modifier": ["super"], "action": {"type": "desktop.raise", "num": 1}},
+		{ "key": "3", "modifier": ["super"], "action": {"type": "desktop.raise", "num": 2}},
+		{ "key": "4", "modifier": ["super"], "action": {"type": "desktop.raise", "num": 3}},
 		{
 			"key"      : "d",
 			"modifier" : ["super"],

@@ -81,12 +81,13 @@ export function desktop_raise(state, action) {
 		const desktopCurrentId = state.getIn(['screens', screenId.toString(), 'desktopCurrentId']);
 		// If a desktop change is requested for the current screen.
 		if (desktopId !== desktopCurrentId) {
+			// Update the references between desktops and screen
 			state = state
 				.setIn(['screens', screenId.toString(), 'desktopCurrentId'], desktopId)
 				.setIn(['widgets', desktopId.toString(), 'screenId'], screenId)
 				.deleteIn(['widgets', desktopCurrentId.toString(), 'screenId']);
 			// If any other screens were showing the selected desktop,
-			// put the desktop on that screen that had been on this one.
+			// put this screen's previous desktop on that screen.
 			const screenKey = screenId.toString();
 			state.get('screens').forEach((screen, key) => {
 				if (key !== screenKey && desktopId === screen.get('desktopCurrentId')) {
@@ -95,8 +96,19 @@ export function desktop_raise(state, action) {
 						.setIn(['widgets', desktopCurrentId.toString(), screenId], parseInt(key));
 				}
 			});
+			// Update the focus window
+			const focusCurrentId = state.getIn(['widgets', desktopId.toString(), 'focuseCurrentId']);
+			if (focusCurrentId >= 0)
+				state.setIn(['widgets', desktopId.toString(), 'focuseCurrentId'], focuseCurrentId);
+			else
+				state.deleteIn(['widgets', desktopId.toString(), 'focuseCurrentId']);
+
+			state = updateFocus(state);
+			state = updateLayout(state);
+			state = updateX11(state);
 		}
 	}
+
 	return state;
 }
 
@@ -298,13 +310,13 @@ function updateFocus(state, wid) {
 		const widget = widgets0.get(wid.toString());
 		return state
 			.setIn(['widgets', desktopId.toString(), 'focusCurrentId'], wid)
-			.setIn(['focusCurrentId'], wid)
+			.setIn(['focusCurrentId'], wid);
 	}
 	// Else, set focus to root of current screen
 	else {
 		return state
 			.deleteIn(['widgets', desktopId.toString(), 'focusCurrentId'])
-			.deleteIn(['focusCurrentId'])
+			.deleteIn(['focusCurrentId']);
 	}
 }
 
@@ -369,9 +381,14 @@ function updateLayout(state) {
 	});
 
 	// For all non-visible desktops, hide the windows
-	state.get('widgets').forEach((w, id) => {
-		if (!w.has('parentId') && !w.has('screenId')) {
-			w.get('childIds', List()).forEach(childId => {
+	state.get('desktopIds').forEach(desktopId => {
+		// If this desktop is not on a screen:
+		//console.log({desktopId})
+		//console.log(state.hasIn(['widgets', desktopId.toString(), 'screenId']))
+		//console.log(state.getIn(['widgets', desktopId.toString()]))
+		//console.log(state.getIn(['widgets', desktopId.toString(), 'childIds']))
+		if (!state.hasIn(['widgets', desktopId.toString(), 'screenId'])) {
+			state.getIn(['widgets', desktopId.toString(), 'childIds'], List()).forEach(childId => {
 				state = state.setIn(['widgets', childId.toString(), 'visible'], false);
 			})
 		}
@@ -389,7 +406,7 @@ function updateX11(state) {
 			const hasFocus = (key === focusCurrentKey);
 			const info = {
 				xid: xid,
-				visible: w.get('visible')
+				visible: w.get('visible', false)
 			};
 			if (info.visible) {
 				const desktopId = getWidgetDesktopId(state, w);
@@ -446,6 +463,7 @@ function updateX11(state) {
 	const focusXid = (focusCurrentId >= 0)
 		? state.getIn(['widgets', focusCurrentKey, 'xid'])
 		: state.getIn(['screens', screenCurrentId.toString(), 'xidRoot']);
+	console.log({focusCurrentId, focusCurrentKey, focusXid, screenCurrentId});
 	state = state.updateIn(['x11', 'wmSettings', 'SetInputFocus'], l => {
 		if (l) return l.set(0, focusXid);
 		else return List.of(focusXid);

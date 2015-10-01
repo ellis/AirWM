@@ -9,6 +9,8 @@
 * [x] allow for passing keyboard bindings to store.dispatch()
 * [x] automatically make space for `_NET_WM_WINDOW_TYPE_DOCK`, such as lxqt-panel
 * [ ] core: desktop.raise
+* [ ] widget.add: maybe add 'desktopNum' parameter?
+* [ ] remove 'xid' from first element of 'x11' settings lists
 * [ ] implement more commandHandlers() as actions
 * [ ] switch desktops with Win-1..9
 * [ ] test multiple docks and different dock gravities
