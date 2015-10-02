@@ -30,13 +30,13 @@ describe('reducer', () => {
 		//console.log(diff(state, ex.state110));
 		expect(state).is.equal(ex.state110);
 	});
-/*
+
 	describe('activateDesktop', () => {
 		describe('with one screen, one dock, no windows', () => {
 			describe('raise desktop 2', () => {
 				const state = reducer(ex.state120, {type: 'activateDesktop', num: 1});
 				it('should show desktop 2', () => {
-					expect(state.getIn(['screens', '0', 'desktopCurrentId'])).to.equal(1);
+					expect(State.getCurrentDesktopId(state, 0)).to.equal(1);
 					expect(state.getIn(['widgets', '0', 'screenId'])).to.be.undefined;
 					expect(state.getIn(['widgets', '1', 'screenId'])).to.equal(0);
 				});
@@ -45,7 +45,7 @@ describe('reducer', () => {
 				});
 			});
 		});
-
+/*
 		describe("with one screen, one dock, one window", () => {
 			const action1 = {
 				type: 'createWidget',
@@ -277,9 +277,9 @@ describe('reducer', () => {
 					}));
 				});
 			});
-		});
+		});*/
 	});
-
+/*
 	describe('destroyWidget', () => {
 		const action1 = {type: 'destroyWidget', id: 1};
 		const action2 = {type: 'destroyWidget', id: 2};
