@@ -4,6 +4,7 @@ import {expect} from 'chai';
 import diff from 'immutablediff';
 
 import reducer from '../src/reducer.js';
+import State from '../src/state.js';
 import * as ex from './exampleStates.js';
 
 describe('reducer', () => {
@@ -25,9 +26,11 @@ describe('reducer', () => {
 			]
 		};
 		const state = reducer(undefined, action);
+		//State.print(state);
+		//console.log(diff(state, ex.state110));
 		expect(state).is.equal(ex.state110);
 	});
-
+/*
 	describe('activateDesktop', () => {
 		describe('with one screen, one dock, no windows', () => {
 			describe('raise desktop 2', () => {
@@ -379,4 +382,5 @@ describe('reducer', () => {
 		expect(state1.getIn(['x11', 'screens', '0', 'colors', 'a'])).to.equal(1);
 		expect(state1.getIn(['x11', 'screens', '0', 'colors', 'b'])).to.equal(2);
 	});
+*/
 });

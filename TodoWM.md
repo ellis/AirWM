@@ -14,6 +14,7 @@
 * [x] actions: send window to desktop
 * [x] rename actions
 * [ ] windowOrder, windowStack, desktopOrder, desktopStack, screenOrder, screenStack
+* [ ] move old files with conflicting names (on MacOS) to another directory
 * [ ] use selector parameters
 * [ ] actions: move windows in childIds order
 * [ ] actions: close window
