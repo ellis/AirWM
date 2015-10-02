@@ -34,9 +34,6 @@ function stateCheck(state) {
 				statePrint(state);
 			}
 			// ENDFIX
-			console.log({childId, child: stateGetWindow(state, childId), child2: state.getIn(['widgets', childId.toString()])})
-			if (stateGetWindow(state, childId).get('parentId') !== desktopId)
-				console.log({desktopIdOrder: state.get('desktopIdOrder')});
 			assert.equal(stateGetWindow(state, childId).get('parentId'), desktopId);
 		});
 	});

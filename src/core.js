@@ -100,6 +100,7 @@ export function activateDesktop(state, action) {
 		// If a desktop change is actually requested for the current screen.
 		if (desktopId !== desktopIdOld) {
 			// If desktop was on another screen, swap desktops.
+			// FIXME: instead, we should activate that screen!
 			if (screenIdOld >= 0)
 				state = State.swapDesktopsOnScreens(state, screenId, screenIdOld);
 			else
@@ -564,7 +565,7 @@ function updateLayout(state) {
 
 function layout_tileRight(state, desktopId) {
 	const desktop = state.getIn(['widgets', desktopId.toString()]);
-	const childIds = desktop.get('childIds', List());
+	const childIds = desktop.get('childIdOrder', List());
 	let n = childIds.count();
 	if (n > 0) {
 		let [x, y, w, h] = desktop.get('rc');
@@ -588,8 +589,8 @@ function layout_tileRight(state, desktopId) {
 
 function layout_mainLeft(state, desktopId) {
 	assert(_.isNumber(desktopId), 'desktopId should be numeric: '+desktopId);
-	const desktop = state.getIn(['widgets', desktopId.toString()]);
-	const childIds = desktop.get('childIds', List());
+	const desktop = State.getDesktop(state, desktopId);
+	const childIds = desktop.get('childIdOrder', List());
 	let n = childIds.count();
 	if (n == 1) {
 		let [x, y, w, h] = desktop.get('rc');

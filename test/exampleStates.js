@@ -230,7 +230,7 @@ export const state120 = fromJS({
 			xidRoot: screen0_xidRoot,
 			width: 800,
 			height: 600,
-			desktopIdStack: [0]
+			desktopIdStack: [0, 1]
 		}
 	},
 	widgetIdNext: 3,
@@ -313,13 +313,13 @@ export const state240 = fromJS({
 			xidRoot: screen0_xidRoot,
 			width: 800,
 			height: 600,
-			desktopIdStack: [0]
+			desktopIdStack: [0, 1, 2, 3]
 		},
 		1: {
 			xidRoot: screen1_xidRoot,
 			width: 800,
 			height: 600,
-			desktopIdStack: [1]
+			desktopIdStack: [1, 0, 2, 3]
 		}
 	},
 	widgetIdNext: 5,

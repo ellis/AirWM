@@ -45,7 +45,7 @@ describe('reducer', () => {
 				});
 			});
 		});
-/*
+
 		describe("with one screen, one dock, one window", () => {
 			const action1 = {
 				type: 'createWidget',
@@ -59,7 +59,7 @@ describe('reducer', () => {
 			describe('raise desktop 2', () => {
 				const state = state1;
 				it('should show desktop 2', () => {
-					expect(state.getIn(['screens', '0', 'desktopCurrentId'])).to.equal(1);
+					expect(State.getCurrentDesktopId(state, 0)).to.equal(1);
 					expect(state.getIn(['widgets', '0', 'screenId'])).to.be.undefined;
 					expect(state.getIn(['widgets', '1', 'screenId'])).to.equal(0);
 				});
@@ -67,7 +67,7 @@ describe('reducer', () => {
 					expect(state.getIn(['widgets', '3', 'visible'])).to.equal(false);
 				});
 				it('should not have a focus window', () => {
-					expect(state.getIn(['focuseCurrentId'])).to.be.undefined;
+					expect(state.getIn(['focusCurrentId'])).to.be.undefined;
 				});
 				it('should set x11 focus on root', () => {
 					expect(state.getIn(['x11', 'wmSettings', 'SetInputFocus', 0])).to.equal(ex.screen0_xidRoot);
@@ -77,20 +77,21 @@ describe('reducer', () => {
 			describe('switch back to desktop 1', () => {
 				const state2 = reducer(state1, {type: 'activateDesktop', num: 0});
 				it('should be the same as before', () => {
-					//console.log(JSON.stringify(state2.toJS(), null, '\t'));
-					//console.log(diff(state2, state121));
-					expect(state2).to.equal(state121.setIn(['widgets', '1', 'rc'], List.of(0, 0, 800, 600)));
+					const expected2 = state121.setIn(['widgets', '1', 'rc'], List.of(0, 0, 800, 600));
+					//State.print(state2)
+					//console.log(diff(state2, expected2));
+					expect(state2).to.equal(expected2);
 				});
 			});
 		});
-
+/*
 		describe('with two screens, one dock, no windows', () => {
 			describe('raise desktop 2', () => {
 				const state = reducer(ex.state240, {type: 'activateDesktop', num: 1});
 				it('should switch to desktop 2 on screen 2', () => {
 					expect(state.getIn(['screenCurrentId'])).to.equal(1);
-					expect(state.getIn(['screens', '0', 'desktopCurrentId'])).to.equal(0);
-					expect(state.getIn(['screens', '1', 'desktopCurrentId'])).to.equal(1);
+					expect(State.getCurrentDesktopId(state, 0)).to.equal(0);
+					expect(State.getCurrentDesktopId(state, 1)).to.equal(1);
 					expect(state.getIn(['widgets', '0', 'screenId'])).to.equal(0);
 					expect(state.getIn(['widgets', '1', 'screenId'])).to.equal(1);
 				});
@@ -102,8 +103,8 @@ describe('reducer', () => {
 				const state = reducer(ex.state240, {type: 'activateDesktop', num: 2});
 				it('should show desktop 3 on screen 1', () => {
 					expect(state.getIn(['screenCurrentId'])).to.equal(0);
-					expect(state.getIn(['screens', '0', 'desktopCurrentId'])).to.equal(2);
-					expect(state.getIn(['screens', '1', 'desktopCurrentId'])).to.equal(1);
+					expect(State.getCurrentDesktopId(state, 0)).to.equal(2);
+					expect(State.getCurrentDesktopId(state, 1)).to.equal(1);
 					expect(state.getIn(['widgets', '0', 'screenId'])).to.be.undefined;
 					expect(state.getIn(['widgets', '1', 'screenId'])).to.equal(1);
 					expect(state.getIn(['widgets', '2', 'screenId'])).to.equal(0);
@@ -128,14 +129,14 @@ describe('reducer', () => {
 			const state = reducer(state241, {type: 'activateDesktop', num: 2});
 			console.log(JSON.stringify(state.toJS(), null, '\t'));
 			it('should show desktop 3 on screen 1', () => {
-				expect(state.getIn(['screens', '0', 'desktopCurrentId'])).to.equal(2);
+				expect(State.getCurrentDesktopId(state, 0)).to.equal(2);
 				expect(state.getIn(['widgets', '2', 'screenId'])).to.equal(0);
 			});
 			it('hides previously visible window', () => {
 				expect(state.getIn(['widgets', '5', 'visible'])).to.equal(false);
 			});
 			it('should not have a focus window', () => {
-				expect(state.getIn(['focuseCurrentId'], -1)).to.equal(-1);
+				expect(state.getIn(['focusCurrentId'], -1)).to.equal(-1);
 			});
 			it('should set x11.wmSettings.SetInputFocus to the screen id', () => {
 				console.log(JSON.stringify(state.toJS(), null, '\t'));
@@ -283,14 +284,14 @@ describe('reducer', () => {
 	describe('destroyWidget', () => {
 		const action1 = {type: 'destroyWidget', id: 1};
 		const action2 = {type: 'destroyWidget', id: 2};
-		it('handles removing last, unfocused widget', () => {
+		it('handles removing last, unfocusd widget', () => {
 			const state = reducer(ex.state112, action2);
 			//console.log(JSON.stringify(state.toJS(), null, '\t'));
 			//console.log(diff(state, ex.state111));
 			expect(state).to.equal(ex.state111.setIn(['widgetIdNext'], 3));
 		});
 
-		it('handles removing last, focused widget', () => {
+		it('handles removing last, focusd widget', () => {
 			const actionA = {type: 'activateWindow', id: 2};
 			const state1 = reducer(ex.state112, actionA);
 			const state = reducer(state1, action2);
@@ -299,7 +300,7 @@ describe('reducer', () => {
 			expect(state).to.equal(ex.state111.setIn(['widgetIdNext'], 3));
 		});
 
-		it('handles removing first, unfocused widget', () => {
+		it('handles removing first, unfocusd widget', () => {
 			const actionA = {type: 'activateWindow', id: 2};
 			const state1 = reducer(ex.state112, actionA);
 			const state = reducer(state1, action1);
