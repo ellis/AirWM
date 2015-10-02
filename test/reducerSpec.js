@@ -28,10 +28,10 @@ describe('reducer', () => {
 		expect(state).is.equal(ex.state110);
 	});
 
-	describe('desktop.raise', () => {
+	describe('activateDesktop', () => {
 		describe('with one screen, one dock, no windows', () => {
 			describe('raise desktop 2', () => {
-				const state = reducer(ex.state120, {type: 'desktop.raise', num: 1});
+				const state = reducer(ex.state120, {type: 'activateDesktop', num: 1});
 				it('should show desktop 2', () => {
 					expect(state.getIn(['screens', '0', 'desktopCurrentId'])).to.equal(1);
 					expect(state.getIn(['widgets', '0', 'screenId'])).to.be.undefined;
@@ -45,14 +45,14 @@ describe('reducer', () => {
 
 		describe("with one screen, one dock, one window", () => {
 			const action1 = {
-				type: 'widget.add',
+				type: 'createWidget',
 				widget: {
 					type: 'window',
 					xid: 1001
 				}
 			};
 			const state121 = reducer(ex.state120, action1);
-			const state1 = reducer(state121, {type: 'desktop.raise', num: 1});
+			const state1 = reducer(state121, {type: 'activateDesktop', num: 1});
 			describe('raise desktop 2', () => {
 				const state = state1;
 				it('should show desktop 2', () => {
@@ -72,7 +72,7 @@ describe('reducer', () => {
 			});
 
 			describe('switch back to desktop 1', () => {
-				const state2 = reducer(state1, {type: 'desktop.raise', num: 0});
+				const state2 = reducer(state1, {type: 'activateDesktop', num: 0});
 				it('should be the same as before', () => {
 					//console.log(JSON.stringify(state2.toJS(), null, '\t'));
 					//console.log(diff(state2, state121));
@@ -83,7 +83,7 @@ describe('reducer', () => {
 
 		describe('with two screens, one dock, no windows', () => {
 			describe('raise desktop 2', () => {
-				const state = reducer(ex.state240, {type: 'desktop.raise', num: 1});
+				const state = reducer(ex.state240, {type: 'activateDesktop', num: 1});
 				it('should switch to desktop 2 on screen 2', () => {
 					expect(state.getIn(['screenCurrentId'])).to.equal(1);
 					expect(state.getIn(['screens', '0', 'desktopCurrentId'])).to.equal(0);
@@ -96,7 +96,7 @@ describe('reducer', () => {
 				});
 			});
 			describe('raise desktop 3', () => {
-				const state = reducer(ex.state240, {type: 'desktop.raise', num: 2});
+				const state = reducer(ex.state240, {type: 'activateDesktop', num: 2});
 				it('should show desktop 3 on screen 1', () => {
 					expect(state.getIn(['screenCurrentId'])).to.equal(0);
 					expect(state.getIn(['screens', '0', 'desktopCurrentId'])).to.equal(2);
@@ -111,18 +111,18 @@ describe('reducer', () => {
 		// TODO: it('shows windows on current desktop')
 	});
 
-	describe('desktop.raise with two screens', () => {
+	describe('activateDesktop with two screens', () => {
 		// TODO: move this up
 		describe('switch away from desktop with windows', () => {
 			const action1 = {
-				type: 'widget.add',
+				type: 'createWidget',
 				widget: {
 					type: 'window',
 					xid: 1001
 				}
 			};
 			const state241 = reducer(ex.state240, action1);
-			const state = reducer(state241, {type: 'desktop.raise', num: 2});
+			const state = reducer(state241, {type: 'activateDesktop', num: 2});
 			console.log(JSON.stringify(state.toJS(), null, '\t'));
 			it('should show desktop 3 on screen 1', () => {
 				expect(state.getIn(['screens', '0', 'desktopCurrentId'])).to.equal(2);
@@ -142,9 +142,9 @@ describe('reducer', () => {
 		});
 	});
 
-	describe('widget.add', () => {
+	describe('createWidget', () => {
 		const action1 = {
-			type: 'widget.add',
+			type: 'createWidget',
 			widget: {
 				type: 'window',
 				xid: 1001
@@ -177,7 +177,7 @@ describe('reducer', () => {
 		});
 
 		const action2 = {
-			type: 'widget.add',
+			type: 'createWidget',
 			widget: {
 				type: 'window',
 				xid: 1002
@@ -210,9 +210,9 @@ describe('reducer', () => {
 		});
 
 		describe('removing first window, then adding a thrid', () => {
-			const actionA = {type: 'widget.remove', id: 1};
+			const actionA = {type: 'destroyWidget', id: 1};
 			const action3 = {
-				type: 'widget.add',
+				type: 'createWidget',
 				widget: {
 					type: 'window',
 					xid: 1003
@@ -240,7 +240,7 @@ describe('reducer', () => {
 
 		describe('add docks (with single window)', () => {
 			const actionB = {
-				type: 'widget.add',
+				type: 'createWidget',
 				widget: {
 					type: 'dock',
 					dockGravity: 'bottom',
@@ -277,9 +277,9 @@ describe('reducer', () => {
 		});
 	});
 
-	describe('widget.remove', () => {
-		const action1 = {type: 'widget.remove', id: 1};
-		const action2 = {type: 'widget.remove', id: 2};
+	describe('destroyWidget', () => {
+		const action1 = {type: 'destroyWidget', id: 1};
+		const action2 = {type: 'destroyWidget', id: 2};
 		it('handles removing last, unfocused widget', () => {
 			const state = reducer(ex.state112, action2);
 			//console.log(JSON.stringify(state.toJS(), null, '\t'));
@@ -288,7 +288,7 @@ describe('reducer', () => {
 		});
 
 		it('handles removing last, focused widget', () => {
-			const actionA = {type: 'focus.moveTo', id: 2};
+			const actionA = {type: 'activateWindow', id: 2};
 			const state1 = reducer(ex.state112, actionA);
 			const state = reducer(state1, action2);
 			//console.log(JSON.stringify(state.toJS(), null, '\t'));
@@ -297,7 +297,7 @@ describe('reducer', () => {
 		});
 
 		it('handles removing first, unfocused widget', () => {
-			const actionA = {type: 'focus.moveTo', id: 2};
+			const actionA = {type: 'activateWindow', id: 2};
 			const state1 = reducer(ex.state112, actionA);
 			const state = reducer(state1, action1);
 			//console.log(JSON.stringify(state.toJS(), null, '\t'));
@@ -308,9 +308,9 @@ describe('reducer', () => {
 		});
 	});
 
-	describe('focus.moveNext', () => {
+	describe('activateWindowNext', () => {
 		const action = {
-			type: 'focus.moveNext'
+			type: 'activateWindowNext'
 		};
 		it('handle situation with no windows (no change)', () => {
 			const state1 = reducer(ex.state110, action);
@@ -332,9 +332,9 @@ describe('reducer', () => {
 		});
 	});
 
-	describe('focus.movePrev', () => {
+	describe('activateWindowPrev', () => {
 		const action = {
-			type: 'focus.movePrev'
+			type: 'activateWindowPrev'
 		};
 		it('handle situation with no windows (no change)', () => {
 			const state1 = reducer(ex.state110, action);
@@ -356,9 +356,9 @@ describe('reducer', () => {
 		});
 	});
 
-	it('handles focus.moveTo', () => {
+	it('handles activateWindow', () => {
 		const action1 = {
-			type: 'focus.moveTo',
+			type: 'activateWindow',
 			id: 2
 		};
 		const state1 = reducer(ex.state112, action1);

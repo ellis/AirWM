@@ -205,7 +205,7 @@ var destroyNotifyHandler = function(ev){
 	store.getState().get('widgets').forEach((w, key) => {
 		if (w.get('xid') === ev.wid) {
 			const action = {
-				type: "widget.remove",
+				type: "destroyWidget",
 				id: parseInt(key)
 			};
 			store.dispatch(action);
@@ -224,7 +224,7 @@ function mapRequestHandler(ev) {
 		}[props['_NET_WM_WINDOW_TYPE']] || "window");
 
 		const action = {
-			type: 'widget.add',
+			type: 'createWidget',
 			widget: {
 				type: widgetType,
 				xid: ev.wid
@@ -306,7 +306,7 @@ function handleFocusEvent(ev) {
 			}
 		});
 		if (id >= 0) {
-			store.dispatch({type: 'focus.moveTo', id: id});
+			store.dispatch({type: 'activateWindow', id: id});
 		}
 	} catch (e) {
 		logger.error("handleFocusEvent: ERROR:")

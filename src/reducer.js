@@ -8,35 +8,25 @@ import * as core from './core.js';
 
 
 export default function reducer(state = core.empty, action) {
-	switch (action.type) {
-		case '@@redux/INIT':
-			// do nothing
-			break;
-		case 'desktop.raise':
-			//console.log(action);
-			//state = core.desktop_raise(state, action);
-			//console.log(JSON.stringify(state.toJS(), null, '\t'));
-			//return state;
-			return core.desktop_raise(state, action);
-		case 'initialize':
-			return core.initialize(action.desktops, action.screens);
-		case 'focus.moveNext':
-			return core.focus_moveNext(state, action);
-		case 'focus.movePrev':
-			return core.focus_movePrev(state, action);
-		case 'focus.moveTo':
-			return core.focus_moveTo(state, action);
-		case 'move':
-			return core.move(state, action);
-		case 'widget.add':
-			return core.widget_add(state, action);
-		case 'widget.remove':
-			return core.widget_remove(state, action);
-		case 'setX11ScreenColors':
-			return core.setX11ScreenColors(state, action.screenId, action.colors);
-		default:
-			logger.error("reducer: unknown action:")
-			logger.error(JSON.stringify(action));
+	const handlers = {
+		'@@redux/INIT': () => state,
+		'activateDesktop': () => core.desktop_raise(state, action),
+		'activateWindow': () => core.focus_moveTo(state, action),
+		'activateWindowNext': () => core.focus_moveNext(state, action),
+		'activateWindowPrev': () => core.focus_movePrev(state, action),
+		'createWidget': () => core.widget_add(state, action),
+		'destroyWidget': () => core.widget_remove(state, action),
+		'initialize': () => core.initialize(action.desktops, action.screens),
+		'move': () => core.move(state, action),
+		'setX11ScreenColors': () => core.setX11ScreenColors(state, action.screenId, action.colors)
+	};
+	const handler = handlers[action.type];
+	if (handler) {
+		return handler();
 	}
-	return state;
+	else {
+		logger.warning("reducer: unknown action:")
+		logger.warning(JSON.stringify(action));
+		return state;
+	}
 }

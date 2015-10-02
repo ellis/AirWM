@@ -12,8 +12,11 @@
 * [?] switch desktops with Win-1..9
 * [x] create "Tall" layout engine
 * [x] actions: send window to desktop
-* [ ] actions: close window
+* [ ] rename actions
+* [ ] windowOrder, windowStack, desktopOrder, desktopStack, screenOrder, screenStack
+* [ ] use selector parameters
 * [ ] actions: move windows in childIds order
+* [ ] actions: close window
 * [ ] ewmh: get ewmh to work without blocking lots of window events
 * [ ] ewmh: desktop count
 * [ ] ewmh: desktop switching
@@ -114,7 +117,7 @@ Perhaps start via Win-Period.
 * `an` or `a[w]n`: activate next window?
 * need to figure out next/prev by index or stack order, and stack order for current desktop or over whole session: n, N, NN ?
 * `m[w]1+2d2$!`: send windows 1 and 2 to desktop 2, append to end of children
-* close, new, duplicate?
+* close (c, x?), new, duplicate?
 
 Other commands, perhaps pull up command list with Win-Shift-Period.
 

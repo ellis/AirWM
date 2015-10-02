@@ -9,16 +9,16 @@ export const empty = Map();
 
 /*
 export const actions = {
-	'focus.moveTo': {
-		build: function(id) { return {type: 'focus.moveTo', id: id}; },
+	'activateWindow': {
+		build: function(id) { return {type: 'activateWindow', id: id}; },
 		run: function(state, params) { return focus_moveTo(state, params.id); }
 	},
-	'focus.moveNext': {
-		build: function() { return {type: 'focus.moveNext'}; },
+	'activateWindowNext': {
+		build: function() { return {type: 'activateWindowNext'}; },
 		run: function(state, params) { return focus_moveNext(state); }
 	},
-	'focus.movePrev': {
-		build: function() { return {type: 'focus.movePrev'}; },
+	'activateWindowPrev': {
+		build: function() { return {type: 'activateWindowPrev'}; },
 		run: function(state, params) { return focus_moveNext(state); }
 	}
 }
