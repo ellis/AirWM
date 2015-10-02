@@ -6,17 +6,35 @@ import reducer from '../../src/reducer.js';
 import State from '../../src/state.js';
 import * as ex from '../exampleStates.js';
 
+const action1 = {
+	type: 'createWidget',
+	widget: {
+		type: 'window',
+		xid: 1001
+	}
+};
+
+const action2 = {
+	type: 'createWidget',
+	widget: {
+		type: 'window',
+		xid: 1002
+	}
+};
+
 describe('createWidget', () => {
-	const action1 = {
-		type: 'createWidget',
-		widget: {
-			type: 'window',
-			xid: 1001
-		}
-	};
-	const state1 = reducer(ex.state110, action1);
+	let state1, state2;
+	before(() => {
+		state1 = reducer(ex.state110, action1);
+
+		state2 = reducer(state1, action2);
+	});
+
 	describe('adding first window', () => {
-		let state = state1;
+		let state;
+		before(() => {
+			state = reducer(ex.state110, action1);
+		});
 		it('should increment widgetIdNext', () => {
 			expect(state.getIn(['widgetIdNext'])).to.equal(2);
 		})
@@ -40,16 +58,12 @@ describe('createWidget', () => {
 		});
 	});
 
-	const action2 = {
-		type: 'createWidget',
-		widget: {
-			type: 'window',
-			xid: 1002
-		}
-	};
-	const state2 = reducer(state1, action2);
 	describe('adding second window', () => {
-		let state = state2;
+		let state;
+		before(() => {
+			const state1 = reducer(ex.state110, action1);
+			state = reducer(state1, action2);
+		});
 		it('should increment widgetIdNext', () => {
 			expect(state.getIn(['widgetIdNext'])).to.equal(3);
 		})
@@ -102,7 +116,7 @@ describe('createWidget', () => {
 			expect(state.getIn(['x11', 'windowSettings', '3', 'desktopNum'])).to.equal(0);
 		});
 	});
-/*
+
 	// TODO: when adding dock with no wondows, dock should not receive focus
 
 	describe('add docks (with single window)', () => {
@@ -124,12 +138,11 @@ describe('createWidget', () => {
 				expect(state.getIn(['widgetIdNext'])).to.equal(3);
 			});
 			it('should leave the focus on the first window', () => {
-				expect(state.getIn(['focusCurrentId'])).to.equal(1);
-				expect(state.getIn(['widgets', '0', 'focusCurrentId'])).to.equal(1);
+				expect(State.getCurrentWindowId(state)).to.equal(1);
 			});
 			it('should add window to the current screen', () => {
-				expect(state.getIn(['widgets', '0', 'childIds'])).to.equal(List.of(1));
-				expect(state.hasIn(['widgets', '2', 'parentId'])).to.equal(false);
+				expect(state.getIn(['widgets', '0', 'childIdOrder'])).to.equal(List.of(1));
+				expect(state.getIn(['widgets', '2', 'parentId'])).to.be.undefined;
 				expect(state.getIn(['widgets', '2', 'screenId'])).to.equal(0);
 				expect(state.getIn(['screens', '0', 'dockIds'])).to.equal(List.of(2));
 				expect(state.getIn(['x11', 'windowSettings', '2', 'desktopNum'])).to.equal(-1);
@@ -142,5 +155,4 @@ describe('createWidget', () => {
 			});
 		});
 	});
-	*/
 });
