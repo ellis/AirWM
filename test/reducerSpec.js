@@ -358,7 +358,7 @@ describe('reducer', () => {
 			expect(state2).to.equal(ex.state112);
 		});
 	});
-
+*/
 	it('handles activateWindow', () => {
 		const action1 = {
 			type: 'activateWindow',
@@ -382,5 +382,5 @@ describe('reducer', () => {
 		expect(state1.getIn(['x11', 'screens', '0', 'colors', 'a'])).to.equal(1);
 		expect(state1.getIn(['x11', 'screens', '0', 'colors', 'b'])).to.equal(2);
 	});
-*/
+
 });
