@@ -32,37 +32,6 @@ describe('reducer', () => {
 	});
 
 /*
-	describe('destroyWidget', () => {
-		const action1 = {type: 'destroyWidget', id: 1};
-		const action2 = {type: 'destroyWidget', id: 2};
-		it('handles removing last, unfocusd widget', () => {
-			const state = reducer(ex.state112, action2);
-			//console.log(JSON.stringify(state.toJS(), null, '\t'));
-			//console.log(diff(state, ex.state111));
-			expect(state).to.equal(ex.state111.setIn(['widgetIdNext'], 3));
-		});
-
-		it('handles removing last, focusd widget', () => {
-			const actionA = {type: 'activateWindow', id: 2};
-			const state1 = reducer(ex.state112, actionA);
-			const state = reducer(state1, action2);
-			//console.log(JSON.stringify(state.toJS(), null, '\t'));
-			//console.log(diff(state, ex.state111));
-			expect(state).to.equal(ex.state111.setIn(['widgetIdNext'], 3));
-		});
-
-		it('handles removing first, unfocusd widget', () => {
-			const actionA = {type: 'activateWindow', id: 2};
-			const state1 = reducer(ex.state112, actionA);
-			const state = reducer(state1, action1);
-			//console.log(JSON.stringify(state.toJS(), null, '\t'));
-			//console.log(diff(state, ex.state111));
-			expect(state.getIn(['focusCurrentId'])).to.equal(2);
-			expect(state.getIn(['widgets', '0', 'focusCurrentId'])).to.equal(2);
-			expect(state.getIn(['widgets', '0', 'childIds'])).to.equal(List.of(2));
-		});
-	});
-
 	describe('activateWindowNext', () => {
 		const action = {
 			type: 'activateWindowNext'
@@ -116,9 +85,10 @@ describe('reducer', () => {
 			type: 'activateWindow',
 			id: 2
 		};
-		const state1 = reducer(ex.state112, action1);
-		expect(state1.getIn(['focusCurrentId'])).to.equal(2);
-		expect(state1.getIn(['widgets', '0', 'focusCurrentId'])).to.equal(2);
+		const state = reducer(ex.state112, action1);
+		expect(State.getCurrentWindowId(state)).to.equal(2);
+		expect(state1.getIn(['widgets', '0', 'childIdOrder'])).to.equal(List.of(1, 2));
+		expect(state1.getIn(['widgets', '0', 'childIdStack'])).to.equal(List.of(2, 1));
 	});
 
 	it('handles setX11ScreenColors', () => {
