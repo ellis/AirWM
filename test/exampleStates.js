@@ -85,7 +85,7 @@ export const state111 = fromJS({
 				"ChangeWindowAttributes": [
 					1001,
 					{
-						"bIdOrderPixel": 0,
+						"borderPixel": 0,
 						eventMask: 16
 					}
 				],
@@ -96,8 +96,8 @@ export const state111 = fromJS({
 						y: 5,
 						"width": 780,
 						"height": 580,
-						"bIdOrderWidth": 5,
-						"IdStackMode": 0
+						"borderWidth": 5,
+						"stackMode": 0
 					}
 				]
 			}
@@ -159,7 +159,7 @@ export const state112 = fromJS({
 				"ChangeWindowAttributes": [
 					1001,
 					{
-						"bIdOrderPixel": 0,
+						"borderPixel": 0,
 						eventMask: 16
 					}
 				],
@@ -170,8 +170,8 @@ export const state112 = fromJS({
 						"y": 5,
 						"width": 382,
 						"height": 580,
-						"bIdOrderWidth": 5,
-						"IdStackMode": 0
+						"borderWidth": 5,
+						"stackMode": 0
 					}
 				]
 			},
@@ -182,7 +182,7 @@ export const state112 = fromJS({
 				"ChangeWindowAttributes": [
 					1002,
 					{
-						"bIdOrderPixel": 0,
+						"borderPixel": 0,
 						eventMask: 16
 					}
 				],
@@ -193,8 +193,8 @@ export const state112 = fromJS({
 						"y": 5,
 						"width": 382,
 						"height": 580,
-						"bIdOrderWidth": 5,
-						"IdStackMode": 0
+						"borderWidth": 5,
+						"stackMode": 0
 					}
 				]
 			}
@@ -253,7 +253,7 @@ export const state120 = fromJS({
 				"ChangeWindowAttributes": [
 					2000,
 					{
-						"bIdOrderPixel": 0,
+						"borderPixel": 0,
 						eventMask: 16
 					}
 				],
@@ -264,8 +264,8 @@ export const state120 = fromJS({
 						"y": 590,
 						"width": 800,
 						"height": 10,
-						"bIdOrderWidth": 0,
-						"IdStackMode": 0
+						"borderWidth": 0,
+						"stackMode": 0
 					}
 				]
 			}
@@ -342,7 +342,7 @@ export const state240 = fromJS({
 				"ChangeWindowAttributes": [
 					2000,
 					{
-						"bIdOrderPixel": 0,
+						"borderPixel": 0,
 						eventMask: 16
 					}
 				],
@@ -353,8 +353,8 @@ export const state240 = fromJS({
 						"y": 590,
 						"width": 800,
 						"height": 10,
-						"bIdOrderWidth": 0,
-						"IdStackMode": 0
+						"borderWidth": 0,
+						"stackMode": 0
 					}
 				]
 			}

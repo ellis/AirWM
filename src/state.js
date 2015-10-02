@@ -39,11 +39,11 @@ function stateCheck(state) {
 	});
 }
 
-const stateGetScreen = (state, screenId) => state.getIn(['screens', screenId.toString()]);
+const stateGetScreen = (state, screenId = -1) => state.getIn(['screens', screenId.toString()]);
 const stateGetCurrentScreenId = (state) => state.getIn(['screenIdStack', 0]);
 const stateGetCurrentScreen = (state) => stateGetScreen(state, stateGetCurrentScreenId(state));
 
-const stateGetWidget = (state, id) => state.getIn(['widgets', id.toString()]);
+const stateGetWidget = (state, id = -1) => state.getIn(['widgets', id.toString()]);
 
 const stateGetDesktop = stateGetWidget;
 /**
@@ -60,7 +60,11 @@ const stateGetCurrentDesktop = (state, screenId) =>
 	stateGetDesktop(state, stateGetCurrentDesktopId(state, screenId));
 
 const stateGetWindow = stateGetWidget;
-//const stateGetCurrentWindow
+function getCurrentWindowId(state) {
+	const desktop = stateGetCurrentDesktop(state);
+	return desktop.getIn(['childIdStack', 0]);
+}
+const getCurrentWindow = (state) => stateGetWindow(state, getCurrentWindowId);
 
 function stateRemoveWindowFromDesktop(state, id) {
 	const desktopId = getWidgetDesktopId(state, id);
@@ -228,6 +232,7 @@ const State = {
 	getDesktop: stateGetDesktop,
 	getCurrentDesktopId: stateGetCurrentDesktopId,
 	getCurrentDesktop: stateGetCurrentDesktop,
+	getCurrentWindowId,
 	getWindow: stateGetWindow,
 
 	swapDesktopsOnScreens: stateSwapDesktopsOnScreens,

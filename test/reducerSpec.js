@@ -46,12 +46,12 @@ describe('reducer', () => {
 				expect(state.getIn(['widgetIdNext'])).to.equal(2);
 			})
 			it('should set focus to that window', () => {
-				expect(state.getIn(['focusCurrentId'])).to.equal(1);
-				expect(state.getIn(['widgets', '0', 'focusCurrentId'])).to.equal(1);
+				expect(State.getCurrentWindowId(state)).to.equal(1);
+				expect(state.getIn(['widgets', '0', 'childIdStack', 0])).to.equal(1);
 				expect(state.getIn(['x11', 'wmSettings', 'SetInputFocus'])).to.equal(List.of(1001));
 			});
 			it('should add window to the current desktop', () => {
-				expect(state.getIn(['widgets', '0', 'childIds'])).to.equal(List.of(1));
+				expect(state.getIn(['widgets', '0', 'childIdOrder'])).to.equal(List.of(1));
 				expect(state.getIn(['widgets', '1', 'parentId'])).to.equal(0);
 				expect(state.getIn(['x11', 'windowSettings', '1', 'desktopNum'])).to.equal(0);
 			});
@@ -59,7 +59,7 @@ describe('reducer', () => {
 				expect(state.getIn(['widgets', '1', 'visible'])).to.equal(true);
 			});
 			it('should equal fully specified state', () => {
-				//console.log(JSON.stringify(state.toJS(), null, '\t'));
+				//State.print(state);
 				//console.log(diff(state, ex.state111));
 				expect(state).to.equal(ex.state111);
 			});
