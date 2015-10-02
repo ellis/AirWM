@@ -13,15 +13,15 @@ export const empty = Map();
 export const actions = {
 	'activateWindow': {
 		build: function(id) { return {type: 'activateWindow', id: id}; },
-		run: function(state, params) { return focus_moveTo(state, params.id); }
+		run: function(state, params) { return activateWindow(state, params.id); }
 	},
 	'activateWindowNext': {
 		build: function() { return {type: 'activateWindowNext'}; },
-		run: function(state, params) { return focus_moveNext(state); }
+		run: function(state, params) { return activateWindowNext(state); }
 	},
 	'activateWindowPrev': {
 		build: function() { return {type: 'activateWindowPrev'}; },
-		run: function(state, params) { return focus_moveNext(state); }
+		run: function(state, params) { return activateWindowNext(state); }
 	}
 }
 */
@@ -99,10 +99,10 @@ export function activateDesktop(state, action) {
 		const desktopIdOld = State.getCurrentDesktopId(state, screenId);
 		// If a desktop change is actually requested for the current screen.
 		if (desktopId !== desktopIdOld) {
-			// If desktop was on another screen, swap desktops.
-			// FIXME: instead, we should activate that screen!
+			// If desktop was on another screen, activate that screen
 			if (screenIdOld >= 0)
-				state = State.swapDesktopsOnScreens(state, screenId, screenIdOld);
+				state = State.prependUniqueId(state, screenId, ['screenIdStack']);
+			// Otherwise, bring desktop to the current screen
 			else
 				state = State.raiseDesktopOnScreen(state, desktopId, screenId);
 			state = State.raiseDesktopInWmStack(state, desktopId);
@@ -357,44 +357,29 @@ export function destroyWidget(state, action) {
 	return state;
 }
 
-export function focus_moveTo(state, action) {
+export function activateWindow(state, action) {
 	const id = action.id;
 	assert(_.isNumber(id));
 
-	const key = id.toString();
-	const focusOldId = state.get('focusCurrentId', -1);
-	// If focus is changing
-	if (focusOldId.toString() !== key) {
-		// If focus was previously set
-		if (focusOldId >= 0) {
-			const focusOld = state.getIn(['widgets', focusOldId.toString()]);
-			assert(focusOld);
-			const desktopId = getWidgetDesktopId(state, focusOld);
-			if (desktopId >= 0) {
-				state = state.deleteIn(['widgets', desktopId.toString(), 'focusCurrentId'])
-			}
-		}
+	const w = State.getWidget(state, id);
 
-		// Remove old focus
-		state = state.delete('focusCurrentId');
+	// Activate the desktop
+	const desktopId = State.getDesktopIdOfWidget(state, id);
+	const desktopNum = state.get('desktopIdOrder').indexOf(desktopId);
+	state = activateDesktop(state, {num: desktopNum});
 
-		// Set new focus
-		const w = state.getIn(['widgets', key]);
-		if (w) {
-			const desktopId = getWidgetDesktopId(state, w);
-			if (desktopId >= 0) {
-				state = state.setIn(['widgets', desktopId.toString(), 'focusCurrentId'], id)
-			}
-			state = state.set('focusCurrentId', id);
-		}
-	}
+	// Bring window to front of desktop and WM stacks
+	state = State.prependUniqueId(state, id, ['widgets', desktopId.toString(), 'childIdStack']);
+	state = State.prependUniqueId(state, id, ['windowIdStack']);
 
+	state = updateLayout(state);
 	state = updateX11(state);
+	State.check(state);
 
 	return state;
 }
 
-export function focus_moveNext(state, action) {
+export function activateWindowNext(state, action) {
 	return focus_moveDir(state, action, true);
 }
 
@@ -403,21 +388,21 @@ export function focus_movePrev(state, action) {
 }
 
 function focus_moveDir(state, action, next) {
-	const id = _.get(action, 'id', state.get('focusCurrentId'));
+	const id = _.get(action, 'id', State.getCurrentWindowId(state));
 	//console.log({id})
 	if (id >= 0) {
-		const w = state.getIn(['widgets', id.toString()]);
-		const desktopId = getWidgetDesktopId(state, w);
+		const w = State.getWidget(state, id);
+		const desktopId = State.getDesktopIdOfWidget(state, w);
 		//console.log({desktopId})
 		if (desktopId >= 0) {
-			const childIds = state.getIn(['widgets', desktopId.toString(), 'childIds'], List());
+			const childIds = state.getIn(['widgets', desktopId.toString(), 'childIdOrder'], List());
 			const i = childIds.indexOf(id);
 			assert(i >= 0);
 			const j = (next)
 				? (i + 1) % childIds.count()
 				: (i == 0) ? childIds.count() - 1 : i - 1;
 			//console.log({childIds, i, j})
-			return focus_moveTo(state, {id: childIds.get(j)});
+			return activateWindow(state, {id: childIds.get(j)});
 		}
 	}
 	return state;
