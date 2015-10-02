@@ -12,7 +12,7 @@
 * [?] switch desktops with Win-1..9
 * [x] create "Tall" layout engine
 * [x] actions: send window to desktop
-* [ ] rename actions
+* [x] rename actions
 * [ ] windowOrder, windowStack, desktopOrder, desktopStack, screenOrder, screenStack
 * [ ] use selector parameters
 * [ ] actions: move windows in childIds order

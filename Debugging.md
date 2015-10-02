@@ -1,3 +1,9 @@
+# Running tests
+
+``npm test``
+
+``./node_modules/.bin/mocha --compilers js:babel/register --require ./test/test_helper.js --recursive test``
+
 # Debug the X11 protocol stream
 
 Communication with X11 takes place via a protocol.

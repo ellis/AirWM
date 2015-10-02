@@ -10,11 +10,11 @@ import * as core from './core.js';
 export default function reducer(state = core.empty, action) {
 	const handlers = {
 		'@@redux/INIT': () => state,
-		'activateDesktop': () => core.desktop_raise(state, action),
+		'activateDesktop': () => core.activateDesktop(state, action),
 		'activateWindow': () => core.focus_moveTo(state, action),
 		'activateWindowNext': () => core.focus_moveNext(state, action),
 		'activateWindowPrev': () => core.focus_movePrev(state, action),
-		'createWidget': () => core.widget_add(state, action),
+		'createWidget': () => core.createWidget(state, action),
 		'destroyWidget': () => core.widget_remove(state, action),
 		'initialize': () => core.initialize(action.desktops, action.screens),
 		'move': () => core.move(state, action),

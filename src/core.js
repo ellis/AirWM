@@ -7,6 +7,133 @@ import x11 from 'x11';
 
 export const empty = Map();
 
+
+function statePrint(state) {
+	console.log(JSON.stringify(state.toJS(), null, '\t'));
+}
+
+const stateGetScreen = (state, screenId) => state.getIn(['screens', screenId.toString()]);
+const stateGetCurrentScreenId = (state) => state.getIn(['screenIdStack', 0]);
+const stateGetCurrentScreen = (state) => stateGetScreen(state, stateGetCurrentScreenId(state));
+
+const stateGetWidget = (state, id) => state.getIn(['widgets', id.toString()]);
+
+const stateGetDesktop = stateGetWidget;
+/**
+ * Get ID of current desktop.
+ * @param {object} state - current state.
+ * @param {number} [screenId] - If screen ID is passed, find the current desktop ID on that screen.
+ * @return {number} ID of current desktop or current desktop on a given screen.
+ */
+const stateGetCurrentDesktopId = (state, screenId) =>
+	(_.isUndefined(screenId))
+		? state.getIn(['desktopIdStack', 0])
+		: state.getIn(['screens', screenId.toString(), 'desktopIdStack', 0]);
+const stateGetCurrentDesktop = (state, screenId) =>
+	stateGetDesktop(state, stateGetCurrentDesktopId(state, screenId));
+
+const stateGetWindow = stateGetWidget;
+//const stateGetCurrentWindow
+
+function stateInsertWindowOnDesktop(state, w, id, desktopId, order, stack = 1) {
+	return state
+		.setIn(['widgets', id.toString()], w.set('parentId', desktopId))
+		.updateIn(
+			['widgets', desktopId.toString(), 'childIdOrder'],
+			List(),
+			l => {
+				const i = l.indexOf(id);
+				if (i >= 0)
+					l = l.delete(i);
+				if (order >= l.count()) return l.push(id);
+				else if (_.isNumber(order)) return l.splice(order, 0, id);
+				else return l.push(id);
+			}
+		)
+		.updateIn(
+			['widgets', desktopId.toString(), 'childIdStack'],
+			List(),
+			l => {
+				const i = l.indexOf(id);
+				if (i >= 0)
+					l = l.delete(i);
+				if (stack >= l.count()) return l.push(id);
+				else if (_.isNumber(stack)) return l.splice(stack, 0, id);
+				else return l.unshift(id);
+			}
+		);
+}
+
+function stateSetScreenDesktop(state, screenId, desktopId) {
+	assert(_.isNumber(screenId));
+	assert(_.isNumber(desktopId));
+	const desktopPrevId = state.getIn(['screens', screenId.toString(), 'desktopIdStack', 0]);
+	if (desktopId !== desktopPrevId) {
+		state = state
+			// Remove screen reference from the screen's previous desktop
+			.deleteIn(['widgets', desktopIdPrev.toString(), 'screenId'])
+			// Set screen reference in new desktop
+			.setIn(['widgets', desktopId.toString(), 'screenId'], screenId)
+			// Put desktop at head of screen's stack
+			.updateIn(
+				['screens', screenId.toString(), 'desktopIdStack'],
+				List(),
+				l => l.unshift(desktopId)
+			);
+	}
+	return state;
+}
+
+function stateUpdateWindowStacks(state, id) {
+	assert(_.isNumber(id));
+	const desktopId = getWidgetDesktopId(state, id);
+	assert(_.isNumber(desktopId));
+	return state
+		.updateIn(
+			['windowIdStack'],
+			List(),
+			l => {
+				const i = l.indexOf(id);
+				if (i >= 0)
+					l = l.delete(i);
+				return l.unshift(id);
+			}
+		)
+		.updateIn(
+			['widgets', desktopId.toString(), 'childIdStack'],
+			List(),
+			l => {
+				const i = l.indexOf(id);
+				if (i >= 0)
+					l = l.delete(i);
+				return l.unshift(id);
+			}
+		);
+}
+
+function stateCheck(state) {
+	// Each screen has a desktop, and that desktop references the screen
+	state.get('screen').forEach((screen, key) => {
+		const screenId = parseInt(key);
+		const desktopId = screen.getIn(['desktopIdStack', 0]);
+		assert(_.isNumber(desktopId));
+		assert(state.getIn(['widgets', desktopId.toString(), 'screenId']) === screenId);
+	});
+
+	// Desktops and their children
+	state.get('desktopIdOrder').forEach(desktopId => {
+		const desktop = stateGetDesktop(state, desktopId);
+		const childIdOrder = desktop.get('childIdOrder');
+		const childIdStack = desktop.get('childIdStack');
+		// childIdStack is a permutation of childIdOrder
+		assert(childIdOrder.isSubset(childIdStack) && childIdStack.isSubset(childIdOrder));
+		// Each child references this desktop
+		childIdOrder.forEach(childId => {
+			assert(stateGetWindow(state, childId).get('parentId') === desktopId);
+		})
+	});
+}
+
 /*
 export const actions = {
 	'activateWindow': {
@@ -34,8 +161,16 @@ export function initialize(desktops, screens) {
 	desktops = _.cloneDeep(desktops);
 	// Add default desktops if necessary
 	while (desktops.length < screens.length) {
-		desktops.push({type: "desktop", layout: "tile-right"});
+		desktops.push({});
 	}
+
+	// Add defaults to each desktop
+	desktops.forEach(w => _.defaults(w, {
+		type: "desktop",
+		layout: "tile-right",
+		childIdOrder: [],
+		childIdStack: []
+	}));
 
 	// TODO: allow for initial assignment of desktops to screens rather
 	//  than forcing the first desktops to be assigned in order.
@@ -55,8 +190,12 @@ export function initialize(desktops, screens) {
 		widgets: _.zipObject(_.range(0, desktops.length), desktops),
 		screens: _.zipObject(_.range(0, screens.length), screens),
 		widgetIdNext: desktops.length,
-		desktopIds: _.range(0, desktops.length),
-		screenCurrentId: 0,
+		screenIdOrder: _.range(0, screens.length),
+		screenIdStack: _.range(0, screens.length),
+		desktopIdOrder: _.range(0, desktops.length),
+		desktopIdStack: _.range(0, desktops.length),
+		windowIdOrder: [],
+		windowIdStack: [],
 		x11: {
 			desktopNum: 0
 		}
@@ -73,29 +212,20 @@ export function setX11ScreenColors(state, screenId, colors) {
 	return state.mergeIn(['x11', 'screens', screenId.toString(), 'colors'], Map(colors));
 }
 
-export function desktop_raise(state, action) {
+export function activateDesktop(state, action) {
 	const desktopNum = action.num;
-	const desktopId = state.get('desktopIds').get(desktopNum);
+	const desktopId = state.get('desktopIdOrder').get(desktopNum);
 	if (desktopId >= 0) {
-		const screenId = state.get('screenCurrentId');
-		const desktopCurrentId = state.getIn(['screens', screenId.toString(), 'desktopCurrentId']);
-		// If a desktop change is requested for the current screen.
-		if (desktopId !== desktopCurrentId) {
-			// Update the references between desktops and screen
-			state = state
-				.setIn(['screens', screenId.toString(), 'desktopCurrentId'], desktopId)
-				.setIn(['widgets', desktopId.toString(), 'screenId'], screenId)
-				.deleteIn(['widgets', desktopCurrentId.toString(), 'screenId']);
-			// If any other screens were showing the selected desktop,
-			// put this screen's previous desktop on that screen.
-			const screenKey = screenId.toString();
-			state.get('screens').forEach((screen, key) => {
-				if (key !== screenKey && desktopId === screen.get('desktopCurrentId')) {
-					state = state
-						.setIn(['screens', key, 'desktopCurrentId'], desktopCurrentId)
-						.setIn(['widgets', desktopCurrentId.toString(), screenId], parseInt(key));
-				}
-			});
+		const screenIdOld = state.getIn(['widgets', desktopId.toString(), 'screenId']);
+		const screenId = stateGetCurrentScreenId(state);
+		// Current desktop of the target screen
+		const desktopIdOld = stateGetCurrentDesktopId(state, screenId);
+		// If a desktop change is actually requested for the current screen.
+		if (desktopId !== desktopIdOld) {
+			state = stateSetScreenDesktop(state, screenId, desktopId);
+			// If desktop was on another screen, swap desktops.
+			if (screenIdOld >= 0)
+				state = stateSetScreenDesktop(state, screenIdOld, desktopIdOld);
 			// Update the focus window
 			const focusCurrentId = state.getIn(['widgets', desktopId.toString(), 'focuseCurrentId']);
 			if (focusCurrentId >= 0)
@@ -106,19 +236,20 @@ export function desktop_raise(state, action) {
 			state = updateFocus(state);
 			state = updateLayout(state);
 			state = updateX11(state);
+			stateCheck(state);
 		}
 	}
 
 	return state;
 }
 
-export function widget_add(state, action) {
+export function createWidget(state, action) {
 	const w = action.widget;
 	assert(state);
 	assert(w);
 
-	const screenId = state.get('screenCurrentId');
-	const screen = state.getIn(['screens', screenId.toString()]);
+	const screenId = stateGetCurrentScreenId(state);
+	const screen = stateGetCurrentScreen(state, screenId);
 	const widgets0 = state.get('widgets');
 	const id = state.get('widgetIdNext');
 	let w1 = Map(w);
@@ -127,15 +258,15 @@ export function widget_add(state, action) {
 			screenId: screenId,
 			visible: true
 		});
-		// Add dock to screen
+		// Add dock to screen and to widget list
 		state = state.updateIn(
 			['screens', screenId.toString(), 'dockIds'],
 			List(),
 			dockIds => dockIds.push(id)
-		);
+		).setIn(['widgets', id.toString()], w1);
 	}
 	else {
-		const desktopId = screen.get('desktopCurrentId');
+		const desktopId = stateGetCurrentDesktopId(state, screenId);
 		w1 = w1.merge({
 			parentId: desktopId,
 			visible: true
@@ -143,15 +274,11 @@ export function widget_add(state, action) {
 		//console.log(1)
 		//console.log(state.get('widgets'));
 		// Add widget to desktop
-		state = state.updateIn(
-			['widgets', desktopId.toString(), 'childIds'],
-			List(),
-			childIds => childIds.push(id)
-		);
+		state = stateInsertWindow(state, w1, id, desktopId, 1, 1);
 	}
 
 	// Add widget and increment widgetIdNext
-	state = state.setIn(['widgets', id.toString()], w1).set('widgetIdNext', id + 1);
+	state = state.set('widgetIdNext', id + 1);
 
 	state = updateFocus(state, id);
 	state = updateLayout(state);
@@ -274,10 +401,10 @@ export function move(state, action) {
 				// Move focus with the window
 				if (true) {
 					const desktopId1 = to1.desktopId;
-					// FIXME: increment this value once desktop_raise is changed to activate with 1-indexed numbers
+					// FIXME: increment this value once activateDesktop is changed to activate with 1-indexed numbers
 					const desktopNum1 = state.get('desktopIds').indexOf(desktopId1)/* + 1*/;
 					state = state.setIn(['widgets', desktopId1.toString(), 'focusCurrentId'], id);
-					state = desktop_raise(state, {num: desktopNum1});
+					state = activateDesktop(state, {num: desktopNum1});
 				}
 				state = updateFocus(state, id);
 				state = updateLayout(state);

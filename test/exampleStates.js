@@ -10,7 +10,9 @@ export const state110 = fromJS({
 			name: "web",
 			screenId: 0,
 			rc: [0, 0, 800, 600],
-			layout: "tile-right"
+			layout: "tile-right",
+			childIdOrder: [],
+			childIdStack: []
 		}
 	},
 	screens: {
@@ -18,12 +20,16 @@ export const state110 = fromJS({
 			xidRoot: screen0_xidRoot,
 			width: 800,
 			height: 600,
-			desktopCurrentId: 0
+			desktopIdStack: [0]
 		}
 	},
 	widgetIdNext: 1,
-	desktopIds: [0],
-	screenCurrentId: 0,
+	screenIdOrder: [0],
+	screenIdStack: [0],
+	desktopIdOrder: [0],
+	desktopIdStack: [0],
+	windowIdOrder: [],
+	windowIdStack: [],
 	x11: {
 		desktopNum: 0,
 		wmSettings: {
@@ -40,8 +46,8 @@ export const state111 = fromJS({
 			screenId: 0,
 			rc: [0, 0, 800, 600],
 			layout: "tile-right",
-			childIds: [1],
-			focusCurrentId: 1
+			childIdOrder: [1],
+			childIdStack: [1]
 		},
 		1: {
 			type: "window",
@@ -56,13 +62,16 @@ export const state111 = fromJS({
 			xidRoot: screen0_xidRoot,
 			width: 800,
 			height: 600,
-			desktopCurrentId: 0
+			desktopIdStack: [0]
 		}
 	},
 	widgetIdNext: 2,
-	desktopIds: [0],
-	screenCurrentId: 0,
-	focusCurrentId: 1,
+	screenIdOrder: [0],
+	screenIdStack: [0],
+	desktopIdOrder: [0],
+	desktopIdStack: [0],
+	windowIdOrder: [1],
+	windowIdStack: [1],
 	x11: {
 		desktopNum: 0,
 		wmSettings: {
@@ -76,7 +85,7 @@ export const state111 = fromJS({
 				"ChangeWindowAttributes": [
 					1001,
 					{
-						"borderPixel": 0,
+						"bIdOrderPixel": 0,
 						eventMask: 16
 					}
 				],
@@ -87,8 +96,8 @@ export const state111 = fromJS({
 						y: 5,
 						"width": 780,
 						"height": 580,
-						"borderWidth": 5,
-						"stackMode": 0
+						"bIdOrderWidth": 5,
+						"IdStackMode": 0
 					}
 				]
 			}
@@ -104,8 +113,8 @@ export const state112 = fromJS({
 			screenId: 0,
 			rc: [0, 0, 800, 600],
 			layout: "tile-right",
-			childIds: [1, 2],
-			focusCurrentId: 1
+			childIdOrder: [1, 2],
+			childIdStack: [1, 2]
 		},
 		1: {
 			type: "window",
@@ -127,13 +136,16 @@ export const state112 = fromJS({
 			xidRoot: screen0_xidRoot,
 			width: 800,
 			height: 600,
-			desktopCurrentId: 0
+			desktopIdStack: [0]
 		}
 	},
 	widgetIdNext: 3,
-	desktopIds: [0],
-	screenCurrentId: 0,
-	focusCurrentId: 1,
+	screenIdOrder: [0],
+	screenIdStack: [0],
+	desktopIdOrder: [0],
+	desktopIdStack: [0],
+	windowIdOrder: [1, 2],
+	windowIdStack: [1, 2],
 	x11: {
 		desktopNum: 0,
 		wmSettings: {
@@ -147,7 +159,7 @@ export const state112 = fromJS({
 				"ChangeWindowAttributes": [
 					1001,
 					{
-						"borderPixel": 0,
+						"bIdOrderPixel": 0,
 						eventMask: 16
 					}
 				],
@@ -158,8 +170,8 @@ export const state112 = fromJS({
 						"y": 5,
 						"width": 382,
 						"height": 580,
-						"borderWidth": 5,
-						"stackMode": 0
+						"bIdOrderWidth": 5,
+						"IdStackMode": 0
 					}
 				]
 			},
@@ -170,7 +182,7 @@ export const state112 = fromJS({
 				"ChangeWindowAttributes": [
 					1002,
 					{
-						"borderPixel": 0,
+						"bIdOrderPixel": 0,
 						eventMask: 16
 					}
 				],
@@ -181,8 +193,8 @@ export const state112 = fromJS({
 						"y": 5,
 						"width": 382,
 						"height": 580,
-						"borderWidth": 5,
-						"stackMode": 0
+						"bIdOrderWidth": 5,
+						"IdStackMode": 0
 					}
 				]
 			}
@@ -218,12 +230,16 @@ export const state120 = fromJS({
 			xidRoot: screen0_xidRoot,
 			width: 800,
 			height: 600,
-			desktopCurrentId: 0
+			desktopIdStack: [0]
 		}
 	},
 	widgetIdNext: 3,
-	desktopIds: [0, 1],
-	screenCurrentId: 0,
+	screenIdOrder: [0],
+	screenIdStack: [0],
+	desktopIdOrder: [0, 1],
+	desktopIdStack: [0, 1],
+	windowIdOrder: [],
+	windowIdStack: [],
 	x11: {
 		desktopNum: 0,
 		wmSettings: {
@@ -237,7 +253,7 @@ export const state120 = fromJS({
 				"ChangeWindowAttributes": [
 					2000,
 					{
-						"borderPixel": 0,
+						"bIdOrderPixel": 0,
 						eventMask: 16
 					}
 				],
@@ -248,8 +264,8 @@ export const state120 = fromJS({
 						"y": 590,
 						"width": 800,
 						"height": 10,
-						"borderWidth": 0,
-						"stackMode": 0
+						"bIdOrderWidth": 0,
+						"IdStackMode": 0
 					}
 				]
 			}
@@ -297,18 +313,22 @@ export const state240 = fromJS({
 			xidRoot: screen0_xidRoot,
 			width: 800,
 			height: 600,
-			desktopCurrentId: 0
+			desktopIdStack: [0]
 		},
 		1: {
 			xidRoot: screen1_xidRoot,
 			width: 800,
 			height: 600,
-			desktopCurrentId: 1
+			desktopIdStack: [1]
 		}
 	},
 	widgetIdNext: 5,
-	desktopIds: [0, 1, 2, 3],
-	screenCurrentId: 0,
+	screenIdOrder: [0, 1],
+	screenIdStack: [0, 1],
+	desktopIdOrder: [0, 1, 2, 3],
+	desktopIdStack: [0, 1, 2, 3],
+	windowIdOrder: [],
+	windowIdStack: [],
 	x11: {
 		desktopNum: 0,
 		wmSettings: {
@@ -322,7 +342,7 @@ export const state240 = fromJS({
 				"ChangeWindowAttributes": [
 					2000,
 					{
-						"borderPixel": 0,
+						"bIdOrderPixel": 0,
 						eventMask: 16
 					}
 				],
@@ -333,8 +353,8 @@ export const state240 = fromJS({
 						"y": 590,
 						"width": 800,
 						"height": 10,
-						"borderWidth": 0,
-						"stackMode": 0
+						"bIdOrderWidth": 0,
+						"IdStackMode": 0
 					}
 				]
 			}

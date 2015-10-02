@@ -90,6 +90,12 @@ Possible ways to specify the selector:
 * relative desktop stack: `PN`
 * relative session stack: `<>`? `PPNN`
 
+## createWidget
+
+**Window creation**.  The id is appended to `windowIdOrder` and the desktop's
+`childIdOrder`.  The id is inserted into the second position of `windowIdStack`
+and the desktop's `childIdStack`.
+
 # Keyboard shortcuts
 
 Selecting keys is difficult to do well, because of the large degree of
