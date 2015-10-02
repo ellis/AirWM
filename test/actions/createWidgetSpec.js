@@ -72,20 +72,24 @@ describe('createWidget', () => {
 			expect(state).to.equal(ex.state112);
 		});
 	});
-/*
+
 	describe('removing first window, then adding a thrid', () => {
-		const actionA = {type: 'destroyWidget', id: 1};
-		const action3 = {
-			type: 'createWidget',
-			widget: {
-				type: 'window',
-				xid: 1003
-			}
-		};
-		const state1 = reducer(ex.state112, actionA);
-		const state = reducer(state1, action3);
-		//console.log(JSON.stringify(state.toJS(), null, '\t'));
-		//console.log(diff(state, ex.state111));
+		let state;
+		before(() => {
+			const actionA = {type: 'destroyWidget', id: 1};
+			const action3 = {
+				type: 'createWidget',
+				widget: {
+					type: 'window',
+					xid: 1003
+				}
+			};
+			const state1 = reducer(ex.state112, actionA);
+			State.print(state1);
+			state = reducer(state1, action3);
+			//console.log(JSON.stringify(state.toJS(), null, '\t'));
+			//console.log(diff(state, ex.state111));
+		});
 		it('should increment widgetIdNext', () => {
 			expect(state.getIn(['widgetIdNext'])).to.equal(4);
 		});
@@ -99,7 +103,7 @@ describe('createWidget', () => {
 			expect(state.getIn(['x11', 'windowSettings', '3', 'desktopNum'])).to.equal(0);
 		});
 	});
-
+/*
 	// TODO: when adding dock with no wondows, dock should not receive focus
 
 	describe('add docks (with single window)', () => {
