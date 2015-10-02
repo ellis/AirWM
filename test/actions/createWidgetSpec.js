@@ -39,7 +39,7 @@ describe('createWidget', () => {
 			expect(state).to.equal(ex.state111);
 		});
 	});
-/*
+
 	const action2 = {
 		type: 'createWidget',
 		widget: {
@@ -54,12 +54,12 @@ describe('createWidget', () => {
 			expect(state.getIn(['widgetIdNext'])).to.equal(3);
 		})
 		it('should leave the focus on the first window', () => {
-			expect(state.getIn(['focusCurrentId'])).to.equal(1);
-			expect(state.getIn(['widgets', '0', 'focusCurrentId'])).to.equal(1);
+			expect(State.getCurrentWindowId(state)).to.equal(1);
+			expect(State.getCurrentWindowIdOnDesktop(state, 0)).to.equal(1);
 			expect(state.getIn(['x11', 'wmSettings', 'SetInputFocus'])).to.equal(List.of(1001));
 		});
 		it('should add window to the current desktop', () => {
-			expect(state.getIn(['widgets', '0', 'childIds'])).to.equal(List.of(1, 2));
+			expect(state.getIn(['widgets', '0', 'childIdOrder'])).to.equal(List.of(1, 2));
 			expect(state.getIn(['widgets', '2', 'parentId'])).to.equal(0);
 			expect(state.getIn(['x11', 'windowSettings', '2', 'desktopNum'])).to.equal(0);
 		});
@@ -72,7 +72,7 @@ describe('createWidget', () => {
 			expect(state).to.equal(ex.state112);
 		});
 	});
-
+/*
 	describe('removing first window, then adding a thrid', () => {
 		const actionA = {type: 'destroyWidget', id: 1};
 		const action3 = {
