@@ -326,7 +326,7 @@ export function move(state, action) {
 }
 
 export function destroyWidget(state, action) {
-	console.log("destroyWidget: ", action);
+	//console.log("destroyWidget: ", action);
 	const id = action.id;
 	assert(state);
 	assert(_.isNumber(id));

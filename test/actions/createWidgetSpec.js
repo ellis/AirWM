@@ -85,7 +85,7 @@ describe('createWidget', () => {
 				}
 			};
 			const state1 = reducer(ex.state112, actionA);
-			State.print(state1);
+			//State.print(state1);
 			state = reducer(state1, action3);
 			//console.log(JSON.stringify(state.toJS(), null, '\t'));
 			//console.log(diff(state, ex.state111));
@@ -94,11 +94,10 @@ describe('createWidget', () => {
 			expect(state.getIn(['widgetIdNext'])).to.equal(4);
 		});
 		it('should leave the focus on the second window', () => {
-			expect(state.getIn(['focusCurrentId'])).to.equal(2);
-			expect(state.getIn(['widgets', '0', 'focusCurrentId'])).to.equal(2);
+			expect(State.getCurrentWindowId(state)).to.equal(2);
 		});
 		it('should add window to the current desktop', () => {
-			expect(state.getIn(['widgets', '0', 'childIds'])).to.equal(List.of(2, 3));
+			expect(state.getIn(['widgets', '0', 'childIdStack'])).to.equal(List.of(2, 3));
 			expect(state.getIn(['widgets', '3', 'parentId'])).to.equal(0);
 			expect(state.getIn(['x11', 'windowSettings', '3', 'desktopNum'])).to.equal(0);
 		});
