@@ -21,6 +21,8 @@ describe('activateWindow', () => {
 		});
 		it('handle situation with two windows', () => {
 			const state = reducer(ex.state112, action);
+			State.print(state)
+			console.log(diff(state, ex.state112));
 			expect(State.getCurrentWindowId(state)).to.equal(2);
 			expect(state.getIn(['widgets', '0', 'focusCurrentId'])).to.equal(2);
 		});
