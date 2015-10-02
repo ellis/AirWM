@@ -26,6 +26,8 @@ export default function reducer(state = core.empty, action) {
 			return core.focus_movePrev(state, action);
 		case 'focus.moveTo':
 			return core.focus_moveTo(state, action);
+		case 'move':
+			return core.move(state, action);
 		case 'widget.add':
 			return core.widget_add(state, action);
 		case 'widget.remove':

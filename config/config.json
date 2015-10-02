@@ -15,6 +15,8 @@
 		{ "key": "7", "modifier": ["super"], "action": {"type": "desktop.raise", "num": 6}},
 		{ "key": "8", "modifier": ["super"], "action": {"type": "desktop.raise", "num": 7}},
 		{ "key": "9", "modifier": ["super"], "action": {"type": "desktop.raise", "num": 8}},
+		{ "key": "1", "modifier": ["super","shift"], "action": {"type": "move", "to": {"desktop": 1}}},
+		{ "key": "2", "modifier": ["super","shift"], "action": {"type": "move", "to": {"desktop": 2}}},
 		{
 			"key"      : "d",
 			"modifier" : ["super"],

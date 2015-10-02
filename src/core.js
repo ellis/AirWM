@@ -160,6 +160,140 @@ export function widget_add(state, action) {
 	return state;
 }
 
+function expandObjectSpec(state, spec) {
+	let {screen: screenNum, desktop: desktopNum, window: windowNum} = spec;
+	const l = [
+		_.isUndefined(screenNum) ? 0 : 1,
+		_.isUndefined(desktopNum) ? 0 : 1,
+		_.isUndefined(windowNum) ? 0 : 1
+	];
+
+	function getScreenId() {
+		if (_.isUndefined(screenNum))
+			return state.get('screenCurrentId');
+		else if (screenNum === '$')
+			return state.get('screens').count() - 1;
+		else if (_.isString(screenNum))
+			return parseInt(screenNum) - 1;
+		else
+			return screenNum - 1;
+	}
+
+	function getDesktopId(screenId) {
+		if (_.isUndefined(desktopNum))
+			return state.getIn(['screens', screenId.toString(), 'desktopCurrentId']);
+		else if (desktopNum === '$')
+			return state.get('desktopIds').count() - 1;
+		else {
+			if (_.isString(desktopNum))
+				desktopNum = parseInt(desktopNum);
+			return state.getIn(['desktopIds']).get(desktopNum - 1, -1);
+		}
+	}
+
+	function getWindowId(desktopId) {
+		if (_.isUndefined(windowNum))
+			return state.getIn(['widgets', desktopId.toString(), 'focusCurrentId']);
+		else if (windowNum === '$')
+			return state.getIn(['widgets', desktopId.toString(), 'childIds']).last();
+		else {
+			if (_.isString(windowNum))
+				windowNum = parseInt(windowNum);
+			return state.getIn(['widgets', desktopId.toString(), 'childIds']).get(desktopNum - 1);
+		}
+	}
+
+	if (_.isEqual(l, [0, 0, 0])) {
+		const screenId = getScreenId();
+		const desktopId = getDesktopId(screenId);
+		const windowId = getWindowId(desktopId);
+		return {windowId};
+	}
+	else if (_.isEqual(l, [0, 0, 1])) {
+		const screenId = getScreenId();
+		const desktopId = getDesktopId(screenId);
+		const windowId = getWindowId(desktopId);
+		return {windowId};
+	}
+	else if (_.isEqual(l, [0, 1, 0]) || _.isEqual(l, [1, 1, 0])) {
+		const desktopId = getDesktopId();
+		return {desktopId};
+	}
+	else if (_.isEqual(l, [0, 1, 1]) || _.isEqual(l, [1, 1, 1])) {
+		const desktopId = getDesktopId();
+		const windowId = getWindowId(desktopId);
+		return {windowId};
+	}
+	else if (_.isEqual(l, [1, 0, 0])) {
+		const screenId = getScreenId();
+		return {screenId};
+	}
+	else if (_.isEqual(l, [1, 0, 1])) {
+		const screenId = getScreenId();
+		const desktopId = getDesktopId(screenId);
+		const windowId = getWindowId(desktopId);
+		return {windowId};
+	}
+
+	console.log(spec);
+	console.log(l);
+}
+
+export function move(state, action) {
+	const {from: from0, to: to0} = action;
+	const from1 = expandObjectSpec(state, from0 || {});
+	const to1 = expandObjectSpec(state, to0);
+	if (_.isNumber(from1.windowId)) {
+		const id = from1.windowId;
+		if (_.isNumber(to1.desktopId)) {
+			const desktopId0 = getWidgetDesktopId(state, from1.windowId);
+			if (desktopId0 !== to1.desktopId) {
+				const childIds0 = state.getIn(['widgets', desktopId0.toString(), 'childIds']);
+				const childIndex0 = childIds0.indexOf(id);
+				state = state
+					// Remove from old desktop
+					.deleteIn(['widgets', desktopId0.toString(), 'childIds', childIndex0])
+					// Add to new desktop
+					.updateIn(
+						['widgets', to1.desktopId.toString(), 'childIds'],
+						List(),
+						(childIds) => childIds.unshift(id)
+					)
+					.setIn(['widgets', id.toString(), 'parentId'], to1.desktopId);
+				// Update focus of old desktop
+				console.log({childIds0, childIndex0})
+				if (childIds0.count() <= 1)
+					state = state.deleteIn(['widgets', desktopId0.toString(), 'focusCurrentId']);
+				else {
+					const childIndex1 = (childIndex0 == childIds0.count() - 1)
+						? childIndex0 - 1 : childIndex0 + 1;
+					const childId1 = childIds0.get(childIndex1);
+					console.log({childIndex1, childId1})
+					state = state.setIn(['widgets', desktopId0.toString(), 'focusCurrentId'], childId1);
+				}
+				// Move focus with the window
+				if (true) {
+					const desktopId1 = to1.desktopId;
+					// FIXME: increment this value once desktop_raise is changed to activate with 1-indexed numbers
+					const desktopNum1 = state.get('desktopIds').indexOf(desktopId1)/* + 1*/;
+					state = state.setIn(['widgets', desktopId1.toString(), 'focusCurrentId'], id);
+					state = desktop_raise(state, {num: desktopNum1});
+				}
+				state = updateFocus(state, id);
+				state = updateLayout(state);
+				state = updateX11(state);
+				//console.log("move:")
+				//console.log(JSON.stringify(state.toJS(), null, '\t'))
+				return state;
+			}
+		}
+	}
+
+	logger.error("unrecognized combination:");
+	logger.error({from: from1, to: to1});
+	return state;
+}
+
 export function widget_remove(state, action) {
 	const id = action.id;
 	assert(state);
@@ -277,6 +411,9 @@ function focus_moveDir(state, action, next) {
 }
 
 function getWidgetDesktopId(state, w, id = -1) {
+	if (_.isNumber(w)) {
+		w = state.getIn(['widgets', w.toString()]);
+	}
 	if (w.has('screenId'))
 		return id;
 	else if (w.has('parentId')) {
@@ -468,6 +605,11 @@ function updateX11(state) {
 				const desktopId = getWidgetDesktopId(state, w);
 				const desktop = state.getIn(['widgets', desktopId.toString()]);
 				const screenId = (desktop) ? desktop.get('screenId') : w.get('screenId');
+				// FIXME: for debug only
+				if (_.isUndefined(screenId)) {
+					console.log(JSON.stringify(state.toJS(), null, '\t'))
+				}
+				// ENDFIX
 				const screenX11 = state.getIn(['x11', 'screens', screenId.toString()], Map());
 				const windowType = w.get('type');
 				const borderWidth = _.get({

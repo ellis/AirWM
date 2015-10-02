@@ -10,8 +10,8 @@
 * [x] automatically make space for `_NET_WM_WINDOW_TYPE_DOCK`, such as lxqt-panel
 * [x] core: desktop.raise
 * [?] switch desktops with Win-1..9
-* [ ] create "Tall" layout engine
-* [ ] actions: send window to desktop
+* [x] create "Tall" layout engine
+* [x] actions: send window to desktop
 * [ ] actions: close window
 * [ ] actions: move windows in childIds order
 * [ ] ewmh: get ewmh to work without blocking lots of window events
@@ -19,7 +19,7 @@
 * [ ] ewmh: desktop switching
 * [ ] ewmh: `_NET_CLIENT_LIST`
 * [ ] ewmh: `_NET_CLIENT_LIST_STACKING`
-* [ ] ewmh: get xfce and lxqt panels to recognize windows
+* [ ] ewmh: get xfce and lxqt panels to recognize windows (see <https://github.com/lxde/lxqt/issues/354> and <https://github.com/herbstluftwm/herbstluftwm/commit/a50457335091cd990d0146e5008ca3b3db1cc574>)
 * [ ] implement more commandHandlers() as actions
 * [ ] recognize and maximize the "Desktop" type window
 * [ ] save state to console after every change, for debugging
@@ -28,15 +28,18 @@
 Testing:
 * [ ] test 'desktop.raise' more thoroughly
 * [ ] test multiple docks and different dock gravities
+* [ ] test 'move' action
 
 Refactoring:
 * [ ] remove 'xid' from first element of 'x11' settings lists
 * [ ] use 'activate' for 'focus.move*' => 'window.active*', and 'desktop.activate'
 * [ ] handleStateChange: don't call DestroyWindow on a window that was already destroyed
+* [ ] consider using `activeChildIndex` and `activeDesktopIndex` instead of IDs
 
 Later:
 * [ ] config: allow for loading a js file instead of just JSON
 * [ ] config: add desktop config, accept a number, a list of strings, or JSON widget objects
+* [ ] detect existing X11 tree on startup and add windows
 * [ ] widget.add: maybe add 'desktopNum' parameter?
 * [ ] allow for different desktops on different workspaces
 * [ ] figure out some form of 'show desktop' functionality
@@ -86,3 +89,35 @@ Multi-screen todos:
 	* support switching activities by stopping the old programs and starting new ones
 * Allow for restoring workspaces, layouts, frames, and windows
 * Drag-n-drop frames: depending on where the frame is dropped, swap, insert above, create tab, create a new row/col, create a dock
+
+# Grammar
+
+Perhaps start via Win-Period.
+
+(or use asdf: activate, send, destroy, flip)
+(or for activate: go, focus, jump)
+
+* `m[w][i]1`: move current window to position 1
+* `m[w][i]$`: move current window to last position
+* `m[w][i]n`: move current window to next position among siblings
+* `m[w]d2`: move current window to desktop 2 (insert at front of children)
+* `m[w]dn`: move current window to next desktop
+* `m[w]d2!`: move current window to desktop 2, but don't follow it
+* `m[w]1d2i3`: move window 1 (on current desktop) to desktop 2 at index 3
+* `md1w1d2i3`: move desktop 1's window 1 to desktop 2 at index 3
+* `md1s2`: move desktop 1 to screen 2
+* `mdsn`: move desktop to next screen
+* `s[w]1i4` or `s1,4`: swap positions of windows 1 and 4
+* `a[w]1`: activate window 1 (on current desktop)
+* `ad2`: activate desktop 2
+* `as2`: activate screen 2
+* `an` or `a[w]n`: activate next window?
+* need to figure out next/prev by index or stack order, and stack order for current desktop or over whole session: n, N, NN ?
+* `m[w]1+2d2$!`: send windows 1 and 2 to desktop 2, append to end of children
+* close, new, duplicate?
+
+Other commands, perhaps pull up command list with Win-Shift-Period.
+
+* lock
+* logout
+* shutdown
