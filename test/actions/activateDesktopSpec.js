@@ -1,5 +1,4 @@
 import {List, Map, fromJS} from 'immutable';
-import Immutable from 'immutable';
 import {expect} from 'chai';
 import diff from 'immutablediff';
 
