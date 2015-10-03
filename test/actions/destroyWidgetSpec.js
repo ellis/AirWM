@@ -39,8 +39,8 @@ describe('destroyWidget', () => {
 		const actionA = {type: 'activateWindow', id: 2};
 		const state1 = reducer(ex.state112, actionA);
 		const state = reducer(state1, action2);
-		console.log(JSON.stringify(state.toJS(), null, '\t'));
-		console.log(diff(state, ex.state111));
+		//console.log(JSON.stringify(state.toJS(), null, '\t'));
+		//console.log(diff(state, ex.state111));
 		expect(state).to.equal(ex.state111.setIn(['widgetIdNext'], 3));
 	});
 

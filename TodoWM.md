@@ -13,8 +13,8 @@
 * [x] create "Tall" layout engine
 * [x] actions: send window to desktop
 * [x] rename actions
+* [x] move old files with conflicting names (on MacOS) to another directory
 * [ ] windowOrder, windowStack, desktopOrder, desktopStack, screenOrder, screenStack
-* [ ] move old files with conflicting names (on MacOS) to another directory
 * [ ] use selector parameters
 * [ ] actions: move windows in childIds order
 * [ ] actions: close window
@@ -35,6 +35,8 @@ Testing:
 * [ ] test 'move' action
 
 Refactoring:
+* [ ] consider switching from Immutable to <https://github.com/rtfeldman/seamless-immutable>
+* [ ] maybe make StateWrapper, ScreenWrapper, and related classes to encapsulate related functions
 * [ ] remove 'xid' from first element of 'x11' settings lists
 * [ ] use 'activate' for 'focus.move*' => 'window.active*', and 'desktop.activate'
 * [ ] handleStateChange: don't call DestroyWindow on a window that was already destroyed
