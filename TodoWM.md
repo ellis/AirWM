@@ -18,11 +18,14 @@
 * [x] actions: move windows in childIds order
 * [x] only have mouse follow cursor when the user moves the mouse
 * [x] actions: close window
-* [ ] ewmh: get ewmh to work without blocking lots of window events
-* [ ] ewmh: desktop count
-* [ ] ewmh: desktop switching
-* [ ] ewmh: `_NET_CLIENT_LIST`
-* [ ] ewmh: `_NET_CLIENT_LIST_STACKING`
+* [x] ewmh: get ewmh to work without blocking lots of window events
+* [x] ewmh: set desktop count
+* [x] ewmh: set current desktop
+* [x] ewmh: `_NET_CLIENT_LIST`
+* [x] ewmh: `_NET_CLIENT_LIST_STACKING`
+* [ ] ewmh: set window's desktop
+* [ ] ewmh: accept client messages
+* [ ] ewmh: handle desktop switching
 * [ ] ewmh: get xfce and lxqt panels to recognize windows (see <https://github.com/lxde/lxqt/issues/354> and <https://github.com/herbstluftwm/herbstluftwm/commit/a50457335091cd990d0146e5008ca3b3db1cc574>)
 * [ ] implement more commandHandlers() as actions
 * [ ] recognize and maximize the "Desktop" type window

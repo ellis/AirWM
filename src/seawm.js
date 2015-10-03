@@ -201,6 +201,29 @@ var keyPressHandler = function(ev){
 	}
 }
 
+function handleClientMessage(ev) {
+	this.X.GetAtomName(ev.type, function(err, name) {
+		switch (name) {
+		case '_NET_ACTIVE_WINDOW':
+			//self.emit('ActiveWindow', ev.wid);
+			break;
+
+		case '_NET_CLOSE_WINDOW':
+			destroyNotifyHandler(ev);
+			break;
+
+		case '_NET_CURRENT_DESKTOP':
+			store.dispatch({type: 'activateDesktop', num: ev.data[0]});
+			break;
+
+		case '_NET_WM_DESKTOP':
+			// FIXME: need to use ev.wid rather than assuming that this is for the current window
+			store.dispatch({type: 'moveWindowToDesktop', desktop: ev.data[0]});
+			break;
+		}
+	});
+}
+
 var destroyNotifyHandler = function(ev){
 	logger.info("DestroyNotifier got triggered, removing the window that got destroyed.");
 	store.getState().get('widgets').forEach((w, key) => {
@@ -268,6 +291,9 @@ var eventHandler = function(ev){
 		logger.info("Received a %s event.", ev.name);
 	try {
 		switch( ev.name ) {
+		case 'ClientMessage':
+			handleClientMessage(ev);
+			break;
 		/*case "ConfigureNotify":
 			console.log(ev)
 			break;*/
