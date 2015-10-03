@@ -17,6 +17,11 @@
 		{ "key": "9", "modifier": ["super"], "action": {"type": "activateDesktop", "num": 8}},
 		{ "key": "1", "modifier": ["super","shift"], "action": {"type": "moveWindowToDesktop", "desktop": 1}},
 		{ "key": "2", "modifier": ["super","shift"], "action": {"type": "moveWindowToDesktop", "desktop": 2}},
+
+		{"key": "n", "modifier" : ["super"], "action": {"type": "activateWindowNext"}},
+		{"key": "p", "modifier" : ["super"], "action": {"type": "activateWindowPrev"}},
+		{"key": "n", "modifier" : ["super","shift"], "action": {"type": "moveWindowToIndexNext"}},
+		{"key": "p", "modifier" : ["super","shift"], "action": {"type": "moveWindowToIndexPrev"}},
 		{
 			"key"      : "d",
 			"modifier" : ["super"],
@@ -52,25 +57,5 @@
 			"modifier" : ["super"],
 			"command"  : "SwitchWorkspaceRight"
 		},
-		{
-			"key"      : "j",
-			"modifier" : ["super","shift"],
-			"command"  : "MoveWindowNext"
-		},
-		{
-			"key"      : "k",
-			"modifier" : ["super","shift"],
-			"command"  : "MoveWindowPrev"
-		},
-		{
-			"key"      : "j",
-			"modifier" : ["super"],
-			"action"   : {"type": "activateWindowNext"}
-		},
-		{
-			"key"      : "k",
-			"modifier" : ["super"],
-			"action"   : {"type": "activateWindowPrev"}
-		}
 	]
 }

@@ -37,6 +37,18 @@ function stateCheck(state) {
 			assert.equal(stateGetWindow(state, childId).get('parentId'), desktopId);
 		});
 	});
+
+	// Check that current focus widgets are at the top of the relevant stacks
+	if (true) {
+		const {screenId, desktopId, windowId} = getCurrentScreenDesktopWindowIds(state);
+		assert.equal(state.getIn(['screenIdStack', 0]), screenId);
+		assert.equal(state.getIn(['desktopIdStack', 0]), desktopId);
+		assert.equal(state.getIn(['screens', screenId.toString(), 'desktopIdStack', 0]), desktopId);
+		if (windowId >= 0) {
+			assert.equal(state.getIn(['windowIdStack', 0]), windowId);
+			assert.equal(state.getIn(['widgets', desktopId.toString(), 'childIdStack', 0]), windowId);
+		}
+	}
 }
 
 const stateGetScreen = (state, screenId = -1) => state.getIn(['screens', screenId.toString()]);
@@ -73,6 +85,13 @@ function getCurrentWindowIdOnDesktop(state, desktop) {
 	if (_.isNumber(desktop))
 		desktop = stateGetDesktop(state, desktop);
 	return desktop.getIn(['childIdStack', 0]);
+}
+
+function getCurrentScreenDesktopWindowIds(state) {
+	const screenId = state.getIn(['screenIdStack', 0]);
+	const desktopId = state.getIn(['screens', screenId.toString(), 'desktopIdStack', 0]);
+	const windowId = state.getIn(['widgets', desktopId.toString(), 'childIdStack', 0]);
+	return {screenId, desktopId, windowId};
 }
 
 function removeIdFromList(state, id, path) {
@@ -226,6 +245,7 @@ const State = {
 	getWindow: stateGetWindow,
 	getCurrentWindowId,
 	getCurrentWindowIdOnDesktop,
+	getCurrentScreenDesktopWindowIds,
 
 	swapDesktopsOnScreens: stateSwapDesktopsOnScreens,
 	raiseDesktopOnScreen,
