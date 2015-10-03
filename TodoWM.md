@@ -14,9 +14,9 @@
 * [x] actions: send window to desktop
 * [x] rename actions
 * [x] move old files with conflicting names (on MacOS) to another directory
-* [ ] windowOrder, windowStack, desktopOrder, desktopStack, screenOrder, screenStack
-* [ ] use selector parameters
+* [x] windowOrder, windowStack, desktopOrder, desktopStack, screenOrder, screenStack
 * [ ] actions: move windows in childIds order
+* [ ] only have mouse follow cursor when the user moves the mouse
 * [ ] actions: close window
 * [ ] ewmh: get ewmh to work without blocking lots of window events
 * [ ] ewmh: desktop count
@@ -27,7 +27,7 @@
 * [ ] implement more commandHandlers() as actions
 * [ ] recognize and maximize the "Desktop" type window
 * [ ] save state to console after every change, for debugging
-* [ ] only have mouse follow cursor when the user moves the mouse
+* [ ] implement command language and selector parameters
 
 Testing:
 * [ ] test 'desktop.raise' more thoroughly
