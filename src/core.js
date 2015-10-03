@@ -90,6 +90,12 @@ export function activateDesktop(state, action) {
 				state = State.raiseDesktopOnScreen(state, desktopId, screenId);
 			state = State.raiseDesktopInWmStack(state, desktopId);
 
+			// Raise the desktop's focus window in the WM stack
+			const focusId = state.getIn(['widgets', desktopId.toString(), 'childIdStack', 0]);
+			if (focusId >= 0) {
+				state = State.prependUniqueId(state, focusId, ['windowIdStack']);
+			}
+
 			//state = updateFocus(state);
 			state = updateLayout(state);
 			state = updateX11(state);
@@ -318,6 +324,7 @@ export function moveWindowToDesktop(state, action) {
 	const desktopId = state.getIn(['desktopIdOrder', desktopNum]);
 	if (desktopId0 !== desktopId) {
 		const doFocus = true;
+		//console.log(state.getIn(['widgets', '0', ]))
 		state = State.removeWindowFromDesktop(state, id);
 		//console.log({id, desktopId, desktopId0})
 		state = State.addWindowToDesktop(state, id, desktopId, undefined, (doFocus) ? 0 : undefined);
@@ -373,13 +380,15 @@ export function activateWindow(state, action) {
 
 	const w = State.getWidget(state, id);
 
-	// Activate the desktop
+	// Bring window to front of desktop stack
 	const desktopId = State.getDesktopIdOfWidget(state, id);
+	state = State.prependUniqueId(state, id, ['widgets', desktopId.toString(), 'childIdStack']);
+
+	// Activate the desktop
 	const desktopNum = state.get('desktopIdOrder').indexOf(desktopId);
 	state = activateDesktop(state, {num: desktopNum});
 
-	// Bring window to front of desktop and WM stacks
-	state = State.prependUniqueId(state, id, ['widgets', desktopId.toString(), 'childIdStack']);
+	// Bring window to front of WM stack
 	state = State.prependUniqueId(state, id, ['windowIdStack']);
 
 	state = updateLayout(state);

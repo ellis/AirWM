@@ -75,14 +75,20 @@ function getCurrentWindowIdOnDesktop(state, desktop) {
 	return desktop.getIn(['childIdStack', 0]);
 }
 
-const removeIdFromList = (state, id, path) =>
-	state.updateIn(path, List(), l => l.delete(l.indexOf(id)));
+function removeIdFromList(state, id, path) {
+	return state.updateIn(path, List(), l => {
+		const i = l.indexOf(id);
+		return (i >= 0) ? l.delete(i) : l;
+	});
+}
+
 function insertUniqueId(state, id, path, index) {
 	assert(_.isNumber(id));
 	assert(_.isArray(path));
 	assert(_.isNumber(index));
 	state = removeIdFromList(state, id, path);
-	return state.updateIn(path, List(), l => l.splice(index, 0, id));
+	state = state.updateIn(path, List(), l => l.splice(index, 0, id));
+	return state;
 }
 function appendUniqueId(state, id, path) {
 	assert(_.isNumber(id));
