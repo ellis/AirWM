@@ -1,0 +1,86 @@
+WM_STATE(WM_STATE):
+		window state: Normal
+		icon window: 0x0
+_NET_WM_DESKTOP(CARDINAL) = 4294967295
+_NET_WM_ALLOWED_ACTIONS(ATOM) = 
+_KDE_NET_WM_FRAME_STRUT(CARDINAL) = 0, 0, 0, 0
+_NET_FRAME_EXTENTS(CARDINAL) = 0, 0, 0, 0
+_NET_WM_STATE(ATOM) = 
+_NET_WM_ICON(CARDINAL) = 	Icon (48 x 48):
+	                                                
+	                                                
+	                                                
+	  ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒  
+	  ▒░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░▒  
+	  ▒░▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒░▒  
+	  ▒░▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒░▒  
+	  ▒░▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒░▒  
+	  ▒░▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒░▒  
+	  ▒░▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒░▒  
+	  ▒░▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒░▒  
+	  ▒░▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒░▒  
+	  ▒░▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒░▒  
+	  ▒░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░▒  
+	  ▒░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░▒  
+	  ▒                                          ▒  
+	  ░                                          ▒  
+	  ▒                                          ▒  
+	  ▒                                          ▒  
+	  ▒                                          ▒  
+	  ▒                                          ▒  
+	  ▒                                          ▒  
+	  ▒                                          ▒  
+	  ▒                                          ▒  
+	  ▒                                          ▒  
+	  ▒                                          ▒  
+	  ▒                                          ▒  
+	  ▒                                          ▒  
+	  ▒                                          ▒  
+	  ▒                                          ▒  
+	  ▒                                          ▒  
+	  ▒                                          ▒  
+	  ▒                                          ▒  
+	  ▒                                          ▒  
+	  ▒                                          ▒  
+	  ░                                          ▒  
+	  ░                                          ▒  
+	  ░                                          ░  
+	  ░                                          ▒  
+	  ▒                                          ▒  
+	  ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒  
+	  ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒  
+	  ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒  
+	  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  
+	     ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░    
+	                                                
+	                                                
+	                                                
+
+
+_OB_APP_TYPE(UTF8_STRING) = "desktop"
+_OB_APP_TITLE(UTF8_STRING) = "pcmanfm-qt"
+_OB_APP_GROUP_CLASS(UTF8_STRING) = 
+_OB_APP_GROUP_NAME(UTF8_STRING) = 
+_OB_APP_CLASS(UTF8_STRING) = "pcmanfm-qt"
+_OB_APP_NAME(UTF8_STRING) = "pcmanfm-qt"
+_OB_APP_ROLE(UTF8_STRING) = 
+_NET_WM_VISIBLE_ICON_NAME(UTF8_STRING) = "pcmanfm-qt"
+_NET_WM_VISIBLE_NAME(UTF8_STRING) = "pcmanfm-qt"
+XdndAware(ATOM) = BITMAP
+_NET_WM_NAME(UTF8_STRING) = "pcmanfm-qt"
+_MOTIF_WM_HINTS(_MOTIF_WM_HINTS) = 0x2, 0x1, 0x0, 0x0, 0x0
+_NET_WM_WINDOW_TYPE(ATOM) = _NET_WM_WINDOW_TYPE_DESKTOP
+_XEMBED_INFO(_XEMBED_INFO) = 0x0, 0x1
+WM_CLIENT_LEADER(WINDOW): window id # 0x3000002
+WM_HINTS(WM_HINTS):
+		Client accepts input or input focus: True
+		Initial state is Normal State.
+_NET_WM_PID(CARDINAL) = 6354
+_NET_WM_SYNC_REQUEST_COUNTER(CARDINAL) = 50331654
+WM_CLASS(STRING) = "pcmanfm-qt", "pcmanfm-qt"
+WM_PROTOCOLS(ATOM): protocols  WM_DELETE_WINDOW, WM_TAKE_FOCUS, _NET_WM_PING, _NET_WM_SYNC_REQUEST
+WM_NORMAL_HINTS(WM_SIZE_HINTS):
+		user specified location: 0, 0
+		user specified size: 1920 by 986
+		program specified minimum size: 68 by 68
+		window gravity: Static

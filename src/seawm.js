@@ -455,6 +455,7 @@ var airClientCreator = function(err, display) {
 		// as a hack since almost every file uses it
 		global.X = display.client;
 		ewmhPropTypeFormatInfos = {
+			'WM_STATE': ['WM_STATE', 32],
 			'_NET_CLIENT_LIST': [global.X.atoms.WINDOW, 32],
 			'_NET_CLIENT_LIST_STACKING': [global.X.atoms.WINDOW, 32],
 			'_NET_CURRENT_DESKTOP': [global.X.atoms.CARDINAL, 32],

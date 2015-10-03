@@ -26,11 +26,17 @@
 * [x] ewmh: accept client messages
 * [x] ewmh: handle desktop switching
 * [x] ewmh: set window's desktop
-* [ ] ewmh: get xfce and lxqt panels to recognize windows (see <https://github.com/lxde/lxqt/issues/354> and <https://github.com/herbstluftwm/herbstluftwm/commit/a50457335091cd990d0146e5008ca3b3db1cc574>)
-* [ ] implement more commandHandlers() as actions
+* [x] ewmh: set WM_STATE to [Normal, None]
+* [x] ewmh: get xfce and lxqt panels to recognize windows (see <https://github.com/lxde/lxqt/issues/354> and <https://github.com/herbstluftwm/herbstluftwm/commit/a50457335091cd990d0146e5008ca3b3db1cc574>)
+* [ ] check which client messages are sent from lxqt's task bar when clicking on a member of a program with multiple instances.
+* [ ] ewmh: set `_NET_WM_STATE` to empty by default
 * [ ] recognize and maximize the "Desktop" type window
+* [ ] implement more commandHandlers() as actions
 * [ ] save state to console after every change, for debugging
-* [ ] implement command language and selector parameters
+* [ ] BUG: not receiving mouse move events over gnome-terminal or firefox
+* [ ] BUG: start two xterms; click 'xterm' on lxqt-panel's task bar; occasionally the popup is drawn below the windows
+* [ ] BUG: click lxqt-panel's start menu: menu is displayed too far to the left
+* [ ] BUG: click lxqt-panel's start menu; move over sub-menus: icons keep getting added
 
 Testing:
 * [ ] test `moveWindowToIndex`
@@ -48,6 +54,7 @@ Refactoring:
 * [ ] consider using `activeChildIndex` and `activeDesktopIndex` instead of IDs
 
 Later:
+* [ ] implement command language and selector parameters
 * [ ] ewmh: docks should also be listed in windows
 * [ ] config: allow for loading a js file instead of just JSON
 * [ ] config: add desktop config, accept a number, a list of strings, or JSON widget objects
@@ -60,7 +67,7 @@ Later:
 * [ ] consider <https://github.com/anko/basedwm> for socket interface
 * [ ] look into using 'async', perhaps look at x11-props code
 * [ ] cli command interface
-* [ ] HUD command interface
+* [ ] HUD/UI command interface
 
 Multi-screen todos:
 * [ ] test showing a dock on each screen

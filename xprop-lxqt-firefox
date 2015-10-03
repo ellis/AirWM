@@ -1,0 +1,147 @@
+_NET_WM_ICON_GEOMETRY(CARDINAL) = 310, 954, 401, 32
+WM_STATE(WM_STATE):
+		window state: Normal
+		icon window: 0x0
+_NET_WM_DESKTOP(CARDINAL) = 0
+_NET_WM_ALLOWED_ACTIONS(ATOM) = _NET_WM_ACTION_CHANGE_DESKTOP, _NET_WM_ACTION_SHADE, _NET_WM_ACTION_CLOSE, _NET_WM_ACTION_MOVE, _NET_WM_ACTION_MINIMIZE, _NET_WM_ACTION_RESIZE, _NET_WM_ACTION_FULLSCREEN, _NET_WM_ACTION_MAXIMIZE_HORZ, _NET_WM_ACTION_MAXIMIZE_VERT, _NET_WM_ACTION_ABOVE, _NET_WM_ACTION_BELOW, _OB_WM_ACTION_UNDECORATE
+_KDE_NET_WM_FRAME_STRUT(CARDINAL) = 1, 1, 20, 5
+_NET_FRAME_EXTENTS(CARDINAL) = 1, 1, 20, 5
+_NET_WM_STATE(ATOM) = 
+_OB_APP_TYPE(UTF8_STRING) = "normal"
+_OB_APP_TITLE(UTF8_STRING) = "Mozilla Firefox"
+_OB_APP_GROUP_CLASS(UTF8_STRING) = "Firefox"
+_OB_APP_GROUP_NAME(UTF8_STRING) = "firefox"
+_OB_APP_CLASS(UTF8_STRING) = "Firefox"
+_OB_APP_NAME(UTF8_STRING) = "Navigator"
+_OB_APP_ROLE(UTF8_STRING) = "browser"
+_NET_WM_VISIBLE_ICON_NAME(UTF8_STRING) = "Application Window Properties - Mozilla Firefox"
+_NET_WM_VISIBLE_NAME(UTF8_STRING) = "Application Window Properties - Mozilla Firefox"
+WM_HINTS(WM_HINTS):
+		Client accepts input or input focus: True
+		Initial state is Normal State.
+		bitmap id # to use for icon: 0x3400085
+		bitmap id # of mask for icon: 0x3400086
+		window id # of group leader: 0x3400001
+WM_WINDOW_ROLE(STRING) = "browser"
+XdndAware(ATOM) = BITMAP
+_MOTIF_DRAG_RECEIVER_INFO(_MOTIF_DRAG_RECEIVER_INFO) = 0x6c, 0x0, 0x5, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x10, 0x0, 0x0, 0x0
+_NET_WM_ICON(CARDINAL) = 	Icon (16 x 16):
+	                
+	      ░░░░      
+	    ░▒░░░░░     
+	  ░▒▒░▒░░░▒░    
+	  ▒░░░▒▒▒▒▒▒    
+	 ░░░░░░░▒▒▒▒░   
+	 ░▒░░░▒▒▒▒▒▒░ ░ 
+	 ▒▒░▒▒▒▒▒▓▓▓  ░ 
+	 ▒▒▒▒▒▓▒▒▓▓▓  ░ 
+	 ▒▒▒▒░░░▒▒▓▒  ░ 
+	 ░▒▒▒▒▒▓▓▓▓░░░░ 
+	  ▒▒▒▒▒▒▒▒░░░▒  
+	   ▒▒▒▒▒▒░░░▒░  
+	   ░▒▒▒▒▒▒▒▒░   
+	    ░▒▒▒▒▒▒░    
+	       ░░       
+
+	Icon (32 x 32):
+	                                
+	              ░░░░              
+	          ░░░░░░░░░░░░          
+	        ░░░░░░░░░░░░░░          
+	       ░░▒▒▒░░░░░░░░░░░  ░      
+	    ░ ░▒▒▒▒░░░░░░░░░░░░▒  ░     
+	   ░▒▒▒▒░░░░░░░░░░░▒▒▒▒░░  ░    
+	   ▒▒▒░░░░░░▒▒▒▒▒▒▒▒▒▒▒▒    ░   
+	   ▒░░░░░░░░▒▒▒▒▒▒▒▒▒▒▒▒░       
+	   ░░░░░░░░▒░░░▒▒▒▒▒▒▒▒▒▒       
+	  ░░░░░░░░░▒▒▒░▒▒▒▒▒▒▒▒▒▒░      
+	  ░░░░░░░░░░░ ░▒▒▒▒▒▒▒▒▒▒▒      
+	 ░▒▒░░░░░░░░░▒▒▒▒▒▒▒▒▒▒▒▒▒      
+	 ░▒▒▒░░░░░░░▒▒▒▒▒▒▒▒▒▒▓▓▒░    ░ 
+	 ░▒▒▒░░░░▒▒▒▒▒▒▒▒▒▒▒▓▓▓▓▒     ▒ 
+	 ░▒▒▒░░░▒▒▒▓▒▒▒▒▒▒▓▓▓▓▓▓▒    ░▒ 
+	 ░▒▒▒▒░▒▒▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▒    ░░ 
+	 ░▒▒▒▒▒▒▒░░▒▒▓▓▒▒▒▒▓▓▓▓▓▒    ░  
+	 ░▒▒▒▒▒▒▒░░░░▒░░░░░▓▓▓▓▒░░   ░  
+	  ▒▒▒▒▒▒▒▒░░░░░░▒▒▒▓▓▓▓▒░░ ░░░  
+	  ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▓▓▓▓▓▓▓░░░░░░░  
+	  ░▒▒▒▒▒▒▒░░▒▓▓▓▓▓▓▓▓▓▒░░░░░░░  
+	   ▒▒▒▒▒▒▒▒▒░▒▒▓▓▓▓▓▒▒░░░░░░▒░  
+	   ░▒▒▒▒▒▒▒▒▒░▒▒▒▒▒▒░░░░░░░▒▒   
+	    ▒▒▒▒▒▒▒▒▒▒▒░░░░░░░░░░░░▒░   
+	     ▒▒▒▒▒▒▒▒▒▒▒▒▒░░░░░░░▒▒░    
+	     ░▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒░     
+	      ░▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒░      
+	       ░▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒       
+	        ░▒▒▒▒▒▒▒▒▒▒▒▒▒▒░        
+	          ░▒▒▒▒▒▒▒▒▒▒░          
+	                                
+
+	Icon (48 x 48):
+	                                                
+	                                                
+	                      ░░░░                      
+	                 ░░░░░░░░░░░░░░                 
+	               ░░░░░░░░░░░░░░░░░░               
+	             ░░░░░░░░░░░░░░░░░░░  ░             
+	           ░░░░░░░░░░░░░░░░░░░░░▒░              
+	      ░   ░░░▒▒▒▒▒░░░░░░░░░░░░░░░▒░  ░░         
+	      ░░ ░░▒▒▒▒▒░░░░░░░░░░░░░░░░░░▒░   ░        
+	     ░░▒░▒▒▒▒▒▒░░░░▒░░░░░░░░▒▒▒▒▒▒░▒░   ░       
+	     ░▒▒▒▒░░░░░░░░▒▒▒░░░░░░▒▒▒▒▒▒▒░ ░░  ░░      
+	     ▒▒▒░░░░░░░░░░▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒░     ░      
+	     ▒▒░░░░░░░░░░░▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒░           
+	     ▒░░░░░░░░░░░▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒           
+	     ░░░░░░░░░░░░▒▒░░░░▒▒▒▒▒▒▒▒▒▒▒▒▒▒░          
+	    ░░░░░░░░░░░░░▒▒▒░▒░▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒          
+	   ░░░░░░░░░░░░░░▒▒░░░░▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒          
+	   ░░░░░░░░░░░░░░░░░ ░▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▓░         
+	   ░░▒▒░░░░░░░░░░░░▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒░         
+	  ░░▒▒▒░░░░░░░░░░░░▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▓▓▒ ▒     ░░  
+	  ░░▒▒▒▒░░░░░░░░░░░▒▒▒▒▒▒▒▒▒▒▒▒▒▓▓▓▓▒ ░     ░▒  
+	  ░▒▒▒▒▒░░░░░░▒▒▒▒░▒▒▒▒▒▒▒▒▒▒▓▓▓▓▓▓▓▒       ▒▒  
+	  ░▒▒▒▒▒░░░░░▒▒▒▓▓▒▒▒▒▒▒▒▒▒▓▓▓▓▓▓▓▓▓▒       ▒░  
+	  ░▒▒▒▒▒▒░░░▒▒▒▒▓▓▓▒▒▒▒▒▒▒▒▓▓▓▓▓▓▓▓▓▒       ▒░  
+	  ░▒▒▒▒▒▒▒░▒▒▒▒░▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒      ░░   
+	  ░▒▒▒▒▒▒▒▒▒▒▒░░░▒▓▓▓▓▓▒▒▒▒▓▓▓▓▓▓▓▓▓▒░     ░░   
+	  ░▒▒▒▒▒▒▒▒▒▒▒░░░░░▒▒▒▒░░░░░▒▓▓▓▓▓▓▒░░     ░░   
+	   ▒▒▒▒▒▒▒▒▒▒▒░░░░░░░░░░░░░░░▓▓▓▓▓▓░░░     ░░   
+	   ░▒▒▒▒▒▒▒▒▒▒▒░░░░░░░░░▒▒▒▒▓▓▓▓▓▓▓░░░  ░░░░░   
+	   ░▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▓▓▓▓▓▓▓▓▓▒ ░░ ░░░░░    
+	    ▒▒▒▒▒▒▒▒▒▒▒░▒▒▒▒▒▒▒▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░    
+	    ▒▒▒▒▒▒▒▒▒▒▒▒░░▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░▒▒    
+	     ▒▒▒▒▒▒▒▒▒▒▒▒░░▒▓▓▓▓▓▓▓▓▓▓▓▒▓░░░░░░░░░▒▒    
+	     ▒▒▒▒▒▒▒▒▒▒▒▒▒▒░░▒▒▓▓▓▓▓▓▓▒░░░░░░░░░░▒▒░    
+	      ▒▒▒▒▒▒▒▒▒▒▒▒▒▒░░░▒▒▒▒▒▒░░░░░░░░░░░▒▓▒     
+	      ░▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒░░░░░░░░░░░░░░░░░░▒▒░     
+	       ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒░░░░░░░░░░░░▒▒▒▒░      
+	        ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒░░░░░░░░▒▒▒▒░       
+	        ░▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒░        
+	         ░▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒░         
+	          ░▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒░          
+	           ░▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▓▒▒░          
+	            ░░▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒░░           
+	             ░░░▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒░░             
+	                ░░░▒▒▒▒▒▒▒▒▒▒░░░                
+	                                                
+	                                                
+	                                                
+
+
+_NET_WM_SYNC_REQUEST_COUNTER(CARDINAL) = 54526084
+_NET_WM_WINDOW_TYPE(ATOM) = _NET_WM_WINDOW_TYPE_NORMAL
+_NET_WM_USER_TIME_WINDOW(WINDOW): window id # 0x3400083
+WM_CLIENT_LEADER(WINDOW): window id # 0x3400001
+_NET_WM_PID(CARDINAL) = 6508
+WM_LOCALE_NAME(STRING) = "en_US.UTF-8"
+WM_CLIENT_MACHINE(STRING) = "osboxes"
+WM_NORMAL_HINTS(WM_SIZE_HINTS):
+		program specified minimum size: 300 by 127
+		program specified maximum size: 32767 by 32767
+		window gravity: NorthWest
+WM_PROTOCOLS(ATOM): protocols  WM_DELETE_WINDOW, WM_TAKE_FOCUS, _NET_WM_PING, _NET_WM_SYNC_REQUEST
+WM_CLASS(STRING) = "Navigator", "Firefox"
+WM_ICON_NAME(STRING) = "Application Window Properties - Mozilla Firefox"
+_NET_WM_ICON_NAME(UTF8_STRING) = "Application Window Properties - Mozilla Firefox"
+WM_NAME(STRING) = "Application Window Properties - Mozilla Firefox"
+_NET_WM_NAME(UTF8_STRING) = "Application Window Properties - Mozilla Firefox"

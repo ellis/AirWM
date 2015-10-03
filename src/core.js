@@ -646,6 +646,10 @@ function layout_mainLeft(state, desktopId) {
 	return state;
 }
 
+const WM_STATE_WithdrawnState = 0;
+const WM_STATE_NormalState = 1;
+const WM_STATE_IconicState = 3;
+
 function updateX11(state) {
 	const screen = State.getCurrentScreen(state);
 	const desktop = State.getCurrentDesktop(state);
@@ -653,12 +657,18 @@ function updateX11(state) {
 	const focusCurrentKey = (focusCurrentId >= 0) ? focusCurrentId.toString() : undefined;
 	state.get('widgets').forEach((w, key) => {
 		const xid = w.get('xid');
+		const isVisible = w.get('visible', false);
 		if (xid >= 0) {
 			const hasFocus = (key === focusCurrentKey);
 			const info = {
 				xid: xid,
-				visible: w.get('visible', false),
-				ewmh: {}
+				visible: isVisible,
+				ewmh: {
+					'WM_STATE': {
+						state: (isVisible) ? WM_STATE_NormalState : WM_STATE_IconicState,
+						icon: 0
+					}
+				}
 			};
 			if (info.visible) {
 				const desktopId = getWidgetDesktopId(state, w);

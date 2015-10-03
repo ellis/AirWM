@@ -1,0 +1,25 @@
+_NET_WM_STATE(ATOM) = _NET_WM_STATE_ABOVE, _NET_WM_STATE_STAYS_ON_TOP
+_NET_WM_STRUT(CARDINAL) = 0, 0, 0, 32
+_NET_WM_STRUT_PARTIAL(CARDINAL) = 0, 0, 0, 32, 0, 0, 0, 0, 0, 0, 0, 799
+_NET_WM_DESKTOP(CARDINAL) = 4294967295
+_NET_WM_ICON(CARDINAL) = 	Icon (150 x 150):
+	(not shown)
+XdndAware(ATOM) = BITMAP
+_NET_WM_NAME(UTF8_STRING) = "LXQt Panel"
+_MOTIF_WM_HINTS(_MOTIF_WM_HINTS) = 0x3, 0x4, 0x0, 0x0, 0x0
+_NET_WM_WINDOW_TYPE(ATOM) = _NET_WM_WINDOW_TYPE_DOCK
+_XEMBED_INFO(_XEMBED_INFO) = 0x0, 0x1
+WM_CLIENT_LEADER(WINDOW): window id # 0xa00002
+WM_HINTS(WM_HINTS):
+		Client accepts input or input focus: False
+		Initial state is Normal State.
+_NET_WM_PID(CARDINAL) = 7701
+_NET_WM_SYNC_REQUEST_COUNTER(CARDINAL) = 10485768
+WM_CLASS(STRING) = "lxqt-panel", "lxqt-panel"
+WM_PROTOCOLS(ATOM): protocols  WM_DELETE_WINDOW, WM_TAKE_FOCUS, _NET_WM_PING, _NET_WM_SYNC_REQUEST
+WM_NORMAL_HINTS(WM_SIZE_HINTS):
+		user specified location: 0, 568
+		user specified size: 800 by 32
+		program specified minimum size: 800 by 32
+		program specified maximum size: 800 by 32
+		window gravity: Static
