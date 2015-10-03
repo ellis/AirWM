@@ -724,5 +724,32 @@ function updateX11(state) {
 		else return List.of(focusXid);
 	});
 
+	// EWMH (Extended window manager hints)
+	if (true) {
+		// Number of desktops
+		const desktopCount = state.get('desktopIdOrder').count();
+		state = state.setIn(['x11', 'wmSettings', 'ewmh', '_NET_NUMBER_OF_DESKTOPS'], [desktopCount]);
+		// Current desktop
+		const desktopId = State.getCurrentDesktopId(state);
+		const desktopNum = state.get('desktopIdOrder').indexOf(desktopId);
+		state = state.setIn(['x11', 'wmSettings', 'ewmh', '_NET_CURRENT_DESKTOP'], [desktopNum]);
+		// Window order
+		const windowIdOrder = state.get('windowIdOrder');
+		state = state.updateIn(['x11', 'wmSettings', 'ewmh', '_NET_CLIENT_LIST'], List(), l => l.setSize(windowIdOrder.count()));
+		for (let i = 0; i < windowIdOrder.count(); i++) {
+			const xid = state.getIn(['widgets', windowIdOrder.get(i).toString(), 'xid']);
+			if (xid)
+				state = state.setIn(['x11', 'wmSettings', 'ewmh', '_NET_CLIENT_LIST', i], xid);
+		}
+		// Window stacking
+		const windowIdStack = state.get('windowIdStack');
+		state = state.updateIn(['x11', 'wmSettings', 'ewmh', '_NET_CLIENT_LIST'], List(), l => l.setSize(windowIdStack.count()));
+		for (let i = 0; i < windowIdStack.count(); i++) {
+			const xid = state.getIn(['widgets', windowIdStack.get(i).toString(), 'xid']);
+			if (xid)
+				state = state.setIn(['x11', 'wmSettings', 'ewmh', '_NET_CLIENT_LIST_STACKING', i], xid);
+		}
+	}
+
 	return state;
 }

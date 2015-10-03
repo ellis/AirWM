@@ -268,6 +268,9 @@ var eventHandler = function(ev){
 		logger.info("Received a %s event.", ev.name);
 	try {
 		switch( ev.name ) {
+		/*case "ConfigureNotify":
+			console.log(ev)
+			break;*/
 		case "ConfigureRequest":
 			// Allow requested resize for optimization. Window gets resized
 			// automatically by AirWM again anyway.
@@ -364,12 +367,27 @@ function handleStateChange() {
 			}
 		});
 
+		// Set the X11 focus
 		const SetInputFocus = state.getIn(['x11', 'wmSettings', 'SetInputFocus']);
 		if (SetInputFocus && SetInputFocus !== statePrev.getIn(['x11', 'wmSettings', 'SetInputFocus'])) {
 			console.log("SetInputFocus:", SetInputFocus);
 			global.X.SetInputFocus.apply(global.X, SetInputFocus.toJS());
 		}
 
+		// Set EWMH (extended window manager hints)
+		if (true) {
+			const screen = State.getCurrentScreen(state);
+			const desktop = State.getCurrentDesktop(state);
+			const focusCurrentId = desktop.getIn(['childIdStack', 0]);
+			const xid = screen.get('xidRoot');
+			state.getIn(['x11', 'wmSettings', 'ewmh']).forEach((value, name) => {
+				if (value !== statePrev.getIn(['x11', 'wmSettings', 'ewmh', name])) {
+					handleEwmh(state, xid, name, value);
+				}
+			});
+		}
+
+		// Delete windows that have been removed
 		windowSettingsPrev.forEach((settings, key) => {
 			const xid = settings.get('xid');
 			global.X.DestroyWindow(xid);
@@ -383,6 +401,27 @@ function handleStateChange() {
 	}
 }
 
+let ewmhPropTypeFormatInfos;
+
+/*EWMH.prototype.update_window_list = function(list, cb) {
+this._update_window_list(list, '_NET_CLIENT_LIST', cb);
+};
+
+EWMH.prototype.update_window_list_stacking = function(list, cb) {
+this._update_window_list(list, '_NET_CLIENT_LIST_STACKING', cb);
+};*/
+function handleEwmh(state, xid, name, value) {
+	const info = ewmhPropTypeFormatInfos[name];
+	if (info) {
+		logger.info(`set EWMH ${name} = ${value}`);
+		const [type, format] = info;
+		x11prop.set_property(global.X, xid, name, type, format, value);
+	}
+	else {
+		logger.error(`unknown EWMH property: ${name} = ${value}`);
+	}
+}
+
 var airClientCreator = function(err, display) {
 	initLogger('logs');
 	logger.info("Initializing AirWM client.");
@@ -390,6 +429,12 @@ var airClientCreator = function(err, display) {
 		// Set the connection to the X server in global namespace
 		// as a hack since almost every file uses it
 		global.X = display.client;
+		ewmhPropTypeFormatInfos = {
+			'_NET_CLIENT_LIST': [global.X.atoms.WINDOW, 32],
+			'_NET_CLIENT_LIST_STACKING': [global.X.atoms.WINDOW, 32],
+			'_NET_CURRENT_DESKTOP': [global.X.atoms.CARDINAL, 32],
+			'_NET_NUMBER_OF_DESKTOPS': [global.X.atoms.CARDINAL, 32],
+		};
 
 		const action1 = {
 			type: 'initialize',
@@ -447,10 +492,22 @@ var airClientCreator = function(err, display) {
 		global.X.ChangeWindowAttributes(display.screen[0].root, eventMask, changeWindowAttributeErrorHandler);
 
 		/*
-		NOTE: Using EWMH stops the client from receiving a bunch of messages.
-		I think that it's probably overwriting the eventMask.
+		//NOTE: Using EWMH stops the client from receiving a bunch of messages.
+		//I think that it's probably overwriting the eventMask.
 
 		ewmh = new EWMH(display.client, display.screen[0].root);
+		ewmh.set_number_of_desktops(action1.desktops.length, function(err) {
+			if (err) {
+				throw err;
+			}
+			ewmh.set_current_desktop(0);
+		});
+
+		ewmh.on('CurrentDesktop', function(d) {
+			console.log('Client requested current desktop to be: ' + d);
+			//screens[0].setWorkspace(d);
+		});
+		*/
 
 		const SUPPORTED_ATOMS = [
 			'_NET_CURRENT_DESKTOP',
@@ -468,24 +525,8 @@ var airClientCreator = function(err, display) {
 			// _NET_WM_WINDOW_TYPE_TOOLBAR, _NET_WM_WINDOW_TYPE_MENU, _NET_WM_WINDOW_TYPE_UTILITY, _NET_WM_WINDOW_TYPE_SPLASH, _NET_WM_WINDOW_TYPE_DIALOG, _NET_WM_WINDOW_TYPE_DROPDOWN_MENU, _NET_WM_WINDOW_TYPE_POPUP_MENU, _NET_WM_WINDOW_TYPE_TOOLTIP, _NET_WM_WINDOW_TYPE_NOTIFICATION, _NET_WM_WINDOW_TYPE_COMBO, _NET_WM_WINDOW_TYPE_DND,
 			'_NET_WM_WINDOW_TYPE_NORMAL',
 		];
-		ewmh.set_supported(SUPPORTED_ATOMS, err => {
-			if (err) {
-				throw err;
-			}
-		});
-
-		ewmh.set_number_of_desktops(2, function(err) {
-			if (err) {
-				throw err;
-			}
-			ewmh.set_current_desktop(0);
-		});
-
-		ewmh.on('CurrentDesktop', function(d) {
-			console.log('Client requested current desktop to be: ' + d);
-			//screens[0].setWorkspace(d);
-		});
-		*/
+		const cb = (err) => { if(err) throw err; };
+		x11prop.set_property(global.X, display.screen[0].root, '_NET_SUPPORTED', global.X.atoms.ATOM, 32, SUPPORTED_ATOMS, cb);
 
 		store.subscribe(handleStateChange);
 
@@ -495,8 +536,8 @@ var airClientCreator = function(err, display) {
 	}
 	catch (e) {
 		logger.error("airClientCreator: ERROR:")
-		logger.error(e.message());
-		logger.error(e.stack());
+		logger.error(e.message);
+		logger.error(e.stack);
 	}
 }
 
