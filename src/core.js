@@ -737,11 +737,19 @@ function updateX11(state) {
 	if (true) {
 		// Number of desktops
 		const desktopCount = state.get('desktopIdOrder').count();
-		state = state.setIn(['x11', 'wmSettings', 'ewmh', '_NET_NUMBER_OF_DESKTOPS'], List.of(desktopCount));
+		state = state.updateIn(
+			['x11', 'wmSettings', 'ewmh', '_NET_NUMBER_OF_DESKTOPS'],
+			List.of(1),
+			l => l.set(0, desktopCount)
+		);
 		// Current desktop
 		const desktopId = State.getCurrentDesktopId(state);
 		const desktopNum = state.get('desktopIdOrder').indexOf(desktopId);
-		state = state.setIn(['x11', 'wmSettings', 'ewmh', '_NET_CURRENT_DESKTOP'], List.of(desktopNum));
+		state = state.updateIn(
+			['x11', 'wmSettings', 'ewmh', '_NET_CURRENT_DESKTOP'],
+			List.of(0),
+			l => l.set(0, desktopNum)
+		);
 		// Window order
 		const windowIdOrder = state.get('windowIdOrder');
 		state = state.updateIn(['x11', 'wmSettings', 'ewmh', '_NET_CLIENT_LIST'], List(), l => l.setSize(windowIdOrder.count()));

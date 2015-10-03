@@ -203,11 +203,15 @@ var keyPressHandler = function(ev){
 
 function handleClientMessage(ev) {
 	global.X.GetAtomName(ev.type, function(err, name) {
+		console.log({name, ev})
 		switch (name) {
-		case '_NET_ACTIVE_WINDOW':
-			//self.emit('ActiveWindow', ev.wid);
+		case '_NET_ACTIVE_WINDOW': {
+			const id = findWidgetIdForXid(ev.wid);
+			if (id >= 0) {
+				store.dispatch({type: 'activateWindow', id: id});
+			}
 			break;
-
+		}
 		case '_NET_CLOSE_WINDOW':
 			destroyNotifyHandler(ev);
 			break;
@@ -224,18 +228,22 @@ function handleClientMessage(ev) {
 	});
 }
 
-var destroyNotifyHandler = function(ev){
-	logger.info("DestroyNotifier got triggered, removing the window that got destroyed.");
+function findWidgetIdForXid(xid) {
+	let id;
 	store.getState().get('widgets').forEach((w, key) => {
-		if (w.get('xid') === ev.wid) {
-			const action = {
-				type: "destroyWidget",
-				id: parseInt(key)
-			};
-			store.dispatch(action);
+		if (w.get('xid') === xid) {
+			id = parseInt(key);
 			return false;
 		}
 	});
+}
+
+var destroyNotifyHandler = function(ev){
+	logger.info("DestroyNotifier got triggered, removing the window that got destroyed.");
+	const id = findWidgetIdForXid(ev.wid);
+	if (id >= 0) {
+		store.dispatch({type: 'destroyWidget', id: id});
+	}
 }
 
 /**

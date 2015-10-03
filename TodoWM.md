@@ -28,6 +28,7 @@
 * [x] ewmh: set window's desktop
 * [x] ewmh: set WM_STATE to [Normal, None]
 * [x] ewmh: get xfce and lxqt panels to recognize windows (see <https://github.com/lxde/lxqt/issues/354> and <https://github.com/herbstluftwm/herbstluftwm/commit/a50457335091cd990d0146e5008ca3b3db1cc574>)
+* [x] BUG: `_NET_NUMBER_OF_DESKTOPS` should not be set multiple times
 * [ ] check which client messages are sent from lxqt's task bar when clicking on a member of a program with multiple instances.
 * [ ] ewmh: set `_NET_WM_STATE` to empty by default
 * [ ] recognize and maximize the "Desktop" type window

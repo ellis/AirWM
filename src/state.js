@@ -74,7 +74,8 @@ function getDesktopIdOfWidget(state, widget) {
 	if (_.isNumber(widget))
 		widget = stateGetWidget(state, widget);
 	const parentId = widget.get('parentId');
-	assert.equal(state.getIn(['widgets', parentId.toString(), 'type']), 'desktop');
+	if (parentId >= 0)
+		assert.equal(state.getIn(['widgets', parentId.toString(), 'type']), 'desktop');
 	return parentId;
 }
 
