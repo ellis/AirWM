@@ -23,9 +23,9 @@
 * [x] ewmh: set current desktop
 * [x] ewmh: `_NET_CLIENT_LIST`
 * [x] ewmh: `_NET_CLIENT_LIST_STACKING`
+* [x] ewmh: accept client messages
+* [x] ewmh: handle desktop switching
 * [ ] ewmh: set window's desktop
-* [ ] ewmh: accept client messages
-* [ ] ewmh: handle desktop switching
 * [ ] ewmh: get xfce and lxqt panels to recognize windows (see <https://github.com/lxde/lxqt/issues/354> and <https://github.com/herbstluftwm/herbstluftwm/commit/a50457335091cd990d0146e5008ca3b3db1cc574>)
 * [ ] implement more commandHandlers() as actions
 * [ ] recognize and maximize the "Desktop" type window

@@ -728,11 +728,11 @@ function updateX11(state) {
 	if (true) {
 		// Number of desktops
 		const desktopCount = state.get('desktopIdOrder').count();
-		state = state.setIn(['x11', 'wmSettings', 'ewmh', '_NET_NUMBER_OF_DESKTOPS'], [desktopCount]);
+		state = state.setIn(['x11', 'wmSettings', 'ewmh', '_NET_NUMBER_OF_DESKTOPS'], List.of(desktopCount));
 		// Current desktop
 		const desktopId = State.getCurrentDesktopId(state);
 		const desktopNum = state.get('desktopIdOrder').indexOf(desktopId);
-		state = state.setIn(['x11', 'wmSettings', 'ewmh', '_NET_CURRENT_DESKTOP'], [desktopNum]);
+		state = state.setIn(['x11', 'wmSettings', 'ewmh', '_NET_CURRENT_DESKTOP'], List.of(desktopNum));
 		// Window order
 		const windowIdOrder = state.get('windowIdOrder');
 		state = state.updateIn(['x11', 'wmSettings', 'ewmh', '_NET_CLIENT_LIST'], List(), l => l.setSize(windowIdOrder.count()));
@@ -743,7 +743,7 @@ function updateX11(state) {
 		}
 		// Window stacking
 		const windowIdStack = state.get('windowIdStack');
-		state = state.updateIn(['x11', 'wmSettings', 'ewmh', '_NET_CLIENT_LIST'], List(), l => l.setSize(windowIdStack.count()));
+		state = state.updateIn(['x11', 'wmSettings', 'ewmh', '_NET_CLIENT_LIST_STACKING'], List(), l => l.setSize(windowIdStack.count()));
 		for (let i = 0; i < windowIdStack.count(); i++) {
 			const xid = state.getIn(['widgets', windowIdStack.get(i).toString(), 'xid']);
 			if (xid)

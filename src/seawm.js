@@ -202,7 +202,7 @@ var keyPressHandler = function(ev){
 }
 
 function handleClientMessage(ev) {
-	this.X.GetAtomName(ev.type, function(err, name) {
+	global.X.GetAtomName(ev.type, function(err, name) {
 		switch (name) {
 		case '_NET_ACTIVE_WINDOW':
 			//self.emit('ActiveWindow', ev.wid);
@@ -346,8 +346,8 @@ function handleFocusEvent(ev) {
 		}*/
 	} catch (e) {
 		logger.error("handleFocusEvent: ERROR:")
-		logger.error(e.message());
-		logger.error(e.stack());
+		logger.error(e.message);
+		logger.error(e.stack);
 	}
 }
 
@@ -408,7 +408,8 @@ function handleStateChange() {
 			const xid = screen.get('xidRoot');
 			state.getIn(['x11', 'wmSettings', 'ewmh']).forEach((value, name) => {
 				if (value !== statePrev.getIn(['x11', 'wmSettings', 'ewmh', name])) {
-					handleEwmh(state, xid, name, value);
+					const value2 = Map({value}).toJS().value;
+					handleEwmh(xid, name, value2);
 				}
 			});
 		}
@@ -422,21 +423,13 @@ function handleStateChange() {
 		statePrev = state;
 	} catch (e) {
 		logger.error("handleStateChange: ERROR:")
-		logger.error(e.message());
-		logger.error(e.stack());
+		logger.error(e.message);
+		logger.error(e.stack);
 	}
 }
 
 let ewmhPropTypeFormatInfos;
-
-/*EWMH.prototype.update_window_list = function(list, cb) {
-this._update_window_list(list, '_NET_CLIENT_LIST', cb);
-};
-
-EWMH.prototype.update_window_list_stacking = function(list, cb) {
-this._update_window_list(list, '_NET_CLIENT_LIST_STACKING', cb);
-};*/
-function handleEwmh(state, xid, name, value) {
+function handleEwmh(xid, name, value) {
 	const info = ewmhPropTypeFormatInfos[name];
 	if (info) {
 		logger.info(`set EWMH ${name} = ${value}`);
