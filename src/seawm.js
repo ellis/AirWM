@@ -207,6 +207,7 @@ function handleClientMessage(ev) {
 		switch (name) {
 		case '_NET_ACTIVE_WINDOW': {
 			const id = findWidgetIdForXid(ev.wid);
+			console.log({id})
 			if (id >= 0) {
 				store.dispatch({type: 'activateWindow', id: id});
 			}
