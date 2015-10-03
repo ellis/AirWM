@@ -87,6 +87,19 @@ describe('createWidget', () => {
 		});
 	});
 
+	describe('adding three windows', () => {
+		it('it should have the propert stack order', () => {
+			let state = ex.state120;
+			state = reducer(state, {type: 'createWidget', widget: {type: 'window', xid: 1001}});
+			state = reducer(state, {type: 'createWidget', widget: {type: 'window', xid: 1002}});
+			state = reducer(state, {type: 'createWidget', widget: {type: 'window', xid: 1003}});
+			expect(state.getIn(['widgets', '0', 'childIdOrder'])).to.equal(List.of(3, 4, 5));
+			expect(state.getIn(['widgets', '0', 'childIdStack'])).to.equal(List.of(3, 5, 4));
+			expect(state.getIn(['windowIdOrder'])).to.equal(List.of(3, 4, 5));
+			expect(state.getIn(['windowIdStack'])).to.equal(List.of(3, 5, 4));
+		});
+	});
+
 	describe('removing first window, then adding a thrid', () => {
 		let state;
 		before(() => {

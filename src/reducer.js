@@ -17,7 +17,8 @@ export default function reducer(state = core.empty, action) {
 		'createWidget': () => core.createWidget(state, action),
 		'destroyWidget': () => core.destroyWidget(state, action),
 		'initialize': () => core.initialize(action.desktops, action.screens),
-		'move': () => core.move(state, action),
+		//'move': () => core.move(state, action),
+		'moveWindowToDesktop': () => core.moveWindowToDesktop(state, action),
 		'setX11ScreenColors': () => core.setX11ScreenColors(state, action.screenId, action.colors)
 	};
 	const handler = handlers[action.type];

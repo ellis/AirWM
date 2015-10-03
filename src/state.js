@@ -82,19 +82,19 @@ function insertUniqueId(state, id, path, index) {
 	assert(_.isArray(path));
 	assert(_.isNumber(index));
 	state = removeIdFromList(state, id, path);
-	return state.updateIn(path, l => l.splice(index, 0, id));
+	return state.updateIn(path, List(), l => l.splice(index, 0, id));
 }
 function appendUniqueId(state, id, path) {
 	assert(_.isNumber(id));
 	assert(_.isArray(path));
 	state = removeIdFromList(state, id, path);
-	return state.updateIn(path, l => l.push(id));
+	return state.updateIn(path, List(), l => l.push(id));
 }
 function prependUniqueId(state, id, path) {
 	assert(_.isNumber(id));
 	assert(_.isArray(path));
 	state = removeIdFromList(state, id, path);
-	return state.updateIn(path, l => l.unshift(id));
+	return state.updateIn(path, List(), l => l.unshift(id));
 }
 
 function stateRemoveWindowFromDesktop(state, id) {
@@ -110,35 +110,16 @@ function stateRemoveWindowFromDesktop(state, id) {
 	return state;
 }
 
-function stateAddWindowToDesktop(state, w, id, desktopId, order, stack = 1) {
+function addWindowToDesktop(state, id, desktopId, order, stack = 1) {
+	assert(_.isNumber(id));
+	assert(_.isNumber(desktopId));
+	assert(_.isNumber(stack));
 	state = state.setIn(['widgets', id.toString(), 'parentId'], desktopId)
 	state = (_.isNumber(order))
 		? insertUniqueId(state, id, ['widgets', desktopId.toString(), 'childIdOrder'], order)
 		: appendUniqueId(state, id, ['widgets', desktopId.toString(), 'childIdOrder']);
-		.updateIn(
-			['widgets', desktopId.toString(), 'childIdOrder'],
-			List(),
-			l => {
-				const i = l.indexOf(id);
-				if (i >= 0)
-					l = l.delete(i);
-				if (order >= l.count()) return l.push(id);
-				else if (_.isNumber(order)) return l.splice(order, 0, id);
-				else return l.push(id);
-			}
-		)
-		.updateIn(
-			['widgets', desktopId.toString(), 'childIdStack'],
-			List(),
-			l => {
-				const i = l.indexOf(id);
-				if (i >= 0)
-					l = l.delete(i);
-				if (stack >= l.count()) return l.push(id);
-				else if (_.isNumber(stack)) return l.splice(stack, 0, id);
-				else return l.unshift(id);
-			}
-		);
+	state = insertUniqueId(state, id, ['widgets', desktopId.toString(), 'childIdStack'], stack);
+	return state;
 }
 
 // Bring the desktop to the front of the given stack
@@ -244,7 +225,7 @@ const State = {
 	raiseDesktopOnScreen,
 	raiseDesktopInWmStack: stateRaiseDesktopInWmStack,
 
-	addWindowToDesktop: stateAddWindowToDesktop,
+	addWindowToDesktop,
 	removeWindowFromDesktop: stateRemoveWindowFromDesktop,
 	removeIdFromList,
 	insertUniqueId,

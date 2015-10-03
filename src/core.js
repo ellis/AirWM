@@ -174,6 +174,7 @@ function createWindow(state, w, id) {
 		);
 }
 
+/*
 function expandObjectSpec(state, spec) {
 	let {screen: screenNum, desktop: desktopNum, window: windowNum} = spec;
 	const l = [
@@ -289,7 +290,7 @@ export function move(state, action) {
 				if (true) {
 					const desktopId1 = to1.desktopId;
 					// FIXME: increment this value once activateDesktop is changed to activate with 1-indexed numbers
-					const desktopNum1 = state.get('desktopIds').indexOf(desktopId1)/* + 1*/;
+					const desktopNum1 = state.get('desktopIds').indexOf(desktopId1);
 					state = state.setIn(['widgets', desktopId1.toString(), 'focusCurrentId'], id);
 					state = activateDesktop(state, {num: desktopNum1});
 				}
@@ -305,6 +306,32 @@ export function move(state, action) {
 
 	logger.error("unrecognized combination:");
 	logger.error({from: from1, to: to1});
+	return state;
+}
+*/
+
+export function moveWindowToDesktop(state, action) {
+	//console.log({action})
+	const {desktop: desktopNum} = action;
+	const desktopId0 = State.getCurrentDesktopId(state);
+	const id = State.getCurrentWindowId(state);
+	const desktopId = state.getIn(['desktopIdOrder', desktopNum]);
+	if (desktopId0 !== desktopId) {
+		const doFocus = true;
+		state = State.removeWindowFromDesktop(state, id);
+		//console.log({id, desktopId, desktopId0})
+		state = State.addWindowToDesktop(state, id, desktopId, undefined, (doFocus) ? 0 : undefined);
+		// Move focus with the window
+		if (doFocus) {
+			state = activateDesktop(state, {num: desktopNum});
+		}
+		//state = updateFocus(state, id);
+		state = updateLayout(state);
+		state = updateX11(state);
+		State.check(state);
+		//console.log("move:")
+		//console.log(JSON.stringify(state.toJS(), null, '\t'))
+	}
 	return state;
 }
 
