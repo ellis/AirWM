@@ -106,6 +106,11 @@ export function activateDesktop(state, action) {
 	return state;
 }
 
+export function closeWindow(state, action) {
+	const {desktopId, windowId} = State.getCurrentScreenDesktopWindowIds(state);
+	return destroyWidget(state, {id: windowId});
+}
+
 export function createWidget(state, action) {
 	const w = action.widget;
 	assert(state);

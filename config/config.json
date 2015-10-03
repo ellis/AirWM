@@ -22,6 +22,8 @@
 		{"key": "p", "modifier" : ["super"], "action": {"type": "activateWindowPrev"}},
 		{"key": "n", "modifier" : ["super","shift"], "action": {"type": "moveWindowToIndexNext"}},
 		{"key": "p", "modifier" : ["super","shift"], "action": {"type": "moveWindowToIndexPrev"}},
+
+		{"key": "c", "modifier" : ["super","shift"], "action": {"type": "closeWindow"}},
 		{
 			"key"      : "d",
 			"modifier" : ["super"],

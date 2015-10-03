@@ -17,7 +17,7 @@
 * [x] windowOrder, windowStack, desktopOrder, desktopStack, screenOrder, screenStack
 * [x] actions: move windows in childIds order
 * [x] only have mouse follow cursor when the user moves the mouse
-* [ ] actions: close window
+* [x] actions: close window
 * [ ] ewmh: get ewmh to work without blocking lots of window events
 * [ ] ewmh: desktop count
 * [ ] ewmh: desktop switching
@@ -34,6 +34,7 @@ Testing:
 * [ ] test 'desktop.raise' more thoroughly
 * [ ] test multiple docks and different dock gravities
 * [ ] test 'move' action
+* [ ] test 'closeWindow' (perhaps put it in destroyWidgetSpec.js?)
 
 Refactoring:
 * [ ] consider switching from Immutable to <https://github.com/rtfeldman/seamless-immutable>

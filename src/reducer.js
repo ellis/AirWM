@@ -14,6 +14,7 @@ export default function reducer(state = core.empty, action) {
 		'activateWindow': () => core.activateWindow(state, action),
 		'activateWindowNext': () => core.activateWindowNext(state, action),
 		'activateWindowPrev': () => core.focus_movePrev(state, action),
+		'closeWindow': () => core.closeWindow(state, action),
 		'createWidget': () => core.createWidget(state, action),
 		'destroyWidget': () => core.destroyWidget(state, action),
 		'initialize': () => core.initialize(action.desktops, action.screens),
