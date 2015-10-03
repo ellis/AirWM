@@ -657,17 +657,13 @@ function updateX11(state) {
 			const hasFocus = (key === focusCurrentKey);
 			const info = {
 				xid: xid,
-				visible: w.get('visible', false)
+				visible: w.get('visible', false),
+				ewmh: {}
 			};
 			if (info.visible) {
 				const desktopId = getWidgetDesktopId(state, w);
 				const desktop = state.getIn(['widgets', desktopId.toString()]);
 				const screenId = (desktop) ? desktop.get('screenId') : w.get('screenId');
-				// FIXME: for debug only
-				if (_.isUndefined(screenId)) {
-					console.log(JSON.stringify(state.toJS(), null, '\t'))
-				}
-				// ENDFIX
 				const screenX11 = state.getIn(['x11', 'screens', screenId.toString()], Map());
 				const windowType = w.get('type');
 				const borderWidth = _.get({
@@ -703,6 +699,9 @@ function updateX11(state) {
 						stackMode: (windowType === 'DESKTOP') ? 1 : 0
 					}
 				];
+				info.ewmh['_NET_WM_DESKTOP'] = (windowType === 'window')
+					? [info.desktopNum]
+					: [0xFFFFFFFF];
 				/*if (windowType === 'dock') {
 					console.log("dockInfo:")
 					console.log(w)

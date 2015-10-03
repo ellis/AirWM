@@ -391,6 +391,14 @@ function handleStateChange() {
 				else
 					global.X.UnmapWindow(xid);
 			}
+
+			// EWMH hints
+			settings1.getIn(['ewmh']).forEach((value, name) => {
+				if (value !== statePrev.getIn(['x11', 'windowSettings', key, 'ewmh', name])) {
+					const value2 = Map({value}).toJS().value;
+					handleEwmh(xid, name, value2);
+				}
+			});
 		});
 
 		// Set the X11 focus
@@ -403,8 +411,6 @@ function handleStateChange() {
 		// Set EWMH (extended window manager hints)
 		if (true) {
 			const screen = State.getCurrentScreen(state);
-			const desktop = State.getCurrentDesktop(state);
-			const focusCurrentId = desktop.getIn(['childIdStack', 0]);
 			const xid = screen.get('xidRoot');
 			state.getIn(['x11', 'wmSettings', 'ewmh']).forEach((value, name) => {
 				if (value !== statePrev.getIn(['x11', 'wmSettings', 'ewmh', name])) {
@@ -453,6 +459,7 @@ var airClientCreator = function(err, display) {
 			'_NET_CLIENT_LIST_STACKING': [global.X.atoms.WINDOW, 32],
 			'_NET_CURRENT_DESKTOP': [global.X.atoms.CARDINAL, 32],
 			'_NET_NUMBER_OF_DESKTOPS': [global.X.atoms.CARDINAL, 32],
+			'_NET_WM_DESKTOP': [global.X.atoms.CARDINAL, 32],
 		};
 
 		const action1 = {

@@ -25,7 +25,7 @@
 * [x] ewmh: `_NET_CLIENT_LIST_STACKING`
 * [x] ewmh: accept client messages
 * [x] ewmh: handle desktop switching
-* [ ] ewmh: set window's desktop
+* [x] ewmh: set window's desktop
 * [ ] ewmh: get xfce and lxqt panels to recognize windows (see <https://github.com/lxde/lxqt/issues/354> and <https://github.com/herbstluftwm/herbstluftwm/commit/a50457335091cd990d0146e5008ca3b3db1cc574>)
 * [ ] implement more commandHandlers() as actions
 * [ ] recognize and maximize the "Desktop" type window
@@ -48,6 +48,7 @@ Refactoring:
 * [ ] consider using `activeChildIndex` and `activeDesktopIndex` instead of IDs
 
 Later:
+* [ ] ewmh: docks should also be listed in windows
 * [ ] config: allow for loading a js file instead of just JSON
 * [ ] config: add desktop config, accept a number, a list of strings, or JSON widget objects
 * [ ] detect existing X11 tree on startup and add windows
