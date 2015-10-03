@@ -12,6 +12,7 @@ var keysym = require('keysym');
 // Custom libraries
 var conversion = require('../lib/conversion');
 var logger	 = require('../lib/logger').logger;
+import State from './state.js';
 import {empty} from './core.js';
 import makeStore from './store.js';
 import getWindowProperties from '../lib/getWindowProperties.js';

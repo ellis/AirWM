@@ -111,8 +111,10 @@ function stateRemoveWindowFromDesktop(state, id) {
 }
 
 function stateAddWindowToDesktop(state, w, id, desktopId, order, stack = 1) {
-	return state
-		.setIn(['widgets', id.toString()], w.set('parentId', desktopId))
+	state = state.setIn(['widgets', id.toString(), 'parentId'], desktopId)
+	state = (_.isNumber(order))
+		? insertUniqueId(state, id, ['widgets', desktopId.toString(), 'childIdOrder'], order)
+		: appendUniqueId(state, id, ['widgets', desktopId.toString(), 'childIdOrder']);
 		.updateIn(
 			['widgets', desktopId.toString(), 'childIdOrder'],
 			List(),
@@ -135,33 +137,6 @@ function stateAddWindowToDesktop(state, w, id, desktopId, order, stack = 1) {
 				if (stack >= l.count()) return l.push(id);
 				else if (_.isNumber(stack)) return l.splice(stack, 0, id);
 				else return l.unshift(id);
-			}
-		);
-}
-
-function stateUpdateWindowStacks(state, id) {
-	assert(_.isNumber(id));
-	const desktopId = getWidgetDesktopId(state, id);
-	assert(_.isNumber(desktopId));
-	return state
-		.updateIn(
-			['windowIdStack'],
-			List(),
-			l => {
-				const i = l.indexOf(id);
-				if (i >= 0)
-					l = l.delete(i);
-				return l.unshift(id);
-			}
-		)
-		.updateIn(
-			['widgets', desktopId.toString(), 'childIdStack'],
-			List(),
-			l => {
-				const i = l.indexOf(id);
-				if (i >= 0)
-					l = l.delete(i);
-				return l.unshift(id);
 			}
 		);
 }
@@ -269,6 +244,7 @@ const State = {
 	raiseDesktopOnScreen,
 	raiseDesktopInWmStack: stateRaiseDesktopInWmStack,
 
+	addWindowToDesktop: stateAddWindowToDesktop,
 	removeWindowFromDesktop: stateRemoveWindowFromDesktop,
 	removeIdFromList,
 	insertUniqueId,

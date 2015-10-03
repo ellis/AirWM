@@ -9,23 +9,6 @@ import State from './state.js';
 
 export const empty = Map();
 
-/*
-export const actions = {
-	'activateWindow': {
-		build: function(id) { return {type: 'activateWindow', id: id}; },
-		run: function(state, params) { return activateWindow(state, params.id); }
-	},
-	'activateWindowNext': {
-		build: function() { return {type: 'activateWindowNext'}; },
-		run: function(state, params) { return activateWindowNext(state); }
-	},
-	'activateWindowPrev': {
-		build: function() { return {type: 'activateWindowPrev'}; },
-		run: function(state, params) { return activateWindowNext(state); }
-	}
-}
-*/
-
 export function initialize(desktops, screens) {
 	assert(_.isArray(desktops));
 	assert(_.isArray(screens));
