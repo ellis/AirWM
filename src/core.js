@@ -421,8 +421,6 @@ export function activateWindow(state, action) {
 	// Bring window to front of WM stack
 	state = State.prependUniqueId(state, id, ['windowIdStack']);
 
-	console.log({id, desktopId, desktopNum})
-
 	state = updateLayout(state);
 	state = updateX11(state);
 	State.check(state);
