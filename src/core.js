@@ -342,6 +342,31 @@ export function moveWindowToDesktop(state, action) {
 	return state;
 }
 
+function moveWindowToIndexDir(state, action, next) {
+	const {desktopId, windowId} = State.getCurrentScreenDesktopWindowIds(state);
+	if (windowId >= 0) {
+		const path = ['widgets', desktopId.toString(), 'childIdOrder'];
+		const l = state.getIn(path);
+		const i = l.indexOf(windowId);
+		const j = (next)
+			? (i + 1) % l.count()
+			: (i == 0) ? l.count() - 1 : i - 1;
+		state = State.insertUniqueId(state, windowId, path, j);
+	}
+	state = updateLayout(state);
+	state = updateX11(state);
+	State.check(state);
+	return state;
+}
+
+export function moveWindowToIndexNext(state, action) {
+	return moveWindowToIndexDir(state, action, true);
+}
+
+export function moveWindowToIndexPrev(state, action) {
+	return moveWindowToIndexDir(state, action, false);
+}
+
 export function destroyWidget(state, action) {
 	//console.log("destroyWidget: ", action);
 	const id = action.id;

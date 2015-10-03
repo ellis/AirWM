@@ -15,7 +15,7 @@
 * [x] rename actions
 * [x] move old files with conflicting names (on MacOS) to another directory
 * [x] windowOrder, windowStack, desktopOrder, desktopStack, screenOrder, screenStack
-* [ ] actions: move windows in childIds order
+* [x] actions: move windows in childIds order
 * [ ] only have mouse follow cursor when the user moves the mouse
 * [ ] actions: close window
 * [ ] ewmh: get ewmh to work without blocking lots of window events
@@ -30,6 +30,7 @@
 * [ ] implement command language and selector parameters
 
 Testing:
+* [ ] test `moveWindowToIndex`
 * [ ] test 'desktop.raise' more thoroughly
 * [ ] test multiple docks and different dock gravities
 * [ ] test 'move' action
