@@ -264,7 +264,8 @@ function mapRequestHandler(ev) {
 }
 
 var eventHandler = function(ev){
-	logger.info("Received a %s event.", ev.name);
+	if (ev.name !== "MotionNotify")
+		logger.info("Received a %s event.", ev.name);
 	try {
 		switch( ev.name ) {
 		case "ConfigureRequest":
@@ -274,6 +275,9 @@ var eventHandler = function(ev){
 			break
 		case "MapRequest":
 			mapRequestHandler(ev);
+			break;
+		case "MotionNotify":
+			handleMotionNotify(ev);
 			break;
 		case "DestroyNotify":
 			destroyNotifyHandler(ev);
@@ -296,6 +300,7 @@ var eventHandler = function(ev){
 	}
 }
 
+let _focusId;
 function handleFocusEvent(ev) {
 	try {
 		let state = store.getState();
@@ -306,13 +311,21 @@ function handleFocusEvent(ev) {
 				return false;
 			}
 		});
-		if (id >= 0) {
+		_focusId = id;
+		/*if (id >= 0) {
 			store.dispatch({type: 'activateWindow', id: id});
-		}
+		}*/
 	} catch (e) {
 		logger.error("handleFocusEvent: ERROR:")
 		logger.error(e.message());
 		logger.error(e.stack());
+	}
+}
+
+function handleMotionNotify(ev) {
+	if (_focusId >= 0) {
+		store.dispatch({type: 'activateWindow', id: _focusId});
+		_focusId = undefined;
 	}
 }
 
@@ -419,11 +432,12 @@ var airClientCreator = function(err, display) {
 		const eventMask = {
 			eventMask:
 				x11.eventMask.ButtonPress |
-				x11.eventMask.EnterWindow |
-				x11.eventMask.LeaveWindow |
+				//x11.eventMask.EnterWindow |
+				//x11.eventMask.LeaveWindow |
 				x11.eventMask.SubstructureNotify |
 				x11.eventMask.SubstructureRedirect |
-				x11.eventMask.StructureNotify |
+				//x11.eventMask.StructureNotify |
+				x11.eventMask.PointerMotion |
 				x11.eventMask.PropertyChange |
 				x11.eventMask.ResizeRedirect
 		}

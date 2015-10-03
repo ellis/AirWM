@@ -16,7 +16,7 @@
 * [x] move old files with conflicting names (on MacOS) to another directory
 * [x] windowOrder, windowStack, desktopOrder, desktopStack, screenOrder, screenStack
 * [x] actions: move windows in childIds order
-* [ ] only have mouse follow cursor when the user moves the mouse
+* [x] only have mouse follow cursor when the user moves the mouse
 * [ ] actions: close window
 * [ ] ewmh: get ewmh to work without blocking lots of window events
 * [ ] ewmh: desktop count
@@ -65,6 +65,7 @@ Multi-screen todos:
 
 * <http://seasonofcode.com/posts/how-x-window-managers-work-and-how-to-write-one-part-i.html>
 * <http://teropa.info/blog/2015/09/10/full-stack-redux-tutorial.html>
+* for a python WM with some EWMH support: <https://github.com/qtile/qtile/blob/02fd471f3a3b9becd148709879c3569647d45325/libqtile/xcbq.py>
 
 # Features I'd like
 
