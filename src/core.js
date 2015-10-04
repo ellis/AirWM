@@ -702,7 +702,7 @@ function updateX11(state) {
 			info = info
 				.set('xid', xid)
 				.set('visible', isVisible)
-				.setIn(['ewmh', 'WM_STATE', 'state'], (isVisible) ? WM_STATE_NormalState : WM_STATE_IconicState)
+				.setIn(['ewmh', 'WM_STATE', 'state'], WM_STATE_NormalState) //(isVisible) ? WM_STATE_NormalState : WM_STATE_IconicState)
 				.setIn(['ewmh', 'WM_STATE', 'icon'], 0);
 			if (isVisible) {
 				const desktopId = getWidgetDesktopId(state, w);
