@@ -698,7 +698,7 @@ function updateX11(state) {
 				const eventMask = _.get({
 					'desktop': undefined,
 					'dock': undefined,
-				}, windowType, x11.eventMask.EnterWindow);
+				}, windowType, x11.eventMask.EnterWindow | x11.eventMask.PointerMotion);
 
 				info.desktopNum = state.get('desktopIdOrder').indexOf(desktopId);
 				info.ChangeWindowAttributes = [

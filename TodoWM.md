@@ -33,10 +33,11 @@
 * [x] check which client messages are sent from lxqt's task bar when clicking on a member of a program with multiple instances.
 * [x] state.ewmh: set `_NET_WM_ALLOWED_ACTIONS` to `[_NET_WM_ACTION_CLOSE]` (except on docks and backgrounds)
 * [x] clientMessage: `_NET_CLOSE_WINDOW`
+* [ ] better focus follows mouse
+* [ ] recognize and maximize the "Desktop" type window
 * [ ] check stackMode, don't want windows to be in front of lxqt-panel's popups
 * [ ] state: add orphanId lists
 * [ ] ewmh: set `_NET_WM_STATE` to empty by default
-* [ ] recognize and maximize the "Desktop" type window
 * [ ] implement more commandHandlers() as actions
 * [ ] save state to console after every change, for debugging
 * [ ] BUG: not receiving mouse move events over gnome-terminal or firefox

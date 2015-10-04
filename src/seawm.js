@@ -228,7 +228,7 @@ function handlePreExistingWindow(xid) {
 		// If the override-redirect flag is set, don't manage:
 		if (attrs.overrideRedirect) {
 			logger.info("window has overrideRedirect");
-			return;
+			//return;
 		}
 
 		createWidgetForXid(xid);
@@ -244,8 +244,8 @@ function handleNewWindow(xid) {
 		if (!attrs.overrideRedirect) {
 			// don't manage
 			logger.info(log+": window has overrideRedirect");
-			X.MapWindow(xid);
-			return;
+			//X.MapWindow(xid);
+			//return;
 		}
 
 		createWidgetForXid(xid);
@@ -285,9 +285,12 @@ function createWidgetForXid(xid) {
 	});
 }
 
+let eventNamePrev = undefined;
 var eventHandler = function(ev){
-	if (true || ev.name !== "MotionNotify")
+	// Only log first of sequential MotionNotify events
+	if (ev.name !== "MotionNotify" || eventNamePrev !== "MotionNotify")
 		logger.info("Received a %s event.", ev.name);
+	eventNamePrev = ev.name;
 	try {
 		switch( ev.name ) {
 		case 'ClientMessage':
@@ -312,7 +315,7 @@ var eventHandler = function(ev){
 			destroyNotifyHandler(ev);
 			break;
 		case "EnterNotify":
-			handleFocusEvent(ev);
+			handleEnterNotify(ev);
 			break;
 		case "KeyPress":
 			keyPressHandler(ev);
@@ -328,8 +331,9 @@ var eventHandler = function(ev){
 	}
 }
 
-let _focusId;
-function handleFocusEvent(ev) {
+let ignoreEnterNotify = true;
+//let _focusId;
+function handleEnterNotify(ev) {
 	try {
 		let state = store.getState();
 		var id = undefined;
@@ -345,23 +349,25 @@ function handleFocusEvent(ev) {
 				return false;
 			}
 		});
-		_focusId = id;
+		//_focusId = id;
+		ignoreEnterNotify = false;
+		store.dispatch({type: 'activateWindow', id});
 		/*if (id >= 0) {
 			store.dispatch({type: 'activateWindow', id: id});
 		}*/
 	} catch (e) {
-		logger.error("handleFocusEvent: ERROR:")
+		logger.error("handleEnterNotify: ERROR:")
 		logger.error(e.message);
 		logger.error(e.stack);
 	}
 }
 
 function handleMotionNotify(ev) {
-	if (_focusId >= 0) {
+	/*if (_focusId >= 0) {
 		const id = _focusId;
 		_focusId = undefined;
 		store.dispatch({type: 'activateWindow', id});
-	}
+	}*/
 }
 
 //creates the logDir directory when it doesn't exist (otherwise Winston fails)
@@ -374,6 +380,11 @@ let statePrev = empty;
 function handleStateChange() {
 	try {
 		const state = store.getState();
+		// If the active window has changed, set ignoreEnterNotify = true
+		if (state.getIn(['x11', 'wmSettings', '_NET_ACTIVE_WINDOW', 0]) !== statePrev.getIn(['x11', 'wmSettings', '_NET_ACTIVE_WINDOW', 0])) {
+			ignoreEnterNotify = true;
+		}
+		// Settings for each window
 		let windowSettingsPrev = statePrev.getIn(['x11', 'windowSettings'], Map());
 		state.getIn(['x11', 'windowSettings'], Map()).forEach((settings1, key) => {
 			windowSettingsPrev = windowSettingsPrev.delete(key);
@@ -451,7 +462,7 @@ let ewmhPropTypeFormatInfos;
 function handleEwmh(xid, name, value) {
 	const info = ewmhPropTypeFormatInfos[name];
 	if (info) {
-		logger.info(`set EWMH ${name} = ${value}`);
+		logger.info(`set EWMH ${name} = ${JSON.stringify(value, null, '\t')}`);
 		const [type, format] = info;
 		// If the type is ATOM, make sure strings get converted to atoms.
 		if (type === global.X.atoms.ATOM) {
@@ -490,6 +501,7 @@ var airClientCreator = function(err, display) {
 		global.X = display.client;
 		ewmhPropTypeFormatInfos = {
 			'WM_STATE': ['WM_STATE', 32],
+			'_NET_ACTIVE_WINDOW': [global.X.atoms.WINDOW, 32],
 			'_NET_CLIENT_LIST': [global.X.atoms.WINDOW, 32],
 			'_NET_CLIENT_LIST_STACKING': [global.X.atoms.WINDOW, 32],
 			'_NET_CURRENT_DESKTOP': [global.X.atoms.CARDINAL, 32],
