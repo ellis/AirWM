@@ -8,6 +8,7 @@ import * as core from './core.js';
 
 
 export default function reducer(state = core.empty, action) {
+	logger.info("reducer: "+JSON.stringify(action));
 	const handlers = {
 		'@@redux/INIT': () => state,
 		'activateDesktop': () => core.activateDesktop(state, action),

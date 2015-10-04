@@ -698,17 +698,13 @@ function updateX11(state) {
 		const isVisible = w.get('visible', false);
 		if (xid >= 0) {
 			const hasFocus = (key === focusCurrentKey);
-			const info = {
-				xid: xid,
-				visible: isVisible,
-				ewmh: {
-					'WM_STATE': {
-						state: (isVisible) ? WM_STATE_NormalState : WM_STATE_IconicState,
-						icon: 0
-					},
-				}
-			};
-			if (info.visible) {
+			let info = state.getIn(['x11', 'windowSettings', key], Map());
+			info = info
+				.set('xid', xid)
+				.set('visible', isVisible)
+				.setIn(['ewmh', 'WM_STATE', 'state'], (isVisible) ? WM_STATE_NormalState : WM_STATE_IconicState)
+				.setIn(['ewmh', 'WM_STATE', 'icon'], 0);
+			if (isVisible) {
 				const desktopId = getWidgetDesktopId(state, w);
 				const desktop = state.getIn(['widgets', desktopId.toString()]);
 				const screenId = (desktop) ? desktop.get('screenId') : w.get('screenId');
@@ -728,31 +724,48 @@ function updateX11(state) {
 					'dock': undefined,
 				}, windowType, x11.eventMask.EnterWindow | x11.eventMask.PointerMotion);
 
-				info.desktopNum = state.get('desktopIdOrder').indexOf(desktopId);
-				info.ChangeWindowAttributes = [
-					xid,
-					_.merge({}, {
-						borderPixel: color,
-						eventMask: eventMask
-					})
-				];
-				info.ConfigureWindow = [
-					xid,
-					{
-						x: rc[0],
-						y: rc[1],
-						width: rc[2] - 2*borderWidth,
-						height: rc[3] - 2*borderWidth,
-						borderWidth: borderWidth,
-						stackMode: (windowType === 'DESKTOP') ? 1 : 0
-					}
-				];
-				info.ewmh['_NET_WM_DESKTOP'] = (windowType === 'window')
-					? [info.desktopNum]
-					: [0xFFFFFFFF];
-				info.ewmh['_NET_WM_ALLOWED_ACTIONS'] = (windowType === 'window')
-					? ['_NET_WM_ACTION_CLOSE']
-					: [];
+				try {
+				info = info
+					.set('desktopNum', state.get('desktopIdOrder').indexOf(desktopId))
+					.update(
+						'ChangeWindowAttributes',
+						List.of(xid, Map()),
+						m => m
+							.setIn([1, 'borderPixel'], color)
+							.setIn([1, 'eventMask'], eventMask)
+					)
+					.update(
+						'ConfigureWindow',
+						List.of(xid, Map()),
+						m => m.update(1, x => x.merge({
+							x: rc[0],
+							y: rc[1],
+							width: rc[2] - 2*borderWidth,
+							height: rc[3] - 2*borderWidth,
+							borderWidth: borderWidth,
+							stackMode: (windowType === 'background') ? 1 : 0
+						}))
+					)
+					.updateIn(
+						['ewmh', '_NET_WM_DESKTOP'],
+						List.of(0xFFFFFFFF),
+						l => l.set(0, (windowType === 'window')
+							? info.desktopNum
+							: 0xFFFFFFFF
+						)
+					)
+					.updateIn(
+						['ewmh', '_NET_WM_ALLOWED_ACTIONS'],
+						List(),
+						l => (windowType === 'window')
+							? l.set(0, '_NET_WM_ACTION_CLOSE')
+							: l.clear()
+					);
+				}
+				catch (e) {
+					logger.error(e.message)
+					logger.error(e.stack)
+				}
 				/*if (windowType === 'dock') {
 					console.log("dockInfo:")
 					console.log(w)
@@ -760,7 +773,9 @@ function updateX11(state) {
 				}*/
 			}
 
-			state = state.mergeIn(['x11', 'windowSettings', key], fromJS(info));
+			//console.log("info: "+xid);
+			//console.log(info);
+			state = state.setIn(['x11', 'windowSettings', key], info);
 		}
 	});
 

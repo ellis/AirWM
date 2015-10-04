@@ -51,6 +51,9 @@
 	* [ ] clientMessage: handle WM_CHANGE_STATE
 	* [ ] ewmh: `_NET_WM_STATE_HIDDEN`, `_NET_WM_STATE_FOCUSED`
 
+Naming:
+* jetwm jetwm howmoo lowmo light flowm flowmo flowmotion
+
 Testing:
 * [ ] test `moveWindowToIndex`
 * [ ] test 'desktop.raise' more thoroughly

@@ -257,8 +257,8 @@ function createWidgetForXid(xid) {
 	getWindowProperties(global.X, xid).then(props => {
 		const widgetType = ({
 			'_NET_WM_WINDOW_TYPE_DOCK': 'dock',
-			//'_NET_WM_WINDOW_TYPE_DESKTOP': 'background',
-			'_NET_WM_WINDOW_TYPE_DESKTOP': 'window',
+			'_NET_WM_WINDOW_TYPE_DESKTOP': 'background',
+			//'_NET_WM_WINDOW_TYPE_DESKTOP': 'window',
 		}[props['_NET_WM_WINDOW_TYPE']] || "window");
 
 		const action = {
@@ -418,7 +418,7 @@ function handleStateChange() {
 			}
 
 			// EWMH hints
-			settings1.getIn(['ewmh']).forEach((value, name) => {
+			settings1.getIn(['ewmh'], Map()).forEach((value, name) => {
 				if (value !== statePrev.getIn(['x11', 'windowSettings', key, 'ewmh', name])) {
 					const value2 = Map({value}).toJS().value;
 					handleEwmh(xid, name, value2);
@@ -463,7 +463,7 @@ let ewmhPropTypeFormatInfos;
 function handleEwmh(xid, name, value) {
 	const info = ewmhPropTypeFormatInfos[name];
 	if (info) {
-		logger.info(`set EWMH ${name} = ${JSON.stringify(value)}`);
+		logger.info(`set EWMH ${name} ${xid} = ${JSON.stringify(value)}`);
 		const [type, format] = info;
 		// If the type is ATOM, make sure strings get converted to atoms.
 		if (type === global.X.atoms.ATOM) {
