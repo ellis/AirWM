@@ -35,6 +35,7 @@
 * [x] clientMessage: `_NET_CLOSE_WINDOW`
 * [x] better focus follows mouse
 * [x] recognize and maximize the "Desktop" type window
+* [ ] IMPROVEMENT: x11 package: LeaveNotify isn't recognized as event!
 * [ ] BUG: start firefox or atom (or any program?); switch to different desktop; quick WM; restart WM; the windows are no longer displayed
 * [ ] BUG: start firefox; press Ctrl-N; the new window isn't sized properly
 * [ ] activate window on mouse click
