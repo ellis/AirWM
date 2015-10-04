@@ -108,7 +108,14 @@ export function activateDesktop(state, action) {
 
 export function closeWindow(state, action) {
 	const {desktopId, windowId} = State.getCurrentScreenDesktopWindowIds(state);
-	return destroyWidget(state, {id: windowId});
+	const windowType = state.getIn(['widgets', windowId.toString(), 'windowType']);
+	switch (windowType) {
+		case 'background':
+		case 'dock':
+			return state;
+		default:
+			return destroyWidget(state, {id: windowId});
+	}
 }
 
 export function createWidget(state, action) {
@@ -411,7 +418,10 @@ export function activateWindow(state, action) {
 	const w = State.getWidget(state, id);
 
 	// Bring window to front of desktop stack
-	const desktopId = State.getDesktopIdOfWidget(state, id);
+	const screenId = w.get('screenId');
+	const desktopId = (screenId >= 0)
+		? state.getIn(['screens', screenId.toString(), 'desktopIdStack', 0])
+		: State.getDesktopIdOfWidget(state, id);
 	state = State.prependUniqueId(state, id, ['widgets', desktopId.toString(), 'childIdStack']);
 
 	// Activate the desktop

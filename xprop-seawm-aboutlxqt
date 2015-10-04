@@ -1,0 +1,26 @@
+_NET_WM_USER_TIME(CARDINAL) = 39788253
+_NET_WM_ICON_GEOMETRY(CARDINAL) = 407, 569, 165, 32
+_NET_WM_DESKTOP(CARDINAL) = 0
+WM_STATE(WM_STATE):
+		window state: Normal
+		icon window: 0x0
+WM_TRANSIENT_FOR(WINDOW): window id # 0x400002
+_NET_WM_ICON(CARDINAL) = 	Icon (150 x 150):
+	(not shown)
+XdndAware(ATOM) = BITMAP
+_NET_WM_NAME(UTF8_STRING) = " About LXQt"
+_MOTIF_WM_HINTS(_MOTIF_WM_HINTS) = 0x3, 0x26, 0x1e, 0x0, 0x0
+_NET_WM_WINDOW_TYPE(ATOM) = _NET_WM_WINDOW_TYPE_DIALOG, _NET_WM_WINDOW_TYPE_NORMAL
+_XEMBED_INFO(_XEMBED_INFO) = 0x0, 0x1
+WM_CLIENT_LEADER(WINDOW): window id # 0x400002
+WM_HINTS(WM_HINTS):
+		Client accepts input or input focus: True
+		Initial state is Normal State.
+_NET_WM_PID(CARDINAL) = 19856
+_NET_WM_SYNC_REQUEST_COUNTER(CARDINAL) = 4194310
+WM_CLASS(STRING) = "lxqt-about", "lxqt-about"
+WM_PROTOCOLS(ATOM): protocols  WM_DELETE_WINDOW, WM_TAKE_FOCUS, _NET_WM_PING, _NET_WM_SYNC_REQUEST, _NET_WM_CONTEXT_HELP
+WM_NORMAL_HINTS(WM_SIZE_HINTS):
+		user specified size: 633 by 416
+		program specified minimum size: 155 by 275
+		window gravity: NorthWest

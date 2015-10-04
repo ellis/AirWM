@@ -17,3 +17,9 @@ Terminal 2: ``xtrace -n -D:2 -d:1 -o xtrace.log``
 Terminal 3: ``DISPLAY=:2 ./node_modules/.bin/babel-node src/seawm.js``
 
 This can also be used with other WMs so see what they are sending to the X11 server.
+
+# Other helpful programs
+
+* ``xwininfo -tree -root``
+* ``xprop``
+* ``xev``

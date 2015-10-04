@@ -29,6 +29,9 @@
 * [x] ewmh: set WM_STATE to [Normal, None]
 * [x] ewmh: get xfce and lxqt panels to recognize windows (see <https://github.com/lxde/lxqt/issues/354> and <https://github.com/herbstluftwm/herbstluftwm/commit/a50457335091cd990d0146e5008ca3b3db1cc574>)
 * [x] BUG: `_NET_NUMBER_OF_DESKTOPS` should not be set multiple times
+* [?] don't let user close docks or backgrounds (will need to have separate commands for when X tells us that a window is closed and when the user pressed Win-Shift-C)
+* [ ] check stackMode, don't want windows to be in front of lxqt-panel's popups
+* [ ] state: add orphanId lists
 * [ ] check which client messages are sent from lxqt's task bar when clicking on a member of a program with multiple instances.
 * [ ] ewmh: set `_NET_WM_STATE` to empty by default
 * [ ] recognize and maximize the "Desktop" type window
@@ -36,8 +39,10 @@
 * [ ] save state to console after every change, for debugging
 * [ ] BUG: not receiving mouse move events over gnome-terminal or firefox
 * [ ] BUG: start two xterms; click 'xterm' on lxqt-panel's task bar; occasionally the popup is drawn below the windows
-* [ ] BUG: click lxqt-panel's start menu: menu is displayed too far to the left
-* [ ] BUG: click lxqt-panel's start menu; move over sub-menus: icons keep getting added
+* [ ] ?BUG: click lxqt-panel's start menu: menu is displayed too far to the left
+* [ ] state: add floatId lists
+* [ ] Win-move to move floating windows
+* [ ] ewmh: handle `_NET_WM_WINDOW_TYPE_DIALOG`, sometimes make it floating
 
 Testing:
 * [ ] test `moveWindowToIndex`
@@ -55,6 +60,8 @@ Refactoring:
 * [ ] consider using `activeChildIndex` and `activeDesktopIndex` instead of IDs
 
 Later:
+* [ ] ewmh: handle `_NET_WM_WINDOW_TYPE_NOTIFICATION`
+* [ ] ewmh: handle `_NET_WM_STATE_STICKY`
 * [ ] implement command language and selector parameters
 * [ ] ewmh: docks should also be listed in windows
 * [ ] config: allow for loading a js file instead of just JSON
@@ -69,6 +76,7 @@ Later:
 * [ ] look into using 'async', perhaps look at x11-props code
 * [ ] cli command interface
 * [ ] HUD/UI command interface
+* [ ] option to add titlebar and frame to windows, especially floating windows
 
 Multi-screen todos:
 * [ ] test showing a dock on each screen

@@ -126,44 +126,10 @@ var commandHandler = function(command) {
 				closeAllWindows();
 				process.exit(0);
 				break;
-			case "CloseWindow": {
-				const state = store.getState().toJS();
-				if (state.focusCurrentId) {
-					const w = state.widgets[state.focusCurrentId.toString()];
-					widgetDestroy(w);
-				}
-				break;
-			}
 			case "SwitchTilingMode":
 				if( global.focus_window !== null ) {
 					global.focus_window.parent.switchTilingMode();
 				}
-				break;
-			case "MoveWindowLeft":
-				if( global.focus_window !== null ) {
-					global.focus_window.moveLeft();
-				}
-				break;
-			case "MoveWindowDown":
-				if( global.focus_window !== null ) {
-					global.focus_window.moveDown();
-				}
-				break;
-			case "MoveWindowUp":
-				if( global.focus_window !== null ) {
-					global.focus_window.moveUp();
-				}
-				break;
-			case "MoveWindowRight":
-				if( global.focus_window !== null ) {
-					global.focus_window.moveRight();
-				}
-				break;
-			case "SwitchWorkspaceRight":
-				workspaces.moveRight();
-				break;
-			case "SwitchWorkspaceLeft":
-				workspaces.moveLeft();
 				break;
 			default:
 				break;
@@ -247,11 +213,48 @@ var destroyNotifyHandler = function(ev){
 	}
 }
 
-/**
- * X11 event to add a new window
- */
-function mapRequestHandler(ev) {
-	getWindowProperties(global.X, ev.wid).then(props => {
+function handlePreExistingWindow(xid) {
+	logger.info(`handlePreExistingWindow(${xid})`);
+	global.X.GetWindowAttributes(xid, function(err, attrs) {
+		if (err) throw err;
+
+		console.log({attrs});
+		// If this window is not visible:
+		if (attrs.mapState !== 2) {
+			logger.info("window isn't visible")
+			return;
+		}
+
+		// If the override-redirect flag is set, don't manage:
+		if (attrs.overrideRedirect) {
+			logger.info("window has overrideRedirect");
+			return;
+		}
+
+		createWidgetForXid(xid);
+	});
+}
+
+function handleNewWindow(xid) {
+	let log = `handleNewWindow(${xid})`;
+	global.X.GetWindowAttributes(xid, function(err, attrs) {
+		if (err) { logger.error(log); throw err; }
+
+		// If the override-redirect flag is set, don't manage:
+		if (!attrs.overrideRedirect) {
+			// don't manage
+			logger.info(log+": window has overrideRedirect");
+			X.MapWindow(xid);
+			return;
+		}
+
+		createWidgetForXid(xid);
+	});
+}
+
+function createWidgetForXid(xid) {
+	logger.info(`createWidgetForXid(${xid})`);
+	getWindowProperties(global.X, xid).then(props => {
 		const widgetType = ({
 			'_NET_WM_WINDOW_TYPE_DOCK': 'dock'
 		}[props['_NET_WM_WINDOW_TYPE']] || "window");
@@ -260,7 +263,7 @@ function mapRequestHandler(ev) {
 			type: 'createWidget',
 			widget: {
 				type: widgetType,
-				xid: ev.wid
+				xid
 			}
 		};
 
@@ -280,19 +283,6 @@ function mapRequestHandler(ev) {
 
 		store.dispatch(action);
 	});
-
-	/*
-	ewmh.update_window_list(xids, err => {
-		if (err) {
-			throw err;
-		}
-	});
-	ewmh.update_window_list_stacking(xids, err => {
-		if (err) {
-			throw err;
-		}
-	});
-	*/
 }
 
 var eventHandler = function(ev){
@@ -311,8 +301,9 @@ var eventHandler = function(ev){
 			// automatically by AirWM again anyway.
 			X.ResizeWindow(ev.wid, ev.width, ev.height);
 			break
+		// Show a window
 		case "MapRequest":
-			mapRequestHandler(ev);
+			handleNewWindow(ev.wid);
 			break;
 		case "MotionNotify":
 			handleMotionNotify(ev);
@@ -342,10 +333,16 @@ let _focusId;
 function handleFocusEvent(ev) {
 	try {
 		let state = store.getState();
-		var id;
+		var id = undefined;
 		state.get('widgets').forEach((w, key) => {
 			if (w.get('xid') === ev.wid) {
-				id = parseInt(key);
+				switch (w.get('windowType')) {
+					case 'window':
+						id = parseInt(key);
+						break;
+					default:
+						break;
+				}
 				return false;
 			}
 		});
@@ -362,8 +359,9 @@ function handleFocusEvent(ev) {
 
 function handleMotionNotify(ev) {
 	if (_focusId >= 0) {
-		store.dispatch({type: 'activateWindow', id: _focusId});
+		const id = _focusId;
 		_focusId = undefined;
+		store.dispatch({type: 'activateWindow', id});
 	}
 }
 
@@ -385,7 +383,14 @@ function handleStateChange() {
 
 			const ChangeWindowAttributes = settings1.get('ChangeWindowAttributes');
 			if (ChangeWindowAttributes !== settings0.get('ChangeWindowAttributes')) {
-				global.X.ChangeWindowAttributes.apply(global.X, ChangeWindowAttributes.toJS());
+				global.X.ChangeWindowAttributes.apply(global.X, ChangeWindowAttributes.toJS(), (err) => {
+					if (err) {
+						console.log(1)
+						console.log({err});
+						console.log(2)
+						throw err;
+					}
+				});
 			}
 
 			const ConfigureWindow = settings1.get('ConfigureWindow');
@@ -564,11 +569,17 @@ var airClientCreator = function(err, display) {
 		const cb = (err) => { if(err) throw err; };
 		x11prop.set_property(global.X, display.screen[0].root, '_NET_SUPPORTED', global.X.atoms.ATOM, 32, SUPPORTED_ATOMS, cb);
 
+		global.X.QueryTree(display.screen[0].root, function(err, tree) {
+			console.log({err, tree});
+			if (err) throw err;
+			tree.children.forEach(handlePreExistingWindow);
+		});
+
 		store.subscribe(handleStateChange);
 
 		// Load the programs that should get started and start them
 		logger.info("Launching startup applications.");
-		programs.forEach(execHandler);
+		//programs.forEach(execHandler);
 	}
 	catch (e) {
 		logger.error("airClientCreator: ERROR:")
