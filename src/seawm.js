@@ -319,6 +319,9 @@ var eventHandler = function(ev){
 		case "EnterNotify":
 			handleEnterNotify(ev);
 			break;
+		case "LeaveNotify":
+			handleLeaveNotify(ev);
+			break;
 		case "KeyPress":
 			keyPressHandler(ev);
 			break;
@@ -333,34 +336,57 @@ var eventHandler = function(ev){
 	}
 }
 
+/**
+ * After activating a window, ignoreEnterNotify should be set to true.
+ * This will lead ignoring the next EnterNotify event.
+ * This way, when the user switches desktops, the window under the mouse
+ * doesn't get automatically selected.
+ * TODO: This strategy won't be entirely adequate, because it won't handle
+ * the case of a new window opening, where we also shouldn't automatically
+ * switch to the window under the cursor!  We could possibly save the
+ * positition of the mouse from the previous EnterNotify, and ignore any
+ * future events at the same position.
+ */
+let handleEnterNotifyCoordsPrev = {};
 let ignoreEnterNotify = true;
-//let _focusId;
 function handleEnterNotify(ev) {
+	console.log(ev);
 	try {
-		let state = store.getState();
-		var id = undefined;
-		state.get('widgets').forEach((w, key) => {
-			if (w.get('xid') === ev.wid) {
-				switch (w.get('type')) {
-					case 'window':
-						id = parseInt(key);
-						break;
-					default:
-						break;
+		const coords = _.pick(ev, ['rootx', 'rooty']);
+		console.log({coords, ev, handleEnterNotifyCoordsPrev});
+		if (!ignoreEnterNotify && !_.isEqual(coords, handleEnterNotifyCoordsPrev)) {
+			let state = store.getState();
+			var id = undefined;
+			state.get('widgets').forEach((w, key) => {
+				if (w.get('xid') === ev.wid) {
+					switch (w.get('type')) {
+						case 'window':
+							id = parseInt(key);
+							break;
+						default:
+							break;
+					}
+					return false;
 				}
-				return false;
+			});
+			//_focusId = id;
+			if (id >= 0) {
+				store.dispatch({type: 'activateWindow', id: id});
 			}
-		});
-		//_focusId = id;
-		ignoreEnterNotify = false;
-		if (id >= 0) {
-			store.dispatch({type: 'activateWindow', id: id});
 		}
+		handleEnterNotifyCoordsPrev = coords;
+		ignoreEnterNotify = false;
 	} catch (e) {
 		logger.error("handleEnterNotify: ERROR:")
 		logger.error(e.message);
 		logger.error(e.stack);
 	}
+}
+
+function handleLeaveNotify(ev) {
+	const coords = _.pick(ev, ['rootx', 'rooty']);
+	console.log({coords, ev, handleEnterNotifyCoordsPrev});
+	handleEnterNotifyCoordsPrev = coords;
 }
 
 function handleMotionNotify(ev) {
@@ -554,8 +580,8 @@ var airClientCreator = function(err, display) {
 		const eventMask = {
 			eventMask:
 				x11.eventMask.ButtonPress |
-				//x11.eventMask.EnterWindow |
-				//x11.eventMask.LeaveWindow |
+				x11.eventMask.EnterWindow |
+				x11.eventMask.LeaveWindow |
 				x11.eventMask.SubstructureNotify |
 				x11.eventMask.SubstructureRedirect |
 				//x11.eventMask.StructureNotify |

@@ -35,18 +35,22 @@
 * [x] clientMessage: `_NET_CLOSE_WINDOW`
 * [x] better focus follows mouse
 * [x] recognize and maximize the "Desktop" type window
+* [ ] BUG: start firefox or atom (or any program?); switch to different desktop; quick WM; restart WM; the windows are no longer displayed
+* [ ] BUG: start firefox; press Ctrl-N; the new window isn't sized properly
 * [ ] activate window on mouse click
 * [ ] state: add orphanId lists
 * [ ] ewmh: set `_NET_WM_STATE` to empty by default
 * [ ] implement more commandHandlers() as actions
 * [ ] save state to console after every change, for debugging
 * [ ] BUG: start two xterms; click 'xterm' on lxqt-panel's task bar then move mouse to one of the xterms; the popup is then drawn below the windows
+* [ ] figure out how `--replace` flag works in xmonad so that I can use the WM in xfce
 * [ ] state: add floatId lists
 * [ ] Win-move to move floating windows (see <https://github.com/jichu4n/basic_wm>)
 * [ ] ewmh: handle `_NET_WM_WINDOW_TYPE_DIALOG`, sometimes make it floating
 * [ ] state: support hidden/iconified windows
 	* [ ] clientMessage: handle WM_CHANGE_STATE
 	* [ ] ewmh: `_NET_WM_STATE_HIDDEN`, `_NET_WM_STATE_FOCUSED`
+* [ ] for better focus-follows-mouse, may need to use XInput extension, but it looks like the x11 package hasn't implemented that protocol yet
 
 Naming:
 * jetwm jetwm howmoo lowmo light flowm flowmo flowmotion
@@ -88,6 +92,7 @@ Later:
 * [ ] cli command interface
 * [ ] HUD/UI command interface
 * [ ] option to add titlebar and frame to windows, especially floating windows (see `x11/examples/windowmanager/wm.js`)
+* [ ] read this to make sure I've got stacking order right: <https://smspillaz.wordpress.com/2011/09/18/braindump-how-to-get-window-stacking-right/>
 
 Multi-screen todos:
 * [ ] test showing a dock on each screen

@@ -722,7 +722,7 @@ function updateX11(state) {
 				const eventMask = _.get({
 					'background': undefined,
 					'dock': undefined,
-				}, windowType, x11.eventMask.EnterWindow | x11.eventMask.PointerMotion);
+				}, windowType, x11.eventMask.EnterWindow | x11.eventMask.LeaveWindow | x11.eventMask.PointerMotion);
 				const desktopNum = state.get('desktopIdOrder').indexOf(desktopId);
 
 				try {
