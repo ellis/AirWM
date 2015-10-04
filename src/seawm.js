@@ -286,7 +286,7 @@ function createWidgetForXid(xid) {
 }
 
 var eventHandler = function(ev){
-	if (ev.name !== "MotionNotify")
+	if (true || ev.name !== "MotionNotify")
 		logger.info("Received a %s event.", ev.name);
 	try {
 		switch( ev.name ) {
@@ -312,7 +312,6 @@ var eventHandler = function(ev){
 			destroyNotifyHandler(ev);
 			break;
 		case "EnterNotify":
-			console.log("EnterNotify")
 			handleFocusEvent(ev);
 			break;
 		case "KeyPress":
@@ -336,7 +335,7 @@ function handleFocusEvent(ev) {
 		var id = undefined;
 		state.get('widgets').forEach((w, key) => {
 			if (w.get('xid') === ev.wid) {
-				switch (w.get('windowType')) {
+				switch (w.get('type')) {
 					case 'window':
 						id = parseInt(key);
 						break;
@@ -454,7 +453,28 @@ function handleEwmh(xid, name, value) {
 	if (info) {
 		logger.info(`set EWMH ${name} = ${value}`);
 		const [type, format] = info;
-		x11prop.set_property(global.X, xid, name, type, format, value);
+		// If the type is ATOM, make sure strings get converted to atoms.
+		if (type === global.X.atoms.ATOM) {
+			if (!_.isArray(value))
+				value = [value];
+			Promise.all(
+				value.map(x => new Promise((resolve, reject) => {
+					if (_.isString(x)) {
+						global.X.InternAtom(false, x, (err, result) => {
+							if (err) return reject(err);
+							resolve(result);
+						});
+					} else {
+						resolve(x);
+					}
+				}))
+			).then(atoms => {
+				x11prop.set_property(global.X, xid, name, type, format, atoms);
+			});
+		}
+		else {
+			x11prop.set_property(global.X, xid, name, type, format, value);
+		}
 	}
 	else {
 		logger.error(`unknown EWMH property: ${name} = ${value}`);
@@ -474,7 +494,9 @@ var airClientCreator = function(err, display) {
 			'_NET_CLIENT_LIST_STACKING': [global.X.atoms.WINDOW, 32],
 			'_NET_CURRENT_DESKTOP': [global.X.atoms.CARDINAL, 32],
 			'_NET_NUMBER_OF_DESKTOPS': [global.X.atoms.CARDINAL, 32],
+			'_NET_WM_ALLOWED_ACTIONS': [global.X.atoms.ATOM, 32],
 			'_NET_WM_DESKTOP': [global.X.atoms.CARDINAL, 32],
+			'_NET_WM_STATE': ['_NET_WM_STATE', 32],
 		};
 
 		const action1 = {
@@ -554,6 +576,7 @@ var airClientCreator = function(err, display) {
 			'_NET_CURRENT_DESKTOP',
 			'_NET_NUMBER_OF_DESKTOPS',
 			'_NET_SUPPORTED',
+			'_NET_WM_ALLOWED_ACTIONS',
 			//'_NET_WM_STATE_FULLSCREEN',
 			//'_NET_SUPPORTING_WM_CHECK',
 			//'_NET_WM_NAME',

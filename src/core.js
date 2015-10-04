@@ -677,7 +677,7 @@ function updateX11(state) {
 					'WM_STATE': {
 						state: (isVisible) ? WM_STATE_NormalState : WM_STATE_IconicState,
 						icon: 0
-					}
+					},
 				}
 			};
 			if (info.visible) {
@@ -722,6 +722,9 @@ function updateX11(state) {
 				info.ewmh['_NET_WM_DESKTOP'] = (windowType === 'window')
 					? [info.desktopNum]
 					: [0xFFFFFFFF];
+				info.ewmh['_NET_WM_ALLOWED_ACTIONS'] = (windowType === 'window')
+					? ['_NET_WM_ACTION_CLOSE']
+					: [];
 				/*if (windowType === 'dock') {
 					console.log("dockInfo:")
 					console.log(w)
@@ -732,6 +735,8 @@ function updateX11(state) {
 			state = state.mergeIn(['x11', 'windowSettings', key], fromJS(info));
 		}
 	});
+
+	// TODO Stacking order: for each screen, docks at top, desktop windows in stack order, then background
 
 	// If no widget is focused, set focus to the root window of the current screen
 	const focusXid = (focusCurrentId >= 0)
@@ -752,6 +757,10 @@ function updateX11(state) {
 			List.of(1),
 			l => l.set(0, desktopCount)
 		);
+		/*state = state.setIn(
+			['x11', 'wmSettings', 'ewmh', '_NET_NUMBER_OF_DESKTOPS'],
+			desktopCount
+		);*/
 		// Current desktop
 		const desktopId = State.getCurrentDesktopId(state);
 		const desktopNum = state.get('desktopIdOrder').indexOf(desktopId);
@@ -760,6 +769,11 @@ function updateX11(state) {
 			List.of(0),
 			l => l.set(0, desktopNum)
 		);
+		// Active window
+		state = state.setIn(
+			['x11', 'wmSettings', 'ewmh', '_NET_ACTIVE_WINDOW'],
+			(focusCurrentId >= 0) ? focusXid : 0
+		)
 		// Window order
 		const windowIdOrder = state.get('windowIdOrder');
 		state = state.updateIn(['x11', 'wmSettings', 'ewmh', '_NET_CLIENT_LIST'], List(), l => l.setSize(windowIdOrder.count()));

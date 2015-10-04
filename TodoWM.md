@@ -30,9 +30,11 @@
 * [x] ewmh: get xfce and lxqt panels to recognize windows (see <https://github.com/lxde/lxqt/issues/354> and <https://github.com/herbstluftwm/herbstluftwm/commit/a50457335091cd990d0146e5008ca3b3db1cc574>)
 * [x] BUG: `_NET_NUMBER_OF_DESKTOPS` should not be set multiple times
 * [?] don't let user close docks or backgrounds (will need to have separate commands for when X tells us that a window is closed and when the user pressed Win-Shift-C)
+* [x] check which client messages are sent from lxqt's task bar when clicking on a member of a program with multiple instances.
+* [x] state.ewmh: set `_NET_WM_ALLOWED_ACTIONS` to `[_NET_WM_ACTION_CLOSE]` (except on docks and backgrounds)
+* [x] clientMessage: `_NET_CLOSE_WINDOW`
 * [ ] check stackMode, don't want windows to be in front of lxqt-panel's popups
 * [ ] state: add orphanId lists
-* [ ] check which client messages are sent from lxqt's task bar when clicking on a member of a program with multiple instances.
 * [ ] ewmh: set `_NET_WM_STATE` to empty by default
 * [ ] recognize and maximize the "Desktop" type window
 * [ ] implement more commandHandlers() as actions
@@ -41,8 +43,11 @@
 * [ ] BUG: start two xterms; click 'xterm' on lxqt-panel's task bar; occasionally the popup is drawn below the windows
 * [ ] ?BUG: click lxqt-panel's start menu: menu is displayed too far to the left
 * [ ] state: add floatId lists
-* [ ] Win-move to move floating windows
+* [ ] Win-move to move floating windows (see <https://github.com/jichu4n/basic_wm>)
 * [ ] ewmh: handle `_NET_WM_WINDOW_TYPE_DIALOG`, sometimes make it floating
+* [ ] state: support hidden/iconified windows
+	* [ ] clientMessage: handle WM_CHANGE_STATE
+	* [ ] ewmh: `_NET_WM_STATE_HIDDEN`, `_NET_WM_STATE_FOCUSED`
 
 Testing:
 * [ ] test `moveWindowToIndex`
@@ -76,7 +81,7 @@ Later:
 * [ ] look into using 'async', perhaps look at x11-props code
 * [ ] cli command interface
 * [ ] HUD/UI command interface
-* [ ] option to add titlebar and frame to windows, especially floating windows
+* [ ] option to add titlebar and frame to windows, especially floating windows (see `x11/examples/windowmanager/wm.js`)
 
 Multi-screen todos:
 * [ ] test showing a dock on each screen
