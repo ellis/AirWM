@@ -723,10 +723,11 @@ function updateX11(state) {
 					'background': undefined,
 					'dock': undefined,
 				}, windowType, x11.eventMask.EnterWindow | x11.eventMask.PointerMotion);
+				const desktopNum = state.get('desktopIdOrder').indexOf(desktopId);
 
 				try {
 				info = info
-					.set('desktopNum', state.get('desktopIdOrder').indexOf(desktopId))
+					.set('desktopNum', desktopNum)
 					.update(
 						'ChangeWindowAttributes',
 						List.of(xid, Map()),
@@ -750,7 +751,7 @@ function updateX11(state) {
 						['ewmh', '_NET_WM_DESKTOP'],
 						List.of(0xFFFFFFFF),
 						l => l.set(0, (windowType === 'window')
-							? info.desktopNum
+							? desktopNum
 							: 0xFFFFFFFF
 						)
 					)
@@ -813,10 +814,11 @@ function updateX11(state) {
 			l => l.set(0, desktopNum)
 		);
 		// Active window
-		state = state.setIn(
+		state = state.updateIn(
 			['x11', 'wmSettings', 'ewmh', '_NET_ACTIVE_WINDOW'],
-			(focusCurrentId >= 0) ? focusXid : 0
-		)
+			List.of(0),
+			l => l.set(0, (focusCurrentId >= 0) ? focusXid : 0)
+		);
 		// Window order
 		const windowIdOrder = state.get('windowIdOrder');
 		state = state.updateIn(['x11', 'wmSettings', 'ewmh', '_NET_CLIENT_LIST'], List(), l => l.setSize(windowIdOrder.count()));

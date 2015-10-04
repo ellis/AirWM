@@ -34,16 +34,13 @@
 * [x] state.ewmh: set `_NET_WM_ALLOWED_ACTIONS` to `[_NET_WM_ACTION_CLOSE]` (except on docks and backgrounds)
 * [x] clientMessage: `_NET_CLOSE_WINDOW`
 * [x] better focus follows mouse
-* [ ] recognize and maximize the "Desktop" type window
+* [x] recognize and maximize the "Desktop" type window
 * [ ] activate window on mouse click
-* [ ] check stackMode, don't want windows to be in front of lxqt-panel's popups
 * [ ] state: add orphanId lists
 * [ ] ewmh: set `_NET_WM_STATE` to empty by default
 * [ ] implement more commandHandlers() as actions
 * [ ] save state to console after every change, for debugging
-* [ ] BUG: not receiving mouse move events over gnome-terminal or firefox
-* [ ] BUG: start two xterms; click 'xterm' on lxqt-panel's task bar; occasionally the popup is drawn below the windows
-* [ ] ?BUG: click lxqt-panel's start menu: menu is displayed too far to the left
+* [ ] BUG: start two xterms; click 'xterm' on lxqt-panel's task bar then move mouse to one of the xterms; the popup is then drawn below the windows
 * [ ] state: add floatId lists
 * [ ] Win-move to move floating windows (see <https://github.com/jichu4n/basic_wm>)
 * [ ] ewmh: handle `_NET_WM_WINDOW_TYPE_DIALOG`, sometimes make it floating
@@ -68,8 +65,12 @@ Refactoring:
 * [ ] use 'activate' for 'focus.move*' => 'window.active*', and 'desktop.activate'
 * [ ] handleStateChange: don't call DestroyWindow on a window that was already destroyed
 * [ ] consider using `activeChildIndex` and `activeDesktopIndex` instead of IDs
+* [ ] move `x11.wmSettings` to `x11.windowsSettings[xidRoot]`
 
 Later:
+* [ ] when a new window is created that is associated with another window, insert is after that window in the stack, rather than at the end of the stack
+* [ ] x11: set sibling and stackMode properly for windows
+* [ ] figure out why task switching using lxqt-panel doesn't work well (it sends messages to iconify the windows)
 * [ ] ewmh: handle `_NET_WM_WINDOW_TYPE_NOTIFICATION`
 * [ ] ewmh: handle `_NET_WM_STATE_STICKY`
 * [ ] implement command language and selector parameters

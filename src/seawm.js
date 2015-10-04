@@ -291,7 +291,7 @@ let eventNamePrev = undefined;
 var eventHandler = function(ev){
 	// Only log first of sequential MotionNotify events
 	if (ev.name !== "MotionNotify" || eventNamePrev !== "MotionNotify")
-		logger.info(`event ${ev.name}: ${JSON.stringify(ev)}`);
+		logger.info(`event ${ev.name}`);//: ${JSON.stringify(ev)}`);
 	eventNamePrev = ev.name;
 	try {
 		switch( ev.name ) {
@@ -382,7 +382,8 @@ function handleStateChange() {
 	try {
 		const state = store.getState();
 		// If the active window has changed, set ignoreEnterNotify = true
-		if (state.getIn(['x11', 'wmSettings', '_NET_ACTIVE_WINDOW', 0]) !== statePrev.getIn(['x11', 'wmSettings', '_NET_ACTIVE_WINDOW', 0])) {
+		if (state.getIn(['x11', 'wmSettings', 'ewmh', '_NET_ACTIVE_WINDOW', 0]) !== statePrev.getIn(['x11', 'wmSettings', 'ewmh', '_NET_ACTIVE_WINDOW', 0])) {
+			console.log("ignoreEnterNotify = true")
 			ignoreEnterNotify = true;
 		}
 		// Settings for each window
