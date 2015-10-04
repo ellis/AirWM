@@ -140,6 +140,28 @@ export function createWidget(state, action) {
 			dockIds => dockIds.push(id)
 		).setIn(['widgets', id.toString()], w1);
 	}
+	else if (w.type === 'background') {
+		// If a background is already set:
+		if (state.hasIn(['screens', screenId.toString(), 'backgroundId'])) {
+			// treat it like a normal window
+			w1.set('type', 'window');
+			state = createWindow(state, w1, id);
+		}
+		// Else, it's a background:
+		else {
+			w1 = w1.merge({
+				screenId: screenId,
+				visible: true
+			});
+			// Add dock to screen and to widget list
+			state = state
+				.setIn(
+					['screens', screenId.toString(), 'backgroundId'],
+					id
+				)
+				.setIn(['widgets', id.toString()], w1);
+		}
+	}
 	else {
 		state = createWindow(state, w1, id);
 	}
@@ -529,6 +551,12 @@ function updateLayout(state) {
 	state.get('screens').forEach((screen, screenKey) => {
 		// Screen dimensions
 		const rc = [0, 0, screen.get('width'), screen.get('height')];
+		// Background layout
+		const backgroundId = screen.get('backgroundId');
+		if (backgroundId >= 0) {
+			const w = state.getIn(['widgets', backgroundId.toString()]);
+			state = state.setIn(['widgets', backgroundId.toString(), 'rc'], List(rc));
+		}
 		// Dock layout
 		screen.get('dockIds', List()).forEach(id => {
 			const w = state.getIn(['widgets', id.toString()]);
@@ -687,7 +715,7 @@ function updateX11(state) {
 				const screenX11 = state.getIn(['x11', 'screens', screenId.toString()], Map());
 				const windowType = w.get('type');
 				const borderWidth = _.get({
-					'desktop': 0,
+					'background': 0,
 					'dock': 0,
 					'window': 5,
 				}, windowType, 1);
@@ -696,7 +724,7 @@ function updateX11(state) {
 					: screenX11.getIn(['colors', 'normal'], 0);
 				const rc = w.get('rc', List([0, 0, 0, 0])).toJS();
 				const eventMask = _.get({
-					'desktop': undefined,
+					'background': undefined,
 					'dock': undefined,
 				}, windowType, x11.eventMask.EnterWindow | x11.eventMask.PointerMotion);
 

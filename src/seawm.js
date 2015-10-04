@@ -256,7 +256,9 @@ function createWidgetForXid(xid) {
 	logger.info(`createWidgetForXid(${xid})`);
 	getWindowProperties(global.X, xid).then(props => {
 		const widgetType = ({
-			'_NET_WM_WINDOW_TYPE_DOCK': 'dock'
+			'_NET_WM_WINDOW_TYPE_DOCK': 'dock',
+			//'_NET_WM_WINDOW_TYPE_DESKTOP': 'background',
+			'_NET_WM_WINDOW_TYPE_DESKTOP': 'window',
 		}[props['_NET_WM_WINDOW_TYPE']] || "window");
 
 		const action = {
@@ -289,7 +291,7 @@ let eventNamePrev = undefined;
 var eventHandler = function(ev){
 	// Only log first of sequential MotionNotify events
 	if (ev.name !== "MotionNotify" || eventNamePrev !== "MotionNotify")
-		logger.info("Received a %s event.", ev.name);
+		logger.info(`event ${ev.name}: ${JSON.stringify(ev)}`);
 	eventNamePrev = ev.name;
 	try {
 		switch( ev.name ) {
@@ -351,10 +353,9 @@ function handleEnterNotify(ev) {
 		});
 		//_focusId = id;
 		ignoreEnterNotify = false;
-		store.dispatch({type: 'activateWindow', id});
-		/*if (id >= 0) {
+		if (id >= 0) {
 			store.dispatch({type: 'activateWindow', id: id});
-		}*/
+		}
 	} catch (e) {
 		logger.error("handleEnterNotify: ERROR:")
 		logger.error(e.message);
@@ -462,7 +463,7 @@ let ewmhPropTypeFormatInfos;
 function handleEwmh(xid, name, value) {
 	const info = ewmhPropTypeFormatInfos[name];
 	if (info) {
-		logger.info(`set EWMH ${name} = ${JSON.stringify(value, null, '\t')}`);
+		logger.info(`set EWMH ${name} = ${JSON.stringify(value)}`);
 		const [type, format] = info;
 		// If the type is ATOM, make sure strings get converted to atoms.
 		if (type === global.X.atoms.ATOM) {

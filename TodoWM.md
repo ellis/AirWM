@@ -33,8 +33,9 @@
 * [x] check which client messages are sent from lxqt's task bar when clicking on a member of a program with multiple instances.
 * [x] state.ewmh: set `_NET_WM_ALLOWED_ACTIONS` to `[_NET_WM_ACTION_CLOSE]` (except on docks and backgrounds)
 * [x] clientMessage: `_NET_CLOSE_WINDOW`
-* [ ] better focus follows mouse
+* [x] better focus follows mouse
 * [ ] recognize and maximize the "Desktop" type window
+* [ ] activate window on mouse click
 * [ ] check stackMode, don't want windows to be in front of lxqt-panel's popups
 * [ ] state: add orphanId lists
 * [ ] ewmh: set `_NET_WM_STATE` to empty by default
