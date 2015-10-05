@@ -33,7 +33,6 @@ describe('StateWrapper', () => {
 		expect(builder.getDesktopIdChain()).to.equal(List.of(d1, d2));
 		expect(builder.getScreenIdOrder()).to.equal(List.of(s1));
 		expect(builder.getScreenIdChain()).to.equal(List.of(s1));
-		expect(builder.screenById(s1).getDesktopIdOrder()).to.equal(List.of(d1, d2));
 		expect(builder.screenById(s1).getDesktopIdChain()).to.equal(List.of(d1, d2));
 		expect(builder.desktopById(d1).screenId).to.equal(s1);
 		expect(builder.desktopById(d2).screenId).to.equal(-1);

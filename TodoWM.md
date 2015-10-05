@@ -36,9 +36,10 @@
 * [x] better focus follows mouse
 * [x] recognize and maximize the "Desktop" type window
 * [x] BUG: start firefox or atom (or any program?); switch to different desktop; quit WM; restart WM; the windows are no longer displayed
+* [ ] work on StateWrapper: addWindow, activateDesktop, activateWindow
 * [ ] BUG: start program and quickly switch to different desktop: window isn't managed or visible
 * [ ] action: moveWindowToDesktop, handle `follow: false` parameter
-* [ ] BUG: start firefox; press Ctrl-N; the new window isn't sized properly
+* [-] BUG: start firefox; press Ctrl-N; the new window isn't sized properly
 * [ ] activate window on mouse click
 * [ ] ewmh: docks and backgrounds should also be listed in windows
 * [ ] state: add orphanId lists

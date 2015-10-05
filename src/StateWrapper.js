@@ -75,8 +75,7 @@ class ScreenWrapper extends SubWrapper {
 	get width() { return this.top._get(this.path.concat(['width']), 0); }
 	get height() { return this.top._get(this.path.concat(['height']), 0); }
 
-	getState(x) { return this.top._get(this.path, Map()); }
-	getDesktopIdChain() { return this.top._get(this.path.concat(['desktopIdChain']), List()); }
+	getDesktopIdChain() { return this._get('desktopIdChain', List()); }
 
 	_desktopIdChain() { return new UniqueListWrapper(this.top, this.path.concat(['desktopIdChain'])); }
 }
