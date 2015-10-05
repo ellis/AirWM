@@ -6,6 +6,7 @@ import Immutable from 'immutable';
 import x11 from 'x11';
 
 import State from './state.js';
+import x11consts from './x11consts.js';
 
 export const empty = Map();
 
@@ -684,10 +685,6 @@ function layout_mainLeft(state, desktopId) {
 	return state;
 }
 
-const WM_STATE_WithdrawnState = 0;
-const WM_STATE_NormalState = 1;
-const WM_STATE_IconicState = 3;
-
 function updateX11(state) {
 	const screen = State.getCurrentScreen(state);
 	const desktop = State.getCurrentDesktop(state);
@@ -702,7 +699,7 @@ function updateX11(state) {
 			info = info
 				.set('xid', xid)
 				.set('visible', isVisible)
-				.setIn(['ewmh', 'WM_STATE', 'state'], WM_STATE_NormalState) //(isVisible) ? WM_STATE_NormalState : WM_STATE_IconicState)
+				.setIn(['ewmh', 'WM_STATE', 'state'], x11consts.WM_STATE_NormalState) //(isVisible) ? x11consts.WM_STATE_NormalState : x11consts.WM_STATE_IconicState)
 				.setIn(['ewmh', 'WM_STATE', 'icon'], 0);
 			if (isVisible) {
 				const desktopId = getWidgetDesktopId(state, w);

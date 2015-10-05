@@ -16,6 +16,7 @@ import State from './state.js';
 import {empty} from './core.js';
 import makeStore from './store.js';
 import getWindowProperties from '../lib/getWindowProperties.js';
+import x11consts from './x11consts.js';
 
 const store = makeStore();
 
@@ -213,25 +214,40 @@ var destroyNotifyHandler = function(ev){
 	}
 }
 
+/**
+ * Decides whether to manage the given window when the WM starts.
+ *
+ * - If the `overrideRedirect` attribute is set, don't manage.
+ * - If the `mapState` attribute is 'viewable', manage.
+ * - If the `WM_STATE` property is 'iconified', manage.
+ * - If the `_NET_WM_DESKTOP` property is set, manage.
+ * - Otherwise, don't manage
+ * @param  {number} xid - X11 window ID
+ */
 function handlePreExistingWindow(xid) {
-	logger.info(`handlePreExistingWindow(${xid})`);
 	global.X.GetWindowAttributes(xid, function(err, attrs) {
+		logger.info(`handlePreExistingWindow(${xid})`);
 		if (err) throw err;
-
-		console.log({attrs});
-		// If this window is not visible:
-		if (attrs.mapState !== 2) {
-			logger.info("window isn't visible")
-			return;
-		}
+		console.log(attrs);
 
 		// If the override-redirect flag is set, don't manage:
 		if (attrs.overrideRedirect) {
 			logger.info("window has overrideRedirect");
-			//return;
 		}
+		else {
+			getWindowProperties(global.X, xid).then(props => {
+				const isVisible = (attrs.mapState === x11consts.WA_MapState_IsViewable);
+				const isIconified = (props['WM_STATE'] === x11consts.WM_STATE_IconicState);
+				const hasDesktop = (props['_NET_WM_DESKTOP'] >= 0);
 
-		createWidgetForXid(xid);
+				if (isVisible || isIconified || hasDesktop) {
+					createWidgetForXid(xid, props);
+				}
+				else {
+					logger.info("window isn't visible: "+JSON.stringify({isVisible, isIconified, hasDesktop}));
+				}
+			});
+		}
 	});
 }
 
@@ -248,43 +264,43 @@ function handleNewWindow(xid) {
 			//return;
 		}
 
-		createWidgetForXid(xid);
+		getWindowProperties(global.X, xid).then(props => {
+			createWidgetForXid(xid, props);
+		});
 	});
 }
 
-function createWidgetForXid(xid) {
+function createWidgetForXid(xid, props) {
 	logger.info(`createWidgetForXid(${xid})`);
-	getWindowProperties(global.X, xid).then(props => {
-		const widgetType = ({
-			'_NET_WM_WINDOW_TYPE_DOCK': 'dock',
-			'_NET_WM_WINDOW_TYPE_DESKTOP': 'background',
-			//'_NET_WM_WINDOW_TYPE_DESKTOP': 'window',
-		}[props['_NET_WM_WINDOW_TYPE']] || "window");
+	const widgetType = ({
+		'_NET_WM_WINDOW_TYPE_DOCK': 'dock',
+		'_NET_WM_WINDOW_TYPE_DESKTOP': 'background',
+		//'_NET_WM_WINDOW_TYPE_DESKTOP': 'window',
+	}[props['_NET_WM_WINDOW_TYPE']] || "window");
 
-		const action = {
-			type: 'createWidget',
-			widget: {
-				type: widgetType,
-				xid
-			}
-		};
-
-		if (widgetType === 'dock') {
-			let [left, right, top, bottom, left_start_y, left_end_y, right_start_y, right_end_y, top_start_x, top_end_x, bottom_start_x, bottom_end_x] = props["_NET_WM_STRUT_PARTIAL"];
-			console.log("addXwinDock: "+props["_NET_WM_STRUT_PARTIAL"]);
-			//console.log([left, right, top, bottom]);
-			if (top > 0) {
-				action.widget.dockGravity = "top";
-				action.widget.dockSize = top;
-			}
-			else if (bottom > 0) {
-				action.widget.dockGravity = "bottom";
-				action.widget.dockSize = bottom;
-			}
+	const action = {
+		type: 'createWidget',
+		widget: {
+			type: widgetType,
+			xid
 		}
+	};
 
-		store.dispatch(action);
-	});
+	if (widgetType === 'dock') {
+		let [left, right, top, bottom, left_start_y, left_end_y, right_start_y, right_end_y, top_start_x, top_end_x, bottom_start_x, bottom_end_x] = props["_NET_WM_STRUT_PARTIAL"];
+		console.log("addXwinDock: "+props["_NET_WM_STRUT_PARTIAL"]);
+		//console.log([left, right, top, bottom]);
+		if (top > 0) {
+			action.widget.dockGravity = "top";
+			action.widget.dockSize = top;
+		}
+		else if (bottom > 0) {
+			action.widget.dockGravity = "bottom";
+			action.widget.dockSize = bottom;
+		}
+	}
+
+	store.dispatch(action);
 }
 
 let eventNamePrev = undefined;

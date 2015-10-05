@@ -29,22 +29,24 @@
 * [x] ewmh: set WM_STATE to [Normal, None]
 * [x] ewmh: get xfce and lxqt panels to recognize windows (see <https://github.com/lxde/lxqt/issues/354> and <https://github.com/herbstluftwm/herbstluftwm/commit/a50457335091cd990d0146e5008ca3b3db1cc574>)
 * [x] BUG: `_NET_NUMBER_OF_DESKTOPS` should not be set multiple times
-* [?] don't let user close docks or backgrounds (will need to have separate commands for when X tells us that a window is closed and when the user pressed Win-Shift-C)
+* [x] don't let user close docks or backgrounds (will need to have separate commands for when X tells us that a window is closed and when the user pressed Win-Shift-C)
 * [x] check which client messages are sent from lxqt's task bar when clicking on a member of a program with multiple instances.
 * [x] state.ewmh: set `_NET_WM_ALLOWED_ACTIONS` to `[_NET_WM_ACTION_CLOSE]` (except on docks and backgrounds)
 * [x] clientMessage: `_NET_CLOSE_WINDOW`
 * [x] better focus follows mouse
 * [x] recognize and maximize the "Desktop" type window
-* [ ] IMPROVEMENT: x11 package: LeaveNotify isn't recognized as event!
-* [ ] BUG: start firefox or atom (or any program?); switch to different desktop; quit WM; restart WM; the windows are no longer displayed
+* [x] BUG: start firefox or atom (or any program?); switch to different desktop; quit WM; restart WM; the windows are no longer displayed
+* [ ] BUG: start program and quickly switch to different desktop: window isn't managed or visible
+* [ ] action: moveWindowToDesktop, handle `follow: false` parameter
 * [ ] BUG: start firefox; press Ctrl-N; the new window isn't sized properly
 * [ ] activate window on mouse click
+* [ ] ewmh: docks and backgrounds should also be listed in windows
 * [ ] state: add orphanId lists
 * [ ] ewmh: set `_NET_WM_STATE` to empty by default
 * [ ] implement more commandHandlers() as actions
 * [ ] save state to console after every change, for debugging
 * [ ] BUG: start two xterms; click 'xterm' on lxqt-panel's task bar then move mouse to one of the xterms; the popup is then drawn below the windows
-* [ ] figure out how `--replace` flag works in xmonad so that I can use the WM in xfce
+* [ ] figure out how `--replace` flag works in xmonad so that I can use the WM in xfce (see Main.hs:replace)
 * [ ] state: add floatId lists
 * [ ] Win-move to move floating windows (see <https://github.com/jichu4n/basic_wm>)
 * [ ] ewmh: handle `_NET_WM_WINDOW_TYPE_DIALOG`, sometimes make it floating
@@ -80,7 +82,6 @@ Later:
 * [ ] ewmh: handle `_NET_WM_WINDOW_TYPE_NOTIFICATION`
 * [ ] ewmh: handle `_NET_WM_STATE_STICKY`
 * [ ] implement command language and selector parameters
-* [ ] ewmh: docks should also be listed in windows
 * [ ] config: allow for loading a js file instead of just JSON
 * [ ] config: add desktop config, accept a number, a list of strings, or JSON widget objects
 * [ ] detect existing X11 tree on startup and add windows
@@ -95,6 +96,8 @@ Later:
 * [ ] HUD/UI command interface
 * [ ] option to add titlebar and frame to windows, especially floating windows (see `x11/examples/windowmanager/wm.js`)
 * [ ] read this to make sure I've got stacking order right: <https://smspillaz.wordpress.com/2011/09/18/braindump-how-to-get-window-stacking-right/>
+* [ ] hot-reloading for updates to config?
+* [ ] hot-reloading for changes to source files?
 
 Multi-screen todos:
 * [ ] test showing a dock on each screen
