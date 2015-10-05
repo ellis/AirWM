@@ -41,10 +41,12 @@ function stateCheck(state) {
 	// Check that current focus widgets are at the top of the relevant stacks
 	if (true) {
 		const {screenId, desktopId, windowId} = getCurrentScreenDesktopWindowIds(state);
+		console.log({screenId, desktopId, windowId})
 		assert.equal(state.getIn(['screenIdStack', 0]), screenId);
 		assert.equal(state.getIn(['desktopIdStack', 0]), desktopId);
 		assert.equal(state.getIn(['screens', screenId.toString(), 'desktopIdStack', 0]), desktopId);
 		if (windowId >= 0) {
+			console.log(state.delete('x11'));
 			assert.equal(state.getIn(['windowIdStack', 0]), windowId);
 			assert.equal(state.getIn(['widgets', desktopId.toString(), 'childIdStack', 0]), windowId);
 		}

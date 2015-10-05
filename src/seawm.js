@@ -251,22 +251,28 @@ function handlePreExistingWindow(xid) {
 	});
 }
 
+function promiseCatcher(e) {
+	logger.error(e);
+	logger.error(e.message);
+	logger.error(e.stack);
+}
+
 function handleNewWindow(xid) {
 	let log = `handleNewWindow(${xid})`;
 	global.X.GetWindowAttributes(xid, function(err, attrs) {
 		if (err) { logger.error(log); throw err; }
 
-		// If the override-redirect flag is set, don't manage:
-		if (!attrs.overrideRedirect) {
-			// don't manage
+		// If the override-redirect flag is set, don't manage, just show:
+		if (attrs.overrideRedirect) {
 			logger.info(log+": window has overrideRedirect");
-			//X.MapWindow(xid);
+			X.MapWindow(xid);
 			//return;
 		}
-
-		getWindowProperties(global.X, xid).then(props => {
-			createWidgetForXid(xid, props);
-		});
+		else {
+			getWindowProperties(global.X, xid).then(props => {
+				createWidgetForXid(xid, props);
+			}).catch(promiseCatcher);
+		}
 	});
 }
 

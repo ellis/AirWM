@@ -180,7 +180,7 @@ export function createWidget(state, action) {
 
 function createWindow(state, w, id) {
 	const desktopId = State.getCurrentDesktopId(state);
-	return state
+	state = state
 		.setIn(['widgets', id.toString()], w.merge({
 			parentId: desktopId,
 			visible: true
@@ -203,16 +203,21 @@ function createWindow(state, w, id) {
 			['windowIdOrder'],
 			List(),
 			l => l.push(id)
-		)
+		);
+	state = state
 		.updateIn(
 			['windowIdStack'],
 			List(),
 			l => {
+				// If this is the first window, just add to list
 				if (l.count() === 0) return l.push(id);
+				// If this is the focused widget on its desktop, prepend to list
+				if (state.get['widgets', desktopId.toString(), 'childIdStack', 0] === id) return l.unshift(id);
 				// Insert at second position in stack
 				else return l.splice(1, 0, id);
 			}
 		);
+	return state;
 }
 
 /*
