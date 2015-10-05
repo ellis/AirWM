@@ -21,35 +21,33 @@ class SubWrapper {
 		this.dflt = dflt;
 	}
 
-	getState(x) { return this.top._getIn(this.path, this.dflt); }
+	getState(x) { return this.top._get(this.path, this.dflt); }
 
-	_getIn(path, dflt) {
+	_get(path, dflt) {
 		if (!_.isArray(path))
 			path = [path];
-		return this.top._getIn(this.path.concat(path), dflt);
+		return this.top._get(this.path.concat(path), dflt);
 	}
 
-	_setIn(path, value) {
+	_set(path, value) {
 		if (!_.isArray(path))
 			path = [path];
-		return this.top._setIn(this.path.concat(path), value);
+		return this.top._set(this.path.concat(path), value);
 	}
 }
 
 class DesktopWrapper extends SubWrapper {
 	constructor(top, path) {
 		super(top, path, Map());
-		this.top = top;
-		this.path = path;
-
-		assert.equal(this.top._getIn(this.path.concat(['type'])), 'desktop');
+		//console.log({top: this.top, path: this.path})
+		assert.equal(this.top._get(this.path.concat(['type'])), 'desktop');
 	}
 
 	get type() { return "desktop"; }
-	get layout() { return this.top._getIn(this.path.concat(['type']), 'default'); }
-	getChildIdOrder() { return this._getIn('childIdOrder', List()); }
-	getChildIdChain() { return this._getIn('childIdChain', List()); }
-	getChildIdStack() { return this._getIn('childIdStack', List()); }
+	get layout() { return this.top._get(this.path.concat(['type']), 'default'); }
+	getChildIdOrder() { return this._get('childIdOrder', List()); }
+	getChildIdChain() { return this._get('childIdChain', List()); }
+	getChildIdStack() { return this._get('childIdStack', List()); }
 
 	_childIdOrder() { return new UniqueListWrapper(this.top, this.path.concat(['childIdOrder'])); }
 	_childIdChain() { return new UniqueListWrapper(this.top, this.path.concat(['childIdChain'])); }
@@ -59,8 +57,6 @@ class DesktopWrapper extends SubWrapper {
 class ListWrapper extends SubWrapper {
 	constructor(top, path) {
 		super(top, path, List());
-		this.top = top;
-		this.path = path;
 	}
 
 	push(x) { this.top._updateIn(this.path, List(), l => l.push(x)); return this; }
@@ -72,16 +68,14 @@ class ListWrapper extends SubWrapper {
 class ScreenWrapper extends SubWrapper {
 	constructor(top, path) {
 		super(top, path, Map());
-		this.top = top;
-		this.path = path;
 	}
 
-	get xid() { return this.top._getIn(this.path.concat(['xid']), -1); }
-	get width() { return this.top._getIn(this.path.concat(['width']), 0); }
-	get height() { return this.top._getIn(this.path.concat(['height']), 0); }
+	get xid() { return this.top._get(this.path.concat(['xid']), -1); }
+	get width() { return this.top._get(this.path.concat(['width']), 0); }
+	get height() { return this.top._get(this.path.concat(['height']), 0); }
 
-	getState(x) { return this.top._getIn(this.path, Map()); }
-	getDesktopIdChain() { return this.top._getIn(this.path.concat(['desktopIdChain']), List()); }
+	getState(x) { return this.top._get(this.path, Map()); }
+	getDesktopIdChain() { return this.top._get(this.path.concat(['desktopIdChain']), List()); }
 
 	_desktopIdChain() { return new UniqueListWrapper(this.top, this.path.concat(['desktopIdChain'])); }
 }
@@ -109,6 +103,8 @@ export default class StateWrapper {
 	constructor(state) {
 		this.state = fromJS(state);
 
+		this._screenIdOrder = new UniqueListWrapper(this, StatePaths.screenIdOrder);
+		this._screenIdChain = new UniqueListWrapper(this, StatePaths.screenIdChain);
 		this._desktopIdOrder = new UniqueListWrapper(this, StatePaths.desktopIdOrder);
 		this._desktopIdChain = new UniqueListWrapper(this, StatePaths.desktopIdChain);
 	}
@@ -121,7 +117,8 @@ export default class StateWrapper {
 	getDesktopIdChain() { return this.state.getIn(StatePaths.desktopIdChain, List()); }
 	getCurrentScreenId() { return this.state.getIn(['screenIdChain', 0], 0); }
 
-	desktopById(desktopId) { return _getWidgetById(desktopId); }
+	screenById(screenId) { return new ScreenWrapper(this, ['widgets', screenId.toString()]); }
+	desktopById(desktopId) { return new DesktopWrapper(this, ['widgets', desktopId.toString()]); }
 
 	addDesktop(w) {
 		w = fromJS(w);
@@ -150,14 +147,14 @@ export default class StateWrapper {
 	}
 
 	addScreen(screen) {
-		const desktopIdOrder0 = getDesktopIdOrder().toJS();
+		const desktopIdOrder0 = this.getDesktopIdOrder().toJS();
 		const desktopIdVisibles = this.mapEachScreen(screen => screen.getCurrentDesktopId());
 		const desktopIdHiddens = _.difference(desktopIdOrder0, desktopIdVisibles);
 
 		// Figure out which desktop to display
 		let desktopId;
 		// If there aren't and free desktops to display on this screen:
-		if (_.isEmpty(deskotpIdHiddens)) {
+		if (_.isEmpty(desktopIdHiddens)) {
 			desktopId = addDesktop({});
 		}
 		else {
@@ -167,7 +164,7 @@ export default class StateWrapper {
 		// Chaining order for desktops
 		const desktopIdChain = [desktopId].concat(_.without(desktopIdOrder0, desktopId));
 
-		w = fromJS(screen);
+		let w = fromJS(screen);
 		// Default values
 		w = fromJS({
 			type: "screen",
@@ -182,14 +179,15 @@ export default class StateWrapper {
 		this._screenIdChain.push(id);
 
 		// Set desktop's screenId
-		desktopById(id).setScreenId(id);
+		//console.log({desktopId, desktop: this.desktopById(desktopId), id, klass: typeof this.desktopById(desktopId)})
+		this.desktopById(desktopId)._set('screenId', id);
 
 		return id;
 	}
 
 	forEachScreen(fn) {
 		this.getScreenIdOrder().forEach(screenId => {
-			const screen = _getWidgetById(screenId);
+			const screen = screenById(screenId);
 			fn(screen, screenId);
 		});
 	}
@@ -197,18 +195,18 @@ export default class StateWrapper {
 	mapEachScreen(fn) {
 		const result = [];
 		this.getScreenIdOrder().forEach(screenId => {
-			const screen = _getWidgetById(screenId);
+			const screen = screenById(screenId);
 			result.push(fn(screen, screenId));
 		});
 		return result;
 	}
 
 
-	_getIn(path, dflt) {
+	_get(path, dflt) {
 		return this.state.getIn(path, dflt);
 	}
 
-	_setIn(path, value) {
+	_set(path, value) {
 		this.state = this.state.setIn(path, value);
 		return this;
 	}
