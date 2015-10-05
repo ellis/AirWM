@@ -12,11 +12,11 @@ describe('StateWrapper', () => {
 		builder.addDesktop({});
 		expect(builder.getWidgetIdNext()).to.equal(1);
 		expect(builder.getDesktopIdOrder()).to.equal(List.of(0));
-		expect(builder.getDesktopIdVisit()).to.equal(List.of(0));
+		expect(builder.getDesktopIdChain()).to.equal(List.of(0));
 		builder.addDesktop({});
 		expect(builder.getWidgetIdNext()).to.equal(2);
 		expect(builder.getDesktopIdOrder()).to.equal(List.of(0, 1));
-		expect(builder.getDesktopIdVisit()).to.equal(List.of(0, 1));
+		expect(builder.getDesktopIdChain()).to.equal(List.of(0, 1));
 
 		//expect(builder.desktopIdOrder.getState()).to.equal(List.of(1,2,3));
 
