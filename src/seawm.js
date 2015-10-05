@@ -319,9 +319,9 @@ var eventHandler = function(ev){
 		case "EnterNotify":
 			handleEnterNotify(ev);
 			break;
-		case "LeaveNotify":
-			handleLeaveNotify(ev);
-			break;
+		//case "LeaveNotify":
+		//	handleLeaveNotify(ev);
+		//	break;
 		case "KeyPress":
 			keyPressHandler(ev);
 			break;
@@ -337,57 +337,79 @@ var eventHandler = function(ev){
 }
 
 /**
- * After activating a window, ignoreEnterNotify should be set to true.
- * This will lead ignoring the next EnterNotify event.
- * This way, when the user switches desktops, the window under the mouse
- * doesn't get automatically selected.
- * TODO: This strategy won't be entirely adequate, because it won't handle
- * the case of a new window opening, where we also shouldn't automatically
- * switch to the window under the cursor!  We could possibly save the
- * positition of the mouse from the previous EnterNotify, and ignore any
- * future events at the same position.
+ * This event handler is responsible "focus follows mouse".
+ * Unfortunately, the implementation is complicated.
+ * The EnterNotify event is sent whenever the mouse "enters" a window,
+ * but that may occur when windows are moved or opened, or the desktop
+ * is switched.
+ * However, focus-follows-mouse should only occur in response to the
+ * MOVEMENT of the mouse cursor into a new window.
+ *
+ * In order to address this problem, I use a buggy hack:
+ * - in handleStateChange(), after the active window changes, set ignoreEnterNotify = true.
+ * - This will lead ignoring one EnterNotify event (the next one).
+ * - Also check the coordinates of the last EnterNotify event, and
+ *   ignore if the coordinates haven't changed.
+ * - set ignoreEnterNotify=false at end of handleEnterNotify(),
+ *
+ * Solves:
+ * - when the user switches desktops, the window under the mouse
+ *   doesn't get automatically selected.
+ * - when user moves windows around the layout with shortcut keys.
+ *
+ * Doesn't solve:
+ * - This strategy won't handle
+ *   the case of a new window opening, where we also shouldn't automatically
+ *   switch to the window under the cursor!
+ * - Layout changes that lead to a different window being under the cursor.
+ * - when the user uses shortcuts to activate a window, the next time the mouse
+ *   moves to a new window, EnterNotify might be ignored.
+ *
+ * Possible better solutions:
+ * 1. set ignoreEnterNotify=true whenever there is a layout change, and use
+ *    a timer to limit how long EnterNotify will be ignored.
+ * 2. use XInput to detect mouse movement, and only use EnterNotify it's for
+ *    the window that was under the last mouse movement.
  */
 let handleEnterNotifyCoordsPrev = {};
 let ignoreEnterNotify = true;
 function handleEnterNotify(ev) {
-	console.log(ev);
-	try {
-		const coords = _.pick(ev, ['rootx', 'rooty']);
-		console.log({coords, ev, handleEnterNotifyCoordsPrev});
-		if (!ignoreEnterNotify && !_.isEqual(coords, handleEnterNotifyCoordsPrev)) {
-			let state = store.getState();
-			var id = undefined;
-			state.get('widgets').forEach((w, key) => {
-				if (w.get('xid') === ev.wid) {
-					switch (w.get('type')) {
-						case 'window':
-							id = parseInt(key);
-							break;
-						default:
-							break;
-					}
-					return false;
-				}
-			});
-			//_focusId = id;
-			if (id >= 0) {
-				store.dispatch({type: 'activateWindow', id: id});
-			}
-		}
-		handleEnterNotifyCoordsPrev = coords;
-		ignoreEnterNotify = false;
-	} catch (e) {
-		logger.error("handleEnterNotify: ERROR:")
-		logger.error(e.message);
-		logger.error(e.stack);
-	}
-}
-
-function handleLeaveNotify(ev) {
+	//console.log(ev);
 	const coords = _.pick(ev, ['rootx', 'rooty']);
-	console.log({coords, ev, handleEnterNotifyCoordsPrev});
+	let state = store.getState();
+	var id = undefined;
+	state.get('widgets').forEach((w, key) => {
+		if (w.get('xid') === ev.wid) {
+			switch (w.get('type')) {
+				case 'window':
+					id = parseInt(key);
+					break;
+				default:
+					break;
+			}
+			return false;
+		}
+	});
+	//_focusId = id;
+	if (id >= 0) {
+		//console.log({coords, ev, handleEnterNotifyCoordsPrev});
+		if (!ignoreEnterNotify && !_.isEqual(coords, handleEnterNotifyCoordsPrev)) {
+			store.dispatch({type: 'activateWindow', id: id});
+		}
+		else {
+			//console.log("ignored EnterNotify");
+		}
+		ignoreEnterNotify = false;
+		//console.log("ignoreEnterNotify = false")
+	}
 	handleEnterNotifyCoordsPrev = coords;
 }
+
+/*function handleLeaveNotify(ev) {
+	const coords = _.pick(ev, ['rootx', 'rooty']);
+	//console.log({coords, ev, handleEnterNotifyCoordsPrev});
+	handleEnterNotifyCoordsPrev = coords;
+}*/
 
 function handleMotionNotify(ev) {
 	/*if (_focusId >= 0) {
@@ -409,7 +431,7 @@ function handleStateChange() {
 		const state = store.getState();
 		// If the active window has changed, set ignoreEnterNotify = true
 		if (state.getIn(['x11', 'wmSettings', 'ewmh', '_NET_ACTIVE_WINDOW', 0]) !== statePrev.getIn(['x11', 'wmSettings', 'ewmh', '_NET_ACTIVE_WINDOW', 0])) {
-			console.log("ignoreEnterNotify = true")
+			//console.log("ignoreEnterNotify = true")
 			ignoreEnterNotify = true;
 		}
 		// Settings for each window
@@ -456,7 +478,7 @@ function handleStateChange() {
 		// Set the X11 focus
 		const SetInputFocus = state.getIn(['x11', 'wmSettings', 'SetInputFocus']);
 		if (SetInputFocus && SetInputFocus !== statePrev.getIn(['x11', 'wmSettings', 'SetInputFocus'])) {
-			console.log("SetInputFocus:", SetInputFocus);
+			//console.log("SetInputFocus:", SetInputFocus);
 			global.X.SetInputFocus.apply(global.X, SetInputFocus.toJS());
 		}
 
@@ -581,7 +603,7 @@ var airClientCreator = function(err, display) {
 			eventMask:
 				x11.eventMask.ButtonPress |
 				x11.eventMask.EnterWindow |
-				x11.eventMask.LeaveWindow |
+				//x11.eventMask.LeaveWindow |
 				x11.eventMask.SubstructureNotify |
 				x11.eventMask.SubstructureRedirect |
 				//x11.eventMask.StructureNotify |

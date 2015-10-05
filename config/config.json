@@ -25,10 +25,10 @@
 		{ "key": "8", "modifier": ["super","shift"], "action": {"type": "moveWindowToDesktop", "desktop": 7}},
 		{ "key": "9", "modifier": ["super","shift"], "action": {"type": "moveWindowToDesktop", "desktop": 8}},
 
-		{"key": "n", "modifier" : ["super"], "action": {"type": "activateWindowNext"}},
-		{"key": "p", "modifier" : ["super"], "action": {"type": "activateWindowPrev"}},
-		{"key": "n", "modifier" : ["super","shift"], "action": {"type": "moveWindowToIndexNext"}},
-		{"key": "p", "modifier" : ["super","shift"], "action": {"type": "moveWindowToIndexPrev"}},
+		{"key": "j", "modifier" : ["super"], "action": {"type": "activateWindowNext"}},
+		{"key": "k", "modifier" : ["super"], "action": {"type": "activateWindowPrev"}},
+		{"key": "j", "modifier" : ["super","shift"], "action": {"type": "moveWindowToIndexNext"}},
+		{"key": "k", "modifier" : ["super","shift"], "action": {"type": "moveWindowToIndexPrev"}},
 
 		{"key": "c", "modifier" : ["super","shift"], "action": {"type": "closeWindow"}},
 		{

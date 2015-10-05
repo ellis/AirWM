@@ -36,7 +36,7 @@
 * [x] better focus follows mouse
 * [x] recognize and maximize the "Desktop" type window
 * [ ] IMPROVEMENT: x11 package: LeaveNotify isn't recognized as event!
-* [ ] BUG: start firefox or atom (or any program?); switch to different desktop; quick WM; restart WM; the windows are no longer displayed
+* [ ] BUG: start firefox or atom (or any program?); switch to different desktop; quit WM; restart WM; the windows are no longer displayed
 * [ ] BUG: start firefox; press Ctrl-N; the new window isn't sized properly
 * [ ] activate window on mouse click
 * [ ] state: add orphanId lists
@@ -51,7 +51,7 @@
 * [ ] state: support hidden/iconified windows
 	* [ ] clientMessage: handle WM_CHANGE_STATE
 	* [ ] ewmh: `_NET_WM_STATE_HIDDEN`, `_NET_WM_STATE_FOCUSED`
-* [ ] for better focus-follows-mouse, may need to use XInput extension, but it looks like the x11 package hasn't implemented that protocol yet
+* [ ] for better focus-follows-mouse: detect layout changes and use a timer to limit duration that EnterNotify is ignored.
 
 Naming:
 * jetwm jetwm howmoo lowmo light flowm flowmo flowmotion
@@ -71,6 +71,7 @@ Refactoring:
 * [ ] handleStateChange: don't call DestroyWindow on a window that was already destroyed
 * [ ] consider using `activeChildIndex` and `activeDesktopIndex` instead of IDs
 * [ ] move `x11.wmSettings` to `x11.windowsSettings[xidRoot]`
+* [ ] rename 'seawm.js' to 'wm.js'
 
 Later:
 * [ ] when a new window is created that is associated with another window, insert is after that window in the stack, rather than at the end of the stack
