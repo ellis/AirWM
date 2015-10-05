@@ -2,6 +2,16 @@ import _ from 'lodash';
 import assert from 'assert';
 import {List, Map, fromJS} from 'immutable';
 
+export const initialState = fromJS({
+	widgetIdNext: 0,
+	screenIdOrder: [],
+	screenIdVisit: [],
+	desktopIdOrder: [],
+	desktopIdVisit: [],
+	windowIdOrder: [],
+	windowIdVisit: [],
+});
+
 const listRemove = (l, x) => l.filter(a => a !== x);
 
 class ListWrapper {
@@ -29,13 +39,20 @@ class UniqueListWrapper {
 	remove(x) { this.top.updateIn(this.path, List(), l => listRemove(l, x)); return this; }
 }
 
+export const StatePaths = {
+	widgetIdNext: ['widgetIdNext'],
+	screenIdVisit: ['screenIdVisit'],
+	desktopIdOrder: ['desktopIdOrder'],
+	desktopIdVisit: ['desktopIdVisit'],
+}
+
 export default class StateWrapper {
 	constructor(state) {
-		this.state = state;
-	}
+		this.state = fromJS(state);
 
-	get desktopIdOrder() { return new UniqueListWrapper(this, ['desktopIdOrder']); }
-	get desktopIdStack() { return new UniqueListWrapper(this, ['desktopIdStack']); }
+		this._desktopIdOrder = new UniqueListWrapper(this, StatePaths.desktopIdOrder);
+		this._desktopIdVisit = new UniqueListWrapper(this, StatePaths.desktopIdVisit);
+	}
 
 	getIn(path, dflt) {
 		return this.state.getIn(path, dflt);
@@ -53,7 +70,12 @@ export default class StateWrapper {
 	}
 
 	getState() { return this.state; }
-	getCurrentScreenId() { return this.state.getIn(['screenIdStack', 0]); }
+	getWidgetIdNext() { return this.state.getIn(StatePaths.widgetIdNext, 0); }
+	getScreenIdOrder() { return this.state.getIn(StatePaths.screenIdOrder, List()); }
+	getScreenIdVisit() { return this.state.getIn(StatePaths.screenIdVisit, List()); }
+	getDesktopIdOrder() { return this.state.getIn(StatePaths.desktopIdOrder, List()); }
+	getDesktopIdVisit() { return this.state.getIn(StatePaths.desktopIdVisit, List()); }
+	getCurrentScreenId() { return this.state.getIn(['screenIdVisit', 0], 0); }
 
 	addDesktop(w) {
 		w = fromJS(w);
@@ -62,18 +84,30 @@ export default class StateWrapper {
 			type: "desktop",
 			layout: "default",
 			childIdOrder: [],
+			childIdVisit: [],
 			childIdStack: [],
-			childIdRecent: []
 		}).merge(w);
 
-		const id = this.state.get('widgetIdNext', 0);
+		// Add widget to widgets list
+		const id = this.getWidgetIdNext();
 		this.state = this.state.setIn(['widgets', id.toString()], w);
+		//console.log(2)
+		//console.log(this.state);
 
 		// Increment ID counter
-		this.state = this.state.setIn('widgetIdNext', id + 1);
+		this.state = this.state.setIn(StatePaths.widgetIdNext, id + 1);
+		//console.log(3)
+		//console.log(this.state);
+
+		// Append to desktop lists
+		this._desktopIdOrder.push(id);
+		this._desktopIdVisit.push(id);
+		//console.log(4)
+		//console.log(this.state);
 
 		return id;
 	}
+
 	/*
 	createWidget(w, desktopId, widgetNum) {
 		w = fromJS(w);
