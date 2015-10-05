@@ -44,7 +44,8 @@ class DesktopWrapper extends SubWrapper {
 	}
 
 	get type() { return "desktop"; }
-	get layout() { return this.top._get(this.path.concat(['type']), 'default'); }
+	get layout() { return this._get('type', 'default'); }
+	get screenId() { return this._get('screenId', -1); }
 	getChildIdOrder() { return this._get('childIdOrder', List()); }
 	getChildIdChain() { return this._get('childIdChain', List()); }
 	getChildIdStack() { return this._get('childIdStack', List()); }

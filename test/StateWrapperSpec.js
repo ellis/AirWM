@@ -14,11 +14,14 @@ describe('StateWrapper', () => {
 		expect(builder.getWidgetIdNext()).to.equal(d1 + 1);
 		expect(builder.getDesktopIdOrder()).to.equal(List.of(d1));
 		expect(builder.getDesktopIdChain()).to.equal(List.of(d1));
+		expect(builder.desktopById(d1).screenId).to.equal(-1);
 		// Add desktop 2
 		const d2 = builder.addDesktop({});
 		expect(builder.getWidgetIdNext()).to.equal(d2 + 1);
 		expect(builder.getDesktopIdOrder()).to.equal(List.of(d1, d2));
 		expect(builder.getDesktopIdChain()).to.equal(List.of(d1, d2));
+		expect(builder.desktopById(d1).screenId).to.equal(-1);
+		expect(builder.desktopById(d2).screenId).to.equal(-1);
 		// Add screen 1
 		const s1 = builder.addScreen({
 			xid: 100,
@@ -30,6 +33,10 @@ describe('StateWrapper', () => {
 		expect(builder.getDesktopIdChain()).to.equal(List.of(d1, d2));
 		expect(builder.getScreenIdOrder()).to.equal(List.of(s1));
 		expect(builder.getScreenIdChain()).to.equal(List.of(s1));
+		expect(builder.screenById(s1).getDesktopIdOrder()).to.equal(List.of(d1, d2));
+		expect(builder.screenById(s1).getDesktopIdChain()).to.equal(List.of(d1, d2));
+		expect(builder.desktopById(d1).screenId).to.equal(s1);
+		expect(builder.desktopById(d2).screenId).to.equal(-1);
 
 		//expect(builder.desktopIdOrder.getState()).to.equal(List.of(1,2,3));
 
