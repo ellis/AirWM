@@ -243,11 +243,23 @@ describe('StateWrapper', () => {
 
 		// Add window on desktop 2
 		builder.activateDesktop(d1);
-		const w2 = builder.addWindow({xid: 1000});
+		const w2 = builder.addWindow({xid: 1001});
 		builder.moveWindowToDesktop(w2, d2);
 		expect(builder.getWidgetIdChain(), 'widget chain #5').to.equal(List([w1, d1, s1, d2, w2]));
 
 		builder.activateDesktop(d2);
 		expect(builder.getWidgetIdChain(), 'widget chain #6').to.equal(List([w2, d2, s1, w1, d1]));
+	});
+
+	it('removeWindow', () => {
+		const builder = new StateWrapper(initialState);
+		const d1 = builder.addDesktop({});
+		const d2 = builder.addDesktop({});
+		const s1 = builder.addScreen(ActionObjects.screen100);
+		const w1 = builder.addWindow({xid: 1000});
+
+		builder.removeWindow(w1);
+		expect(builder.getWindowIdOrder(), 'window order #1').to.equal(List([]));
+		expect(builder.getWidgetIdChain(), 'widget chain #1').to.equal(List([d1, s1, d2]));
 	});
 });

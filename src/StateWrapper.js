@@ -366,6 +366,15 @@ export default class StateWrapper {
 		return this;
 	}
 
+	removeWindow(windowId) {
+		this.unparentWindow(windowId);
+		this._windowIdOrder.remove(windowId);
+		this._windowIdStack.remove(windowId);
+		this._widgetIdChain.remove(windowId);
+		this._setCurrent();
+		return this;
+	}
+
 	forEachScreen(fn) {
 		this.getScreenIdOrder().forEach(screenId => {
 			const screen = screenById(screenId);
