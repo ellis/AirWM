@@ -337,7 +337,7 @@ export default class StateWrapper {
 			}
 			// Otherwise, move the desktop to the current screen.
 			else {
-				this.moveDesktopToScreen(desktop, currentScreen);
+				this.moveDesktopToScreen(desktop, this.currentScreen);
 				this._setCurrent();
 			}
 		}
@@ -346,10 +346,10 @@ export default class StateWrapper {
 
 	activateWindow(windowId) {
 		// Find desktop
-		const desktop = desktopById(this._findWidgetDekstopIdById(windowId));
+		const desktop = this.desktopById(this._findWidgetDekstopIdById(windowId));
 		if (desktop) {
 			// Move window to front on desktop's chain
-			desktop._windowIdChain.unshift(windowId);
+			desktop._childIdChain.unshift(windowId);
 			// And activate the desktop
 			this.activateDesktop(desktop);
 		}
