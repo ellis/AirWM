@@ -256,9 +256,16 @@ describe('StateWrapper', () => {
 		const d1 = builder.addDesktop({});
 		const d2 = builder.addDesktop({});
 		const s1 = builder.addScreen(ActionObjects.screen100);
-		const w1 = builder.addWindow({xid: 1000});
 
+		const w1 = builder.addWindow({xid: 1000});
+		builder.moveWindowToDesktop(w1, d1);
 		builder.removeWindow(w1);
+		expect(builder.getWindowIdOrder(), 'window order #1').to.equal(List([]));
+		expect(builder.getWidgetIdChain(), 'widget chain #1').to.equal(List([d1, s1, d2]));
+
+		const w2 = builder.addWindow({xid: 1000});
+		builder.moveWindowToDesktop(w2, d2);
+		builder.removeWindow(w2);
 		expect(builder.getWindowIdOrder(), 'window order #1').to.equal(List([]));
 		expect(builder.getWidgetIdChain(), 'widget chain #1').to.equal(List([d1, s1, d2]));
 	});
