@@ -127,6 +127,10 @@ export default class StateWrapper {
 		return new StateWrapper(this.state);
 	}
 
+	print() {
+		console.log(JSON.stringify(this.state, null, '\t'));
+	}
+
 	getState() { return this.state; }
 	getWidgetIdNext() { return this.state.getIn(StatePaths.widgetIdNext, 0); }
 	getScreenIdOrder() { return this.state.getIn(StatePaths.screenIdOrder, List()); }
@@ -182,7 +186,7 @@ export default class StateWrapper {
 		// If there aren't and free desktops to display on this screen:
 		if (_.isEmpty(desktopIdHiddens)) {
 			// Create a new desktop for this screen.
-			desktopId = addDesktop({});
+			desktopId = this.addDesktop({});
 		}
 		// Otherwise, take the first hidden desktop
 		else {
