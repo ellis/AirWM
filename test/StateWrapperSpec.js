@@ -268,5 +268,13 @@ describe('StateWrapper', () => {
 		builder.removeWindow(w2);
 		expect(builder.getWindowIdOrder(), 'window order #1').to.equal(List([]));
 		expect(builder.getWidgetIdChain(), 'widget chain #1').to.equal(List([d1, s1, d2]));
+
+		const w3 = builder.addWindow({xid: 1000});
+		const w4 = builder.addWindow({xid: 1000});
+		builder.moveWindowToDesktop(w3, d1);
+		builder.moveWindowToDesktop(w4, d2);
+		builder.removeWindow(w3);
+		expect(builder.getWindowIdOrder(), 'window order #1').to.equal(List([w4]));
+		expect(builder.getWidgetIdChain(), 'widget chain #1').to.equal(List([d1, s1, d2, w4]));
 	});
 });
