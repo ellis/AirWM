@@ -55,8 +55,8 @@ class DesktopWrapper extends SubWrapper {
 
 	findScreenId() { return this._get('parentId', -1); }
 
-	_childIdOrder() { return new UniqueListWrapper(this.top, this.path.concat(['childIdOrder'])); }
-	_childIdChain() { return new UniqueListWrapper(this.top, this.path.concat(['childIdChain'])); }
+	get _childIdOrder() { return new UniqueListWrapper(this.top, this.path.concat(['childIdOrder'])); }
+	get _childIdChain() { return new UniqueListWrapper(this.top, this.path.concat(['childIdChain'])); }
 	//_childIdStack() { return new UniqueListWrapper(this.top, this.path.concat(['childIdStack'])); }
 }
 
@@ -86,7 +86,7 @@ class ScreenWrapper extends SubWrapper {
 
 	getDesktopIdChain() { return this._get('desktopIdChain', List()); }
 
-	_desktopIdChain() { return new UniqueListWrapper(this.top, this.path.concat(['desktopIdChain'])); }
+	get _desktopIdChain() { return new UniqueListWrapper(this.top, this.path.concat(['desktopIdChain'])); }
 }
 
 class UniqueListWrapper extends SubWrapper {
@@ -127,8 +127,9 @@ export default class StateWrapper {
 		return new StateWrapper(this.state);
 	}
 
-	print() {
-		console.log(JSON.stringify(this.state, null, '\t'));
+	print(path) {
+		const x = (path) ? this.get(path) : this.state;
+		console.log(JSON.stringify(x, null, '\t'));
 	}
 
 	getState() { return this.state; }
@@ -145,8 +146,8 @@ export default class StateWrapper {
 	screenById(screenId) { return this._widgetById(ScreenWrapper, screenId); }
 	desktopById(desktopId) { return this._widgetById(DesktopWrapper, desktopId); }
 
-	currentScreen() { return this.screenById(this.currentScreenId); }
-	currentDesktop() { return this.desktopById(this.currentDesktopId); }
+	get currentScreen() { return this.screenById(this.currentScreenId); }
+	get currentDesktop() { return this.desktopById(this.currentDesktopId); }
 
 	addDesktop(w) {
 		w = fromJS(w);
@@ -296,19 +297,26 @@ export default class StateWrapper {
 	}
 
 	moveWindowToDesktop(windowId, desktopId) {
-		// Remove window from old parent
-		this.unparentWindow(windowId);
+		const desktop = this.desktopById(desktopId);
 		// Add window to given desktop
-		if (desktopId >= 0) {
+		if (desktop) {
+			// Remove window from old parent
+			this.unparentWindow(windowId);
 			// Set parent ID
+			// TODO: use WindowWrapper method here once I create one
 			this._set(['widgets', windowId.toString(), 'parentId'], desktopId);
+			//console.log({desktopId, desktop})
+			//console.log(desktop._childIdOrder)
 			// Append to desktop's child list
-			if (desktopId >= 0) {
-				const desktop = this.desktopById(desktopId);
-				desktop._childIdOrder.push(windowId);
-				desktop._childIdChain.push(windowId);
-				//desktop._childIdStack.push(windowId);
-			}
+			desktop._childIdOrder.push(windowId);
+			desktop._childIdChain.push(windowId);
+			//desktop._childIdStack.push(windowId);
+			//console.log(1)
+			//this.print()
+			this._setCurrent();
+			//console.log(2)
+			//console.log(this.currentWindowId);
+			//this.print()
 		}
 		return this;
 	}
@@ -423,7 +431,9 @@ export default class StateWrapper {
 	}
 
 	_findWidgetDekstopIdById(widgetId) {
-		const w = _getWidgetById(widgetId);
+		//console.log(`_findWidgetDekstopIdById(${widgetId})`);
+		//console.log(this.state);
+		const w = this._getWidgetById(widgetId);
 		if (w.get('type') === 'desktop') {
 			return widgetId;
 		}
@@ -453,16 +463,23 @@ export default class StateWrapper {
 
 		if (screen) {
 			const desktop = screen.currentDesktop;
+			/*
+			if (!desktop) {
+				this.print();
+				console.log({screen})
+			}
+			*/
 			// Update the widgetIdChain
 			this._widgetIdChain
 				.unshift(screen.id)
-				.unshift(desktop.id)
-				.unshift(desktop.currentWindowId);
+				.unshift(desktop.id);
+			if (desktop.currentWindowId >= 0)
+				this._widgetIdChain.unshift(desktop.currentWindowId);
 			// Update the current pointers
 			this
-				._set('currentScreenId', screen.id)
-				._set('currentDesktopId', desktop.id)
-				._set('currentWidowId', desktop.currentWindowId);
+				._set(StatePaths.currentScreenId, screen.id)
+				._set(StatePaths.currentDesktopId, desktop.id)
+				._set(StatePaths.currentWindowId, desktop.currentWindowId);
 		}
 		return this;
 	}
