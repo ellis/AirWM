@@ -282,9 +282,13 @@ export default class StateWrapper {
 			const desktopPrev = this.desktopById(screen.currentDesktopId);
 			// If the desktop was already displayed on another screen
 			if (screenPrev && screenPrev.id !== screen.id) {
-				// Move desktop on this screen to that screen
+				// Swap desktop on this screen to that screen
 				desktopPrev._set('parentId', screenPrev.id);
 				screenPrev._desktopIdChain.unshift(desktopPrev.id);
+			}
+			// Otherwise unparent the previous desktop
+			else {
+				desktopPrev._set('parentId', -1);
 			}
 			// Place desktop on screen
 			desktop._set('parentId', screen.id);
@@ -327,18 +331,22 @@ export default class StateWrapper {
 	}
 
 	activateDesktop(desktop) {
+		//console.log('activateDesktop')
+		//console.log(desktop)
 		if (_.isNumber(desktop))
-			desktop = this.desktopById(desktopId);
+			desktop = this.desktopById(desktop);
 		if (desktop) {
+			//console.log(desktop)
 			// If the desktop is already on a screen, activate that screen
 			let screenId = desktop.findScreenId();
+			//console.log({screenId})
 			if (screenId >= 0) {
 				this._setCurrent(screenId);
 			}
 			// Otherwise, move the desktop to the current screen.
 			else {
+				//console.log(1)
 				this.moveDesktopToScreen(desktop, this.currentScreen);
-				this._setCurrent();
 			}
 		}
 		return this;
