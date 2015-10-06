@@ -132,12 +132,12 @@ export default class StateWrapper {
 	}
 
 	getState() { return this.state; }
-	getWidgetIdNext() { return this.state.getIn(StatePaths.widgetIdNext, 0); }
 	getScreenIdOrder() { return this.state.getIn(StatePaths.screenIdOrder, List()); }
 	getDesktopIdOrder() { return this.state.getIn(StatePaths.desktopIdOrder, List()); }
 	getWindowIdOrder() { return this.state.getIn(StatePaths.windowIdOrder, List()); }
 	getWidgetIdChain() { return this.state.getIn(StatePaths.widgetIdChain, List()); }
 	//getScreenIdChain() { return this.state.getIn(StatePaths.screenIdChain, List()); }
+	get widgetIdNext() { return this.state.getIn(StatePaths.widgetIdNext, 0); }
 	get currentScreenId() { return this.state.getIn(StatePaths.currentScreenId, -1); }
 	get currentDesktopId() { return this.state.getIn(StatePaths.currentDesktopId, -1); }
 	get currentWindowId() { return this.state.getIn(StatePaths.currentWindowId, -1); }
@@ -413,7 +413,7 @@ export default class StateWrapper {
 
 	_addWidget(w) {
 		// Add widget to widgets list
-		const id = this.getWidgetIdNext();
+		const id = this.widgetIdNext;
 		this.state = this.state.setIn(['widgets', id.toString()], w);
 
 		// Increment ID counter
