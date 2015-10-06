@@ -37,12 +37,25 @@ class SubWrapper {
 	}
 }
 
-class DesktopWrapper extends SubWrapper {
+class WidgetWrapper extends SubWrapper {
 	constructor(top, path, id) {
 		super(top, path, Map());
 		this.id = id;
+	}
+
+	get type() { return this._get('type', 'window'); }
+	get parentId() { return this._get('parentId', -1); }
+
+	set _parentId(id) { this._set('parentId', id); }
+	//findDesktopId() { ... }
+	//findScreenId() { ... }
+}
+
+class DesktopWrapper extends WidgetWrapper {
+	constructor(top, path, id) {
+		super(top, path, id);
 		//console.log({top: this.top, path: this.path})
-		assert.equal(this.top._get(this.path.concat(['type'])), 'desktop');
+		assert.equal(this._get('type'), 'desktop');
 	}
 
 	get type() { return "desktop"; }
@@ -71,15 +84,16 @@ class ListWrapper extends SubWrapper {
 	remove(x) { this.top._updateIn(this.path, List(), l => listRemove(l, x)); return this; }
 }
 
-class ScreenWrapper extends SubWrapper {
+class ScreenWrapper extends WidgetWrapper {
 	constructor(top, path, id) {
-		super(top, path, Map());
-		this.id = id;
+		super(top, path, id);
+		assert.equal(this._get('type'), 'screen');
 	}
 
-	get xid() { return this.top._get(this.path.concat(['xid']), -1); }
-	get width() { return this.top._get(this.path.concat(['width']), 0); }
-	get height() { return this.top._get(this.path.concat(['height']), 0); }
+	get xid() { return this._get('xid', -1); }
+	get width() { return this._get('width', 0); }
+	get height() { return this._get('height', 0); }
+	get backgroundId() { return this._get('backgroundId', -1); }
 
 	get currentDesktopId() { return this._get(['desktopIdChain', 0], -1); }
 	get currentDesktop() { return this.top.desktopById(this.currentDesktopId); }
@@ -87,6 +101,8 @@ class ScreenWrapper extends SubWrapper {
 	getDesktopIdChain() { return this._get('desktopIdChain', List()); }
 
 	get _desktopIdChain() { return new UniqueListWrapper(this.top, this.path.concat(['desktopIdChain'])); }
+	get _dockIdOrder() { return new UniqueListWrapper(this.top, this.path.concat(['dockIdOrder'])); }
+	set _backgroundId(id) { this._set('backgroundId', id); }
 }
 
 class UniqueListWrapper extends SubWrapper {
@@ -98,6 +114,17 @@ class UniqueListWrapper extends SubWrapper {
 	unshift(x) { this.top._updateIn(this.path, List(), l => listRemove(l, x).unshift(x)); return this; }
 	insert(x, index) { this.top._updateIn(this.path, List(), l => listRemove(l, x).splice(index, 0, x)); return this; }
 	remove(x) { this.top._updateIn(this.path, List(), l => listRemove(l, x)); return this; }
+}
+
+class WindowWrapper extends WidgetWrapper {
+	constructor(top, path, id) {
+		super(top, path, id);
+		//console.log({top: this.top, path: this.path})
+		assert.equal(this._get('type'), 'window');
+	}
+
+	//findDesktopId() { ... }
+	//findScreenId() { ... }
 }
 
 export const StatePaths = {
@@ -145,6 +172,7 @@ export default class StateWrapper {
 
 	screenById(screenId) { return this._widgetById(ScreenWrapper, screenId); }
 	desktopById(desktopId) { return this._widgetById(DesktopWrapper, desktopId); }
+	windowById(windowId) { return this._widgetById(WindowWrapper, windowId); }
 
 	get currentScreen() { return this.screenById(this.currentScreenId); }
 	get currentDesktop() { return this.desktopById(this.currentDesktopId); }
@@ -255,19 +283,40 @@ export default class StateWrapper {
 	 *
 	 * @param  {number} windowId
 	 */
-	unparentWindow(windowId) {
-		// Find window's desktop
-		const desktopId = this._findWidgetDekstopIdById(windowId);
-		// Set window's parent to -1
-		this._set(['widgets', windowId.toString(), 'parentId'], -1);
-		// Remove window from desktop's window chain
-		if (desktopId >= 0) {
-			const desktop = this.desktopById(desktopId);
-			desktop._childIdOrder.remove(windowId);
-			desktop._childIdChain.remove(windowId);
-			//desktop._childIdStack.remove(windowId);
+	unparentWindow(window) {
+		if (_.isNumber(window))
+			window = this.windowById(window);
+		if (window) {
+			//console.log({window})
+			const parentId = window.parentId;
+
+			// Find window's desktop
+			const desktopId = this._findWidgetDekstopIdById(window.id);
+
+			// Set window's parent to -1
+			window._parentId = -1;
+
+			// If the window is assigned to a screen
+			if (this._get('widgets', parentId.toString(), 'type') === 'screen') {
+				const screen = this.screenById(parentId);
+				screen._dockIdOrder.remove(window.id);
+				if (screen.backgroundId === window.id)
+					screen._backgroundId = -1;
+			}
+			// Otherwise look for desktop parent
+			else {
+				// Remove window from desktop's window chain
+				if (desktopId >= 0) {
+					const desktop = this.desktopById(desktopId);
+					desktop._childIdOrder.remove(window.id);
+					desktop._childIdChain.remove(window.id);
+					//desktop._childIdStack.remove(windowId);
+				}
+			}
+
 			this._setCurrent();
 		}
+
 		return this;
 	}
 
@@ -325,6 +374,31 @@ export default class StateWrapper {
 		return this;
 	}
 
+	moveWindowToScreen(windowId, screenId) {
+		const window = this.windowById(windowId);
+		const screen = this.screenById(screenId);
+		// TODO: do nothing if window is already on the given screen
+		// Add window to given desktop
+		if (screen) {
+			if (window.type === 'dock') {
+				// Remove window from old parent
+				this.unparentWindow(window.id);
+				// Set parent ID
+				window._parentId = screen.id;
+				screen._dockIdOrder.push(window.id);
+			}
+			else if (window.type === 'background') {
+				// Remove window from old parent
+				this.unparentWindow(window.id);
+				// Set parent ID
+				window._parentId = screen.id;
+				screen._backgroundId = window.id;
+			}
+			this._setCurrent();
+		}
+		return this;
+	}
+
 	activateScreen(screen) {
 		this._setCurrent(screen);
 		return this;
@@ -367,11 +441,13 @@ export default class StateWrapper {
 	}
 
 	removeWindow(windowId) {
+		//console.log({windowId, state: this.state})
 		this.unparentWindow(windowId);
 		this._windowIdOrder.remove(windowId);
 		this._windowIdStack.remove(windowId);
 		this._widgetIdChain.remove(windowId);
 		this._setCurrent();
+		//console.log({windowId, state: this.state})
 		return this;
 	}
 
