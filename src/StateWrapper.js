@@ -394,6 +394,10 @@ export default class StateWrapper {
 				window._parentId = screen.id;
 				screen._backgroundId = window.id;
 			}
+			else {
+				const desktopId = screen.currentDesktopId;
+				moveWindowToDesktop(windowId, desktopId);
+			}
 			this._setCurrent();
 		}
 		return this;
