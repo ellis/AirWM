@@ -1,40 +1,41 @@
+import test from 'tape-catch';
 import {List, Map, fromJS} from 'immutable';
-import {expect, assert} from 'chai';
-import diff from 'immutablediff';
+//import diff from 'immutablediff';
 
 import StateWrapper, {initialState} from '../src/StateWrapper.js';
 
-describe('StateWrapper', () => {
-	let builder0, builder1, builder2, builder3;
-	let d1, d2, s1;
-	before(() => {
-		const builder = new StateWrapper(initialState);
-		builder0 = builder.clone();
-		// Add desktop 1
-		d1 = builder.addDesktop({});
-		builder1 = builder.clone();
-		// Add desktop 2
-		d2 = builder.addDesktop({});
-		builder2 = builder.clone();
-		// Add screen 1
-		s1 = builder.addScreen({
-			xid: 100,
-			width: 800,
-			height: 600,
+test('StateWrapper', t => {
+	const builder = new StateWrapper(initialState);
+	const builder0 = builder.clone();
+	// Add desktop 1
+	const d1 = builder.addDesktop({});
+	const builder1 = builder.clone();
+	// Add desktop 2
+	const d2 = builder.addDesktop({});
+	const builder2 = builder.clone();
+	// Add screen 1
+	const s1 = builder.addScreen({
+		xid: 100,
+		width: 800,
+		height: 600,
+	});
+	const builder3 = builder.clone();
+
+	t.equal(builder0.getState(), initialState, 'state left unchanged');
+
+	t.test(' addDesktop', t => {
+		t.test('  with no screens, one desktop', t => {
+			const builder = builder1;
+			t.equal(builder.getWidgetIdNext(), d1 + 1,
+				'should increment `widgetIdNext`');
+			t.end();
 		});
-		builder3 = builder.clone();
 	});
 
-	it('empty', () => {
-		const builder = builder0;
-		expect(builder.getState()).to.equal(initialState);
-	});
+	t.end();
 
-	describe('addDesktop', () => {
-		describe('with no screens, one desktop', () => {
-			const builder = new StateWrapper(initialState);
-			const d1 = builder.addDesktop({});
-
+	/*t.test('addDesktop', t => {
+		t.test('with no screens, one desktop', () => {
 			//const builderPrev = builder0;
 			it('should increment `widgetIdNext`', () => {
 				expect(builder.getWidgetIdNext()).to.equal(d1 + 1);
@@ -58,30 +59,8 @@ describe('StateWrapper', () => {
 			});
 		});
 
-		it('should handle zero screens', () => {
-			const builder = new StateWrapper(initialState);
-			const d1 = builder.addDesktop({});
-
-			assert.equal(builder.getWidgetIdNext(), d1 + 1, 'increment `widgetIdNext`');
-			assert.equal(builder.getScreenIdOrder(), List(), 'should leave the screen order list unchanged');
-			assert.equal(0, 1, 'sample message');
-			/*it('should append to the desktop order list', () => {
-				expect(builder.getDesktopIdOrder()).to.equal(List.of(d1));
-			});
-			it('should leave the winder order list unchanged', () => {
-				expect(builder.getWindowIdOrder()).to.equal(List());
-			});
-			it('should append to the widget chain list', () => {
-				expect(builder.getWidgetIdChain()).to.equal(List.of(d1));
-			});
-			it('should leave the focus references unchanged', () => {
-				expect(builder.currentScreenId).to.equal(-1);
-				expect(builder.currentDesktopId).to.equal(-1);
-				expect(builder.currentWindowId).to.equal(-1);
-			});*/
-		});
-
 		describe('with no screens, two desktops', () => {
+			let builder, d1, d2, s1;
 			const builder = new StateWrapper(initialState);
 			const d1 = builder.addDesktop({});
 			const d2 = builder.addDesktop({});
@@ -106,7 +85,7 @@ describe('StateWrapper', () => {
 				expect(builder.currentWindowId).to.equal(-1);
 			});
 		});
-	});
+	}
 
 	describe('with one screen, two desktops', () => {
 		let builder, d1, d2, s1;
@@ -141,4 +120,5 @@ describe('StateWrapper', () => {
 			expect(builder.currentWindowId).to.equal(-1);
 		});
 	});
+	*/
 });
