@@ -1,5 +1,5 @@
 import {List, Map, fromJS} from 'immutable';
-import {expect} from 'chai';
+import {expect, assert} from 'chai';
 import diff from 'immutablediff';
 
 import StateWrapper, {initialState} from '../src/StateWrapper.js';
@@ -59,7 +59,6 @@ describe('StateWrapper', () => {
 		});
 
 		describe('with no screens, two desktops', () => {
-			let builder, d1, d2, s1;
 			const builder = new StateWrapper(initialState);
 			const d1 = builder.addDesktop({});
 			const d2 = builder.addDesktop({});
@@ -84,7 +83,7 @@ describe('StateWrapper', () => {
 				expect(builder.currentWindowId).to.equal(-1);
 			});
 		});
-	}
+	});
 
 	describe('with one screen, two desktops', () => {
 		let builder, d1, d2, s1;
