@@ -44,10 +44,10 @@ describe('StateWrapper', () => {
 		const d1 = builder.addDesktop({});
 
 		expect(builder.widgetIdNext, 'widgetIdNext').to.equal(d1 + 1);
-		expect(builder.getScreenIdOrder(), 'screen order').to.equal(List());
-		expect(builder.getDesktopIdOrder(), 'desktop order').to.equal(List.of(d1));
-		expect(builder.getWindowIdOrder(), 'window order').to.equal(List());
-		expect(builder.getWidgetIdChain(), 'widget chain').to.equal(List.of(d1));
+		expect(builder.getScreenIdOrder(), 'screen order').to.equal(List([]));
+		expect(builder.getDesktopIdOrder(), 'desktop order').to.equal(List([d1]));
+		expect(builder.getWindowIdOrder(), 'window order').to.equal(List([]));
+		expect(builder.getWidgetIdChain(), 'widget chain').to.equal(List([d1]));
 		expect(builder.currentScreenId, 'current screen').to.equal(-1);
 		expect(builder.currentDesktopId, 'current desktop').to.equal(-1);
 		expect(builder.currentWindowId, 'current window').to.equal(-1);
@@ -114,37 +114,17 @@ describe('StateWrapper', () => {
 		expect(builder.currentWindowId, 'current window').to.equal(-1);
 	});
 
-	describe('with one screen, two desktops', () => {
-		let builder, d1, d2, s1;
-		before(() => {
-			builder = new StateWrapper(initialState);
-			d1 = builder.addDesktop({});
-			d2 = builder.addDesktop({});
-			s1 = builder.addScreen({
-				xid: 100,
-				width: 800,
-				height: 600,
-			});
-		});
-		it('should increment `widgetIdNext`', () => {
-			expect(builder.widgetIdNext).to.equal(s1 + 1);
-		});
-		it('should append to the screen order list', () => {
-			expect(builder.getScreenIdOrder()).to.equal(List.of(s1));
-		});
-		it('should leave the desktop order list unchanged', () => {
-			expect(builder.getDesktopIdOrder()).to.equal(List.of(d1, d2));
-		});
-		it('should leave the winder order list unchanged', () => {
-			expect(builder.getWindowIdOrder()).to.equal(List());
-		});
-		it('should update the widget chain list', () => {
-			expect(builder.getWidgetIdChain()).to.equal(List.of(-1, d1, s1, d2));
-		});
-		it('should update the focus references', () => {
-			expect(builder.currentScreenId).to.equal(s1);
-			expect(builder.currentDesktopId).to.equal(d1);
-			expect(builder.currentWindowId).to.equal(-1);
-		});
+	it('addWindow', () => {
+		const builder = new StateWrapper(initialState);
+		const w1 = builder.addWindow({xid: 1000});
+
+		expect(builder.widgetIdNext, 'widgetIdNext').to.equal(w1 + 1);
+		expect(builder.getScreenIdOrder(), 'screen order').to.equal(List([]));
+		expect(builder.getDesktopIdOrder(), 'desktop order').to.equal(List([]));
+		expect(builder.getWindowIdOrder(), 'window order').to.equal(List([w1]));
+		expect(builder.getWidgetIdChain(), 'widget chain').to.equal(List([w1]));
+		expect(builder.currentScreenId, 'current screen').to.equal(-1);
+		expect(builder.currentDesktopId, 'current desktop').to.equal(-1);
+		expect(builder.currentWindowId, 'current window').to.equal(-1);
 	});
 });
