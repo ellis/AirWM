@@ -53,7 +53,9 @@ describe('StateWrapper', () => {
 			expect(builder.currentDesktopId, 'current desktop').to.equal(-1);
 			expect(builder.currentWindowId, 'current window').to.equal(-1);
 		});
+	});
 
+	describe('addDesktop to empty state', () => {
 		it('to one desktop', () => {
 			const builder = new StateWrapper(initialState);
 			const d1 = builder.addDesktop({});
