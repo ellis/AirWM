@@ -285,6 +285,46 @@ describe('StateWrapper', () => {
 		]);
 	});
 
+	it('moveWindowToScreen (dock)', () => {
+		const builder = new StateWrapper(initialState);
+		const d1 = builder.addDesktop({});
+		const d2 = builder.addDesktop({});
+		const s1 = builder.addScreen(ActionObjects.screen1);
+		const s2 = builder.addScreen(ActionObjects.screen2);
+		const w1 = builder.addWindow({type: 'dock', xid: 1000});
+
+		builder.moveWindowToScreen(w1, s1);
+		checkList(builder, "moveWindowToScreen(w1, s1)", [
+			`screenIdOrder`, [s1, s2],
+			`desktopIdOrder`, [d1, d2],
+			`windowIdOrder`, [w1],
+			`widgetIdChain`, [d1, s1, d2, s2, w1],
+			`currentScreenId`, s1,
+			`currentDesktopId`, d1,
+			`currentWindowId`, -1,
+			`widgets.${d1}.childIdOrder`, [],
+			`widgets.${d1}.childIdChain`, [],
+			`widgets.${s1}.dockIdOrder`, [w1],
+			`widgets.${w1}.parentId`, s1,
+		]);
+
+		builder.moveWindowToScreen(w1, s2);
+		checkList(builder, "moveWindowToScreen(w1, s2)", [
+			`screenIdOrder`, [s1, s2],
+			`desktopIdOrder`, [d1, d2],
+			`windowIdOrder`, [w1],
+			`widgetIdChain`, [d1, s1, d2, s2, w1],
+			`currentScreenId`, s1,
+			`currentDesktopId`, d1,
+			`currentWindowId`, -1,
+			`widgets.${d2}.childIdOrder`, [],
+			`widgets.${d2}.childIdChain`, [],
+			`widgets.${s1}.dockIdOrder`, [],
+			`widgets.${s2}.dockIdOrder`, [w1],
+			`widgets.${w1}.parentId`, s2,
+		]);
+	});
+
 	it('activateWindow (s1d2 + addWindow + moveWindowToDesktop 1)', () => {
 		const builder = new StateWrapper(initialState);
 		const d1 = builder.addDesktop({});
