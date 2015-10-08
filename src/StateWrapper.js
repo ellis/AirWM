@@ -45,6 +45,18 @@ class WidgetWrapper extends SubWrapper {
 
 	get type() { return this._get('type', 'window'); }
 	get parentId() { return this._get('parentId', -1); }
+	get visible() { return this._get('visible', false); }
+	set visible(visible) { return this._set('visible', (visible) ? true : false); }
+
+	getRc() { return this._get('rc', List([0, 0, 0, 0])); }
+	setRc(rc) {
+		rc = List(rc).toJS();
+		let rc1 = this.getRc();
+		for (let i = 0; i < 4; i++) {
+			rc1 = rc1.set(i, rc[i]);
+		}
+		this._set('rc', rc1);
+	}
 
 	set _parentId(id) { this._set('parentId', id); }
 	//findDesktopId() { ... }
@@ -100,6 +112,7 @@ class ScreenWrapper extends WidgetWrapper {
 	get currentDesktop() { return this.top.desktopById(this.currentDesktopId); }
 
 	getDesktopIdChain() { return this._get('desktopIdChain', List()); }
+	getDockIdOrder() { return this._get('dockIdOrder', List()); }
 
 	get _desktopIdChain() { return new UniqueListWrapper(this.top, this.path.concat(['desktopIdChain'])); }
 	get _dockIdOrder() { return new UniqueListWrapper(this.top, this.path.concat(['dockIdOrder'])); }
@@ -486,7 +499,7 @@ export default class StateWrapper {
 	forEachScreen(fn) {
 		this.getScreenIdOrder().forEach(screenId => {
 			const screen = this.screenById(screenId);
-			fn(screen, screenId);
+			fn(screen);
 		});
 		return this;
 	}
@@ -495,9 +508,17 @@ export default class StateWrapper {
 		const result = [];
 		this.getScreenIdOrder().forEach(screenId => {
 			const screen = this.screenById(screenId);
-			result.push(fn(screen, screenId));
+			result.push(fn(screen));
 		});
 		return result;
+	}
+
+	forEachDesktop(fn) {
+		this.getDesktopIdOrder().forEach(desktopId => {
+			const desktop = this.desktopById(desktopId);
+			fn(desktop);
+		});
+		return this;
 	}
 
 	/* Private helper functions */
