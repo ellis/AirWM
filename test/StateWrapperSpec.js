@@ -46,12 +46,15 @@ const ActionObjects = {
  * @param  {string} desc - description of what's being checked
  * @param  {array} stuff - the flat list of path/value pairs to chekc
  */
-function checkList(desc, stuff, builder) {
+function checkList(builder, desc, stuff) {
 	const state = builder.getState().toJS();
 	_.chunk(stuff, 2).forEach(l => {
 		const [key, expected] = l;
 		const actual = _.get(state, key);
-		expect(actual, desc+": "+key).to.deep.equal(expected);
+		if (_.isUndefined(expected))
+			expect(actual, desc+": "+key).to.be.undefined;
+		else
+			expect(actual, desc+": "+key).to.deep.equal(expected);
 	})
 }
 
@@ -212,37 +215,34 @@ describe('StateWrapper', () => {
 		const w1 = builder.addWindow({xid: 1000});
 
 		builder.moveWindowToScreen(w1, s2);
-		const test1 = [
+		checkList(builder, "moveWindowToScreen(w1, s2)", [
+			`screenIdOrder`, [s1, s2],
+			`desktopIdOrder`, [d1, d2],
+			`windowIdOrder`, [w1],
+			`widgetIdChain`, [d1, s1, d2, s2, w1],
+			`currentScreenId`, s1,
+			`currentDesktopId`, d1,
+			`currentWindowId`, -1,
 			`widgets.${d1}.childIdOrder`, [],
 			`widgets.${d1}.childIdChain`, [],
 			`widgets.${d2}.childIdOrder`, [w1],
 			`widgets.${d2}.childIdChain`, [w1],
-		];
-		checkList("moveWindowToScreen(w1, s2)", test1, builder);
-		expect(builder.getScreenIdOrder(), 'screen order #1').to.equal(List([s1, s2]));
-		expect(builder.getDesktopIdOrder(), 'desktop order #1').to.equal(List([d1, d2]));
-		expect(builder.getWindowIdOrder(), 'window order #1').to.equal(List([w1]));
-		expect(builder.getWidgetIdChain(), 'widget chain #1').to.equal(List([d1, s1, d2, s2, w1]));
-		expect(builder.currentScreenId, 'current screen #1').to.equal(s1);
-		expect(builder.currentDesktopId, 'current desktop #1').to.equal(d1);
-		expect(builder.currentWindowId, 'current window #1').to.equal(-1);
-		expect(builder.desktopById(d1).getChildIdOrder(), 'desktop 1 window ID order #1').to.equal(List());
-		expect(builder.desktopById(d1).getChildIdChain(), 'desktop 1 window ID order #1').to.equal(List());
-		expect(builder.desktopById(d2).getChildIdOrder(), 'desktop 2 window ID order #1').to.equal(List([w1]));
-		expect(builder.desktopById(d2).getChildIdChain(), 'desktop 2 window ID order #1').to.equal(List([w1]));
+		]);
 
 		builder.moveWindowToScreen(w1, s1);
-		expect(builder.getScreenIdOrder(), 'screen order #2').to.equal(List([s1, s2]));
-		expect(builder.getDesktopIdOrder(), 'desktop order #2').to.equal(List([d1, d2]));
-		expect(builder.getWindowIdOrder(), 'window order #2').to.equal(List([w1]));
-		expect(builder.getWidgetIdChain(), 'widget chain #2').to.equal(List([w1, d1, s1, d2, s2]));
-		expect(builder.currentScreenId, 'current screen #2').to.equal(s1);
-		expect(builder.currentDesktopId, 'current desktop #2').to.equal(d1);
-		expect(builder.currentWindowId, 'current window #2').to.equal(w1);
-		expect(builder.desktopById(d1).getChildIdOrder(), 'desktop 1 window ID order #2').to.equal(List([w1]));
-		expect(builder.desktopById(d1).getChildIdChain(), 'desktop 1 window ID order #2').to.equal(List([w1]));
-		expect(builder.desktopById(d2).getChildIdOrder(), 'desktop 2 window ID order #2').to.equal(List());
-		expect(builder.desktopById(d2).getChildIdChain(), 'desktop 2 window ID order #2').to.equal(List());
+		checkList(builder, "moveWindowToScreen(w1, s1)", [
+			`screenIdOrder`, [s1, s2],
+			`desktopIdOrder`, [d1, d2],
+			`windowIdOrder`, [w1],
+			`widgetIdChain`, [w1, d1, s1, d2, s2],
+			`currentScreenId`, s1,
+			`currentDesktopId`, d1,
+			`currentWindowId`, w1,
+			`widgets.${d1}.childIdOrder`, [w1],
+			`widgets.${d1}.childIdChain`, [w1],
+			`widgets.${d2}.childIdOrder`, [],
+			`widgets.${d2}.childIdChain`, [],
+		]);
 	});
 
 	it('moveWindowToScreen (background)', () => {
@@ -250,49 +250,39 @@ describe('StateWrapper', () => {
 		const d1 = builder.addDesktop({});
 		const d2 = builder.addDesktop({});
 		const s1 = builder.addScreen(ActionObjects.screen1);
+		const s2 = builder.addScreen(ActionObjects.screen2);
 		const w1 = builder.addWindow({type: 'background', xid: 1000});
 
 		builder.moveWindowToScreen(w1, s1);
-		const test1 = [
+		checkList(builder, "moveWindowToScreen(w1, s1)", [
+			`screenIdOrder`, [s1, s2],
+			`desktopIdOrder`, [d1, d2],
+			`windowIdOrder`, [w1],
+			`widgetIdChain`, [d1, s1, d2, s2, w1],
+			`currentScreenId`, s1,
+			`currentDesktopId`, d1,
+			`currentWindowId`, -1,
 			`widgets.${d1}.childIdOrder`, [],
 			`widgets.${d1}.childIdChain`, [],
-			`widgets.${d2}.childIdOrder`, [w1],
-			`widgets.${d2}.childIdChain`, [w1],
-		];
-		//builder.print();
-		function test(desc, stuff) {
-			const state = builder.getState().toJS();
-			_.chunk(stuff, 2).forEach(l => {
-				const [key, expected] = l;
-				const actual = _.get(state, key);
-				expect(actual, desc+": "+key).to.deep.equal(expected);
-			})
-		}
-		test("moveWindowToScreen(w1, s1)", test1);
-		expect(builder.getScreenIdOrder(), 'screen order #1').to.equal(List([s1, s2]));
-		expect(builder.getDesktopIdOrder(), 'desktop order #1').to.equal(List([d1, d2]));
-		expect(builder.getWindowIdOrder(), 'window order #1').to.equal(List([w1]));
-		expect(builder.getWidgetIdChain(), 'widget chain #1').to.equal(List([d1, s1, d2, s2, w1]));
-		expect(builder.currentScreenId, 'current screen #1').to.equal(s1);
-		expect(builder.currentDesktopId, 'current desktop #1').to.equal(d1);
-		expect(builder.currentWindowId, 'current window #1').to.equal(-1);
-		expect(builder.desktopById(d1).getChildIdOrder(), 'desktop 1 window ID order #1').to.equal(List());
-		expect(builder.desktopById(d1).getChildIdChain(), 'desktop 1 window ID order #1').to.equal(List());
-		expect(builder.desktopById(d2).getChildIdOrder(), 'desktop 2 window ID order #1').to.equal(List([w1]));
-		expect(builder.desktopById(d2).getChildIdChain(), 'desktop 2 window ID order #1').to.equal(List([w1]));
+			`widgets.${s1}.backgroundId`, w1,
+			`widgets.${w1}.parentId`, s1,
+		]);
 
 		builder.moveWindowToScreen(w1, s2);
-		expect(builder.getScreenIdOrder(), 'screen order #2').to.equal(List([s1, s2]));
-		expect(builder.getDesktopIdOrder(), 'desktop order #2').to.equal(List([d1, d2]));
-		expect(builder.getWindowIdOrder(), 'window order #2').to.equal(List([w1]));
-		expect(builder.getWidgetIdChain(), 'widget chain #2').to.equal(List([w1, d1, s1, d2, s2]));
-		expect(builder.currentScreenId, 'current screen #2').to.equal(s1);
-		expect(builder.currentDesktopId, 'current desktop #2').to.equal(d1);
-		expect(builder.currentWindowId, 'current window #2').to.equal(w1);
-		expect(builder.desktopById(d1).getChildIdOrder(), 'desktop 1 window ID order #2').to.equal(List([w1]));
-		expect(builder.desktopById(d1).getChildIdChain(), 'desktop 1 window ID order #2').to.equal(List([w1]));
-		expect(builder.desktopById(d2).getChildIdOrder(), 'desktop 2 window ID order #2').to.equal(List());
-		expect(builder.desktopById(d2).getChildIdChain(), 'desktop 2 window ID order #2').to.equal(List());
+		checkList(builder, "moveWindowToScreen(w1, s2)", [
+			`screenIdOrder`, [s1, s2],
+			`desktopIdOrder`, [d1, d2],
+			`windowIdOrder`, [w1],
+			`widgetIdChain`, [d1, s1, d2, s2, w1],
+			`currentScreenId`, s1,
+			`currentDesktopId`, d1,
+			`currentWindowId`, -1,
+			`widgets.${d2}.childIdOrder`, [],
+			`widgets.${d2}.childIdChain`, [],
+			`widgets.${s1}.backgroundId`, -1,
+			`widgets.${s2}.backgroundId`, w1,
+			`widgets.${w1}.parentId`, s2,
+		]);
 	});
 
 	it('activateWindow (s1d2 + addWindow + moveWindowToDesktop 1)', () => {

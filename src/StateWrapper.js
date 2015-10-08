@@ -129,7 +129,7 @@ class WindowWrapper extends WidgetWrapper {
 
 export const StatePaths = {
 	widgetIdNext: ['widgetIdNext'],
-	screenIdOrder: ['screenIdChain'],
+	screenIdOrder: ['screenIdOrder'],
 	desktopIdOrder: ['desktopIdOrder'],
 	windowIdOrder: ['windowIdOrder'],
 	windowIdStack: ['windowIdStack'],
@@ -290,31 +290,35 @@ export default class StateWrapper {
 			//console.log({window})
 			const parentId = window.parentId;
 
-			// Find window's desktop
-			const desktopId = this._findWidgetDekstopIdById(window.id);
+			if (parentId >= 0) {
+				// Find window's desktop
+				const desktopId = this._findWidgetDekstopIdById(window.id);
 
-			// Set window's parent to -1
-			window._parentId = -1;
+				// Set window's parent to -1
+				window._parentId = -1;
 
-			// If the window is assigned to a screen
-			if (this._get('widgets', parentId.toString(), 'type') === 'screen') {
-				const screen = this.screenById(parentId);
-				screen._dockIdOrder.remove(window.id);
-				if (screen.backgroundId === window.id)
-					screen._backgroundId = -1;
-			}
-			// Otherwise look for desktop parent
-			else {
-				// Remove window from desktop's window chain
-				if (desktopId >= 0) {
-					const desktop = this.desktopById(desktopId);
-					desktop._childIdOrder.remove(window.id);
-					desktop._childIdChain.remove(window.id);
-					//desktop._childIdStack.remove(windowId);
+				// If the window is assigned to a screen
+				//console.log({parentType: this._get(['widgets', parentId.toString(), 'type'])})
+				if (this._get(['widgets', parentId.toString(), 'type']) === 'screen') {
+					const screen = this.screenById(parentId);
+					screen._dockIdOrder.remove(window.id);
+					//console.log({screenBackgroundId: screen.backgroundId, windowId: window.id})
+					if (screen.backgroundId === window.id)
+						screen._backgroundId = -1;
 				}
-			}
+				// Otherwise look for desktop parent
+				else {
+					// Remove window from desktop's window chain
+					if (desktopId >= 0) {
+						const desktop = this.desktopById(desktopId);
+						desktop._childIdOrder.remove(window.id);
+						desktop._childIdChain.remove(window.id);
+						//desktop._childIdStack.remove(windowId);
+					}
+				}
 
-			this._setCurrent();
+				this._setCurrent();
+			}
 		}
 
 		return this;
@@ -393,7 +397,7 @@ export default class StateWrapper {
 				case 'dock':
 				case 'background': {
 					// Remove window from old parent
-					this.unparentWindow(window.id);
+					this.unparentWindow(window);
 					// Set parent ID
 					window._parentId = screen.id;
 					if (window.type === 'dock')
