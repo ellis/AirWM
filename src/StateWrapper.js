@@ -120,7 +120,7 @@ class WindowWrapper extends WidgetWrapper {
 	constructor(top, path, id) {
 		super(top, path, id);
 		//console.log({top: this.top, path: this.path})
-		assert.equal(this._get('type'), 'window');
+		assert(['window', 'dock', 'background'].indexOf(this._get('type')) >= 0, "invalid window type:" +this._get('type'));
 	}
 
 	//findDesktopId() { ... }
@@ -349,20 +349,23 @@ export default class StateWrapper {
 		return this;
 	}
 
-	moveWindowToDesktop(windowId, desktopId) {
-		const desktop = this.desktopById(desktopId);
+	moveWindowToDesktop(window, desktop) {
+		if (_.isNumber(window))
+			window = this.windowById(window);
+		if (_.isNumber(desktop))
+			desktop = this.desktopById(desktop);
+		const desktopId0 = this._findWidgetDekstopIdById(window.id);
 		// Add window to given desktop
-		if (desktop) {
+		if (desktop && desktop.id !== desktopId0) {
 			// Remove window from old parent
-			this.unparentWindow(windowId);
+			this.unparentWindow(window);
 			// Set parent ID
-			// TODO: use WindowWrapper method here once I create one
-			this._set(['widgets', windowId.toString(), 'parentId'], desktopId);
+			window._parentId = desktop.id;
 			//console.log({desktopId, desktop})
 			//console.log(desktop._childIdOrder)
 			// Append to desktop's child list
-			desktop._childIdOrder.push(windowId);
-			desktop._childIdChain.push(windowId);
+			desktop._childIdOrder.push(window.id);
+			desktop._childIdChain.push(window.id);
 			//desktop._childIdStack.push(windowId);
 			//console.log(1)
 			//this.print()
@@ -374,31 +377,33 @@ export default class StateWrapper {
 		return this;
 	}
 
-	moveWindowToScreen(windowId, screenId) {
-		const window = this.windowById(windowId);
-		const screen = this.screenById(screenId);
-		// TODO: do nothing if window is already on the given screen
-		// Add window to given desktop
-		if (screen) {
-			if (window.type === 'dock') {
-				// Remove window from old parent
-				this.unparentWindow(window.id);
-				// Set parent ID
-				window._parentId = screen.id;
-				screen._dockIdOrder.push(window.id);
+	moveWindowToScreen(window, screen) {
+		if (_.isNumber(window))
+			window = this.windowById(window);
+		if (_.isNumber(screen))
+			screen = this.screenById(screen);
+		// Add window to given screen
+		if (screen && window.parentId !== screen.id) {
+			switch (window.type) {
+				case 'window': {
+					const desktopId = screen.currentDesktopId;
+					this.moveWindowToDesktop(window.id, desktopId);
+					break;
+				}
+				case 'dock':
+				case 'background': {
+					// Remove window from old parent
+					this.unparentWindow(window.id);
+					// Set parent ID
+					window._parentId = screen.id;
+					if (window.type === 'dock')
+						screen._dockIdOrder.push(window.id);
+					else
+					screen._backgroundId = window.id;
+					this._setCurrent();
+					break;
+				}
 			}
-			else if (window.type === 'background') {
-				// Remove window from old parent
-				this.unparentWindow(window.id);
-				// Set parent ID
-				window._parentId = screen.id;
-				screen._backgroundId = window.id;
-			}
-			else {
-				const desktopId = screen.currentDesktopId;
-				moveWindowToDesktop(windowId, desktopId);
-			}
-			this._setCurrent();
 		}
 		return this;
 	}
@@ -457,7 +462,7 @@ export default class StateWrapper {
 
 	forEachScreen(fn) {
 		this.getScreenIdOrder().forEach(screenId => {
-			const screen = screenById(screenId);
+			const screen = this.screenById(screenId);
 			fn(screen, screenId);
 		});
 		return this;
@@ -466,7 +471,7 @@ export default class StateWrapper {
 	mapEachScreen(fn) {
 		const result = [];
 		this.getScreenIdOrder().forEach(screenId => {
-			const screen = screenById(screenId);
+			const screen = this.screenById(screenId);
 			result.push(fn(screen, screenId));
 		});
 		return result;

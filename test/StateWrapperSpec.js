@@ -6,11 +6,16 @@ import diff from 'immutablediff';
 import StateWrapper, {initialState} from '../src/StateWrapper.js';
 
 const ActionObjects = {
-	screen100: {
+	screen1: {
 		xid: 100,
 		width: 800,
 		height: 600,
-	}
+	},
+	screen2: {
+		xid: 101,
+		width: 800,
+		height: 600,
+	},
 };
 
 /*[{
@@ -72,7 +77,7 @@ describe('StateWrapper', () => {
 
 	it('addScreen: should create a desktop and set it as current', () => {
 		const builder = new StateWrapper(initialState);
-		const s1 = builder.addScreen(ActionObjects.screen100);
+		const s1 = builder.addScreen(ActionObjects.screen1);
 		const d1 = s1 - 1;
 
 		expect(builder.widgetIdNext, 'widgetIdNext').to.equal(s1 + 1);
@@ -88,7 +93,7 @@ describe('StateWrapper', () => {
 	it('addDesktop, addScreen: should assign the desktop to the new screen and focus it', () => {
 		const builder = new StateWrapper(initialState);
 		const d1 = builder.addDesktop({});
-		const s1 = builder.addScreen(ActionObjects.screen100);
+		const s1 = builder.addScreen(ActionObjects.screen1);
 
 		expect(builder.widgetIdNext, 'widgetIdNext').to.equal(s1 + 1);
 		expect(builder.getScreenIdOrder(), 'screen order').to.equal(List([s1]));
@@ -104,7 +109,7 @@ describe('StateWrapper', () => {
 		const builder = new StateWrapper(initialState);
 		const d1 = builder.addDesktop({});
 		const d2 = builder.addDesktop({});
-		const s1 = builder.addScreen(ActionObjects.screen100);
+		const s1 = builder.addScreen(ActionObjects.screen1);
 
 		expect(builder.widgetIdNext, 'widgetIdNext').to.equal(s1 + 1);
 		expect(builder.getScreenIdOrder(), 'screen order').to.equal(List([s1]));
@@ -134,7 +139,7 @@ describe('StateWrapper', () => {
 		const builder = new StateWrapper(initialState);
 		const d1 = builder.addDesktop({});
 		const d2 = builder.addDesktop({});
-		const s1 = builder.addScreen(ActionObjects.screen100);
+		const s1 = builder.addScreen(ActionObjects.screen1);
 		const w1 = builder.addWindow({xid: 1000});
 
 		expect(builder.widgetIdNext, 'widgetIdNext').to.equal(w1 + 1);
@@ -151,7 +156,7 @@ describe('StateWrapper', () => {
 		const builder = new StateWrapper(initialState);
 		const d1 = builder.addDesktop({});
 		const d2 = builder.addDesktop({});
-		const s1 = builder.addScreen(ActionObjects.screen100);
+		const s1 = builder.addScreen(ActionObjects.screen1);
 		const w1 = builder.addWindow({xid: 1000});
 		builder.moveWindowToDesktop(w1, d1);
 
@@ -169,7 +174,7 @@ describe('StateWrapper', () => {
 		const builder = new StateWrapper(initialState);
 		const d1 = builder.addDesktop({});
 		const d2 = builder.addDesktop({});
-		const s1 = builder.addScreen(ActionObjects.screen100);
+		const s1 = builder.addScreen(ActionObjects.screen1);
 		const w1 = builder.addWindow({xid: 1000});
 		builder.moveWindowToDesktop(w1, d2);
 
@@ -183,11 +188,48 @@ describe('StateWrapper', () => {
 		expect(builder.currentWindowId, 'current window').to.equal(-1);
 	});
 
+	it('moveWindowToScreen (window)', () => {
+		const builder = new StateWrapper(initialState);
+		const d1 = builder.addDesktop({});
+		const d2 = builder.addDesktop({});
+		const s1 = builder.addScreen(ActionObjects.screen1);
+		const s2 = builder.addScreen(ActionObjects.screen2);
+		const w1 = builder.addWindow({xid: 1000});
+
+		expect(builder.widgetIdNext, 'widgetIdNext').to.equal(w1 + 1);
+
+		builder.moveWindowToScreen(w1, s2);
+		expect(builder.getScreenIdOrder(), 'screen order #1').to.equal(List([s1, s2]));
+		expect(builder.getDesktopIdOrder(), 'desktop order #1').to.equal(List([d1, d2]));
+		expect(builder.getWindowIdOrder(), 'window order #1').to.equal(List([w1]));
+		expect(builder.getWidgetIdChain(), 'widget chain #1').to.equal(List([d1, s1, d2, s2, w1]));
+		expect(builder.currentScreenId, 'current screen #1').to.equal(s1);
+		expect(builder.currentDesktopId, 'current desktop #1').to.equal(d1);
+		expect(builder.currentWindowId, 'current window #1').to.equal(-1);
+		expect(builder.desktopById(d1).getChildIdOrder(), 'desktop 1 window ID order #1').to.equal(List());
+		expect(builder.desktopById(d1).getChildIdChain(), 'desktop 1 window ID order #1').to.equal(List());
+		expect(builder.desktopById(d2).getChildIdOrder(), 'desktop 2 window ID order #1').to.equal(List([w1]));
+		expect(builder.desktopById(d2).getChildIdChain(), 'desktop 2 window ID order #1').to.equal(List([w1]));
+
+		builder.moveWindowToScreen(w1, s1);
+		expect(builder.getScreenIdOrder(), 'screen order #2').to.equal(List([s1, s2]));
+		expect(builder.getDesktopIdOrder(), 'desktop order #2').to.equal(List([d1, d2]));
+		expect(builder.getWindowIdOrder(), 'window order #2').to.equal(List([w1]));
+		expect(builder.getWidgetIdChain(), 'widget chain #2').to.equal(List([w1, d1, s1, d2, s2]));
+		expect(builder.currentScreenId, 'current screen #2').to.equal(s1);
+		expect(builder.currentDesktopId, 'current desktop #2').to.equal(d1);
+		expect(builder.currentWindowId, 'current window #2').to.equal(w1);
+		expect(builder.desktopById(d1).getChildIdOrder(), 'desktop 1 window ID order #2').to.equal(List([w1]));
+		expect(builder.desktopById(d1).getChildIdChain(), 'desktop 1 window ID order #2').to.equal(List([w1]));
+		expect(builder.desktopById(d2).getChildIdOrder(), 'desktop 2 window ID order #2').to.equal(List());
+		expect(builder.desktopById(d2).getChildIdChain(), 'desktop 2 window ID order #2').to.equal(List());
+	});
+
 	it('activateWindow (s1d2 + addWindow + moveWindowToDesktop 1)', () => {
 		const builder = new StateWrapper(initialState);
 		const d1 = builder.addDesktop({});
 		const d2 = builder.addDesktop({});
-		const s1 = builder.addScreen(ActionObjects.screen100);
+		const s1 = builder.addScreen(ActionObjects.screen1);
 		const w1 = builder.addWindow({xid: 1000});
 		builder.moveWindowToDesktop(w1, d1);
 		builder.activateWindow(w1);
@@ -206,7 +248,7 @@ describe('StateWrapper', () => {
 		const builder = new StateWrapper(initialState);
 		const d1 = builder.addDesktop({});
 		const d2 = builder.addDesktop({});
-		const s1 = builder.addScreen(ActionObjects.screen100);
+		const s1 = builder.addScreen(ActionObjects.screen1);
 		const w1 = builder.addWindow({xid: 1000});
 		builder.moveWindowToDesktop(w1, d2);
 		builder.activateWindow(w1);
@@ -225,7 +267,7 @@ describe('StateWrapper', () => {
 		const builder = new StateWrapper(initialState);
 		const d1 = builder.addDesktop({});
 		const d2 = builder.addDesktop({});
-		const s1 = builder.addScreen(ActionObjects.screen100);
+		const s1 = builder.addScreen(ActionObjects.screen1);
 
 		builder.activateDesktop(d2);
 		expect(builder.getWidgetIdChain(), 'widget chain #1').to.equal(List([d2, s1, d1]));
@@ -255,7 +297,7 @@ describe('StateWrapper', () => {
 		const builder = new StateWrapper(initialState);
 		const d1 = builder.addDesktop({});
 		const d2 = builder.addDesktop({});
-		const s1 = builder.addScreen(ActionObjects.screen100);
+		const s1 = builder.addScreen(ActionObjects.screen1);
 
 		const w1 = builder.addWindow({xid: 1000});
 		builder.moveWindowToDesktop(w1, d1);
