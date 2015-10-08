@@ -409,4 +409,20 @@ describe('StateWrapper', () => {
 		expect(builder.getWindowIdOrder(), 'window order #3').to.equal(List([w4]));
 		expect(builder.getWidgetIdChain(), 'widget chain #3').to.equal(List([d1, s1, d2, w4]));
 	});
+
+	it('moveWindowToIndexNext/Prev', () => {
+		const builder = new StateWrapper(initialState);
+		const d1 = builder.addDesktop({});
+		const s1 = builder.addScreen(ActionObjects.screen1);
+		const w1 = builder.addWindow({xid: 1000});
+		const w2 = builder.addWindow({xid: 1001});
+		const w3 = builder.addWindow({xid: 1002});
+		builder.moveWindowToDesktop(w1, d1);
+		builder.moveWindowToDesktop(w2, d1);
+		builder.moveWindowToDesktop(w3, d1);
+		checkList(builder, "setup windows", [
+			`widgets.${d1}.childIdOrder`, [w1, w2, w3],
+			`widgets.${d2}.childIdChain`, [w1, w2, w3]
+		]);
+	});
 });

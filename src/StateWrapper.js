@@ -412,6 +412,14 @@ export default class StateWrapper {
 		return this;
 	}
 
+	moveWindowToIndexNext(window) {
+		return moveWindowToIndexDir(window, true);
+	}
+
+	moveWindowToIndexPrev() {
+		return moveWindowToIndexDir(window, false);
+	}
+
 	activateScreen(screen) {
 		this._setCurrent(screen);
 		return this;
@@ -556,6 +564,25 @@ export default class StateWrapper {
 		return this.state.getIn(['widgets', id.toString()]);
 	}
 
+	_moveWindowToIndexDir(window, next) {
+		if (_.isNumber(window))
+			window = this.windowById(window);
+		if (window) {
+			const desktopId = this._findWidgetDekstopIdById(window.id);
+			const desktop = this.desktopById(desktopId);
+			if (desktop) {
+				const l = desktop.getChildIdOrder();
+				const i = l.indexOf(windowId);
+				const j = (next)
+					? (i + 1) % l.count()
+					: (i == 0) ? l.count() - 1 : i - 1;
+				desktop._childIdOrder.insert(window.id, j);
+				this._setCurrent();
+			}
+		}
+		return this;
+	}
+
 	/**
 	 * Set the current screen.
 	 * This will
@@ -589,63 +616,4 @@ export default class StateWrapper {
 		}
 		return this;
 	}
-
-	/*
-	createWidget(w, desktopId, widgetNum) {
-		w = fromJS(w);
-
-		const screenId = State.getCurrentScreenId(state);
-		const screen = State.getCurrentScreen(state, screenId);
-		const widgets0 = state.get('widgets');
-		const id = state.get('widgetIdNext');
-		let w1 = Map(w);
-		if (w.type === 'dock') {
-			w1 = w1.merge({
-				screenId: screenId,
-				visible: true
-			});
-			// Add dock to screen and to widget list
-			state = state.updateIn(
-				['screens', screenId.toString(), 'dockIds'],
-				List(),
-				dockIds => dockIds.push(id)
-			).setIn(['widgets', id.toString()], w1);
-		}
-		else if (w.type === 'background') {
-			// If a background is already set:
-			if (state.hasIn(['screens', screenId.toString(), 'backgroundId'])) {
-				// treat it like a normal window
-				w1.set('type', 'window');
-				state = createWindow(state, w1, id);
-			}
-			// Else, it's a background:
-			else {
-				w1 = w1.merge({
-					screenId: screenId,
-					visible: true
-				});
-				// Add dock to screen and to widget list
-				state = state
-					.setIn(
-						['screens', screenId.toString(), 'backgroundId'],
-						id
-					)
-					.setIn(['widgets', id.toString()], w1);
-			}
-		}
-		else {
-			state = createWindow(state, w1, id);
-		}
-
-		// Add widget and increment widgetIdNext
-		state = state.set('widgetIdNext', id + 1);
-
-		//state = updateFocus(state, id);
-		state = updateLayout(state);
-		state = updateX11(state);
-		State.check(state);
-
-		return state;
-	}
-	*/
 };
