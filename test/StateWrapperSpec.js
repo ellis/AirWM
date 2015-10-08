@@ -468,4 +468,67 @@ describe('StateWrapper', () => {
 			`currentWindowId`, w1,
 		]);
 	});
+
+	it('activateWindowNext/Prev', () => {
+		const builder = new StateWrapper(initialState);
+		const d1 = builder.addDesktop({});
+		const d2 = builder.addDesktop({});
+		const s1 = builder.addScreen(ActionObjects.screen1);
+		const w1 = builder.addWindow({xid: 1000});
+		const w2 = builder.addWindow({xid: 1001});
+		const w3 = builder.addWindow({xid: 1002});
+		const w4 = builder.addWindow({xid: 1003});
+		builder.moveWindowToDesktop(w1, d1);
+		builder.moveWindowToDesktop(w2, d1);
+		builder.moveWindowToDesktop(w3, d1);
+		builder.moveWindowToDesktop(w4, d2);
+		checkList(builder, "setup windows", [
+			`widgets.${d1}.childIdOrder`, [w1, w2, w3],
+			`widgets.${d1}.childIdChain`, [w1, w2, w3],
+			`widgetIdChain`, [w1, d1, s1, d2, w2, w3, w4],
+			`currentWindowId`, w1,
+		]);
+
+		builder.activateWindowNext();
+		checkList(builder, "activateWindowNext #1", [
+			`widgets.${d1}.childIdOrder`, [w1, w2, w3],
+			`widgets.${d1}.childIdChain`, [w2, w1, w3],
+			`currentWindowId`, w2,
+		]);
+
+		builder.activateWindowNext();
+		checkList(builder, "activateWindowNext #2", [
+			`widgets.${d1}.childIdOrder`, [w1, w2, w3],
+			`widgets.${d1}.childIdChain`, [w3, w2, w1],
+			`currentWindowId`, w3,
+		]);
+
+		builder.activateWindowNext();
+		checkList(builder, "activateWindowNext #3", [
+			`widgets.${d1}.childIdOrder`, [w1, w2, w3],
+			`widgets.${d1}.childIdChain`, [w1, w3, w2],
+			`currentWindowId`, w1,
+		]);
+
+		builder.activateWindowPrev();
+		checkList(builder, "activateWindowPrev #1", [
+			`widgets.${d1}.childIdOrder`, [w1, w2, w3],
+			`widgets.${d1}.childIdChain`, [w3, w1, w2],
+			`currentWindowId`, w3,
+		]);
+
+		builder.activateWindowPrev();
+		checkList(builder, "activateWindowPrev #2", [
+			`widgets.${d1}.childIdOrder`, [w1, w2, w3],
+			`widgets.${d1}.childIdChain`, [w2, w3, w1],
+			`currentWindowId`, w2,
+		]);
+
+		builder.activateWindowPrev();
+		checkList(builder, "activateWindowPrev #3", [
+			`widgets.${d1}.childIdOrder`, [w1, w2, w3],
+			`widgets.${d1}.childIdChain`, [w1, w2, w3],
+			`currentWindowId`, w1,
+		]);
+	});
 });

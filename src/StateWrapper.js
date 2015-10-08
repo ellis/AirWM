@@ -178,6 +178,7 @@ export default class StateWrapper {
 
 	get currentScreen() { return this.screenById(this.currentScreenId); }
 	get currentDesktop() { return this.desktopById(this.currentDesktopId); }
+	get currentWindow() { return this.windowById(this.currentWindowId); }
 
 	addDesktop(w) {
 		w = fromJS(w);
@@ -546,8 +547,8 @@ export default class StateWrapper {
 	_activateWindowDir(window, next) {
 		const result = this._calcWindowIndexDir(window, next);
 		if (result) {
-			const windowId = desktop._childIdOrder(result.indexNew);
-			desktop._childIdChain.unshift(windowId);
+			const windowId = result.desktop._childIdOrder.get(result.indexNew);
+			result.desktop._childIdChain.unshift(windowId);
 			this._setCurrent();
 		}
 	}
@@ -564,7 +565,9 @@ export default class StateWrapper {
 	}
 
 	_calcWindowIndexDir(window, next) {
-		if (_.isNumber(window))
+		if (_.isUndefined(window))
+			window = this.currentWindow;
+		else if (_.isNumber(window))
 			window = this.windowById(window);
 		if (window) {
 			const desktopId = this._findWidgetDekstopIdById(window.id);
