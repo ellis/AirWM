@@ -1,13 +1,15 @@
 # Todos
 
-* [ ] StateWrapper: moveWindowToIndexNext/Prev
-* [ ] StateWrapper: activateWindowNext/Prev
+* [x] StateWrapper: moveWindowToIndexNext/Prev
+* [x] StateWrapper: activateWindowNext/Prev (Win-J)
 * [ ] StateWrapper: layout
 * [ ] StateWrapper: x11
-* [ ] StateWrapper: activateWindowBefore/After (on desktop)
-* [ ] StateWrapper: activateWindowBefore/After (in session)
+* [ ] reducer.js: switch to using StateWrapper
+* [ ] seawm.js: switch to using StateWrapper
+* [ ] StateWrapper: activateWindowBefore/After (on desktop) (Win-N)
+* [ ] StateWrapper: activateWindowEarlier/Later (in session) (Win-Tab)
 * [ ] StateWrapper: activateDesktopNext/Prev
-* [ ] StateWrapper: activateDesktopBefore/After
+* [ ] StateWrapper: activateDesktopEarlier/Later (in session)
 * [ ] BUG: start program and quickly switch to different desktop: window isn't managed or visible
 * [ ] action: moveWindowToDesktop, handle `follow: false` parameter
 * [-] BUG: start firefox; press Ctrl-N; the new window isn't sized properly
@@ -72,6 +74,7 @@ Later:
 * [ ] hot-reloading for changes to source files?
 * [ ] look into compatibility with various pagers and launchers (e.g. dockbarx, docky, candybar, lemonbar)
 * [ ] look into turning the WM into a compositing WM
+* [ ] for inspiration, lookup videos on Mac's Mission Control, Compiz F12, Ubuntu window management
 
 Multi-screen todos:
 * [ ] test showing a dock on each screen
@@ -128,7 +131,10 @@ Perhaps start via Win-Period.
 * `m[w]dn`: move current window to next desktop
 * `m[w]d2!`: move current window to desktop 2, but don't follow it
 * `m[w]1d2i3`: move window 1 (on current desktop) to desktop 2 at index 3
+* `md1w1d`: move desktop 1's window 1 to the current desktop
 * `md1w1d2i3`: move desktop 1's window 1 to desktop 2 at index 3
+* `md1w1i`: move desktop 1's window 1 to the current desktop and current index
+* `ms1wi`: move screen 1's current window to the current desktop and current index
 * `md1s2`: move desktop 1 to screen 2
 * `mdsn`: move desktop to next screen
 * `s[w]1i4` or `s1,4`: swap positions of windows 1 and 4
@@ -139,6 +145,11 @@ Perhaps start via Win-Period.
 * need to figure out next/prev by index or stack order, and stack order for current desktop or over whole session: n, N, NN ?
 * `m[w]1+2d2$!`: send windows 1 and 2 to desktop 2, append to end of children
 * close (c, x?), new, duplicate?
+* activate or open an application:
+	* `ot`: activate most recent terminal window
+	* `ot!`: open new terminal
+	* `ov`: open vim
+	* `o'firefox`: open firefox
 
 Other commands, perhaps pull up command list with Win-Shift-Period.
 

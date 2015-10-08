@@ -117,3 +117,10 @@ For display:
 * show/hide
 * minimize/restore/maximize/full-screen
 * toggling dock visibility
+
+Default shortcuts:
+
+* activateWindowNext/Prev: Win+J/K
+* moveWindowToIndexNext/Prev: Win+Shift+J/K
+* [ ] StateWrapper: activateWindowBefore/After (on desktop) (Win-N)
+* [ ] StateWrapper: activateWindowEarlier/Later (in session) (Win-Tab)
