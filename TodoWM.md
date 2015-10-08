@@ -1,42 +1,13 @@
 # Todos
 
-* [x] move X11 window info to core
-* [x] move 'desktopNum' to updateX11
-* [x] handle X11 focus changes
-* [x] catch state changes so that new windows are displayed
-* [x] handle Win-K
-* [x] when window is closed, remove it from layout
-* [x] allow for passing keyboard bindings to store.dispatch()
-* [x] automatically make space for `_NET_WM_WINDOW_TYPE_DOCK`, such as lxqt-panel
-* [x] core: desktop.raise
-* [?] switch desktops with Win-1..9
-* [x] create "Tall" layout engine
-* [x] actions: send window to desktop
-* [x] rename actions
-* [x] move old files with conflicting names (on MacOS) to another directory
-* [x] windowOrder, windowStack, desktopOrder, desktopStack, screenOrder, screenStack
-* [x] actions: move windows in childIds order
-* [x] only have mouse follow cursor when the user moves the mouse
-* [x] actions: close window
-* [x] ewmh: get ewmh to work without blocking lots of window events
-* [x] ewmh: set desktop count
-* [x] ewmh: set current desktop
-* [x] ewmh: `_NET_CLIENT_LIST`
-* [x] ewmh: `_NET_CLIENT_LIST_STACKING`
-* [x] ewmh: accept client messages
-* [x] ewmh: handle desktop switching
-* [x] ewmh: set window's desktop
-* [x] ewmh: set WM_STATE to [Normal, None]
-* [x] ewmh: get xfce and lxqt panels to recognize windows (see <https://github.com/lxde/lxqt/issues/354> and <https://github.com/herbstluftwm/herbstluftwm/commit/a50457335091cd990d0146e5008ca3b3db1cc574>)
-* [x] BUG: `_NET_NUMBER_OF_DESKTOPS` should not be set multiple times
-* [x] don't let user close docks or backgrounds (will need to have separate commands for when X tells us that a window is closed and when the user pressed Win-Shift-C)
-* [x] check which client messages are sent from lxqt's task bar when clicking on a member of a program with multiple instances.
-* [x] state.ewmh: set `_NET_WM_ALLOWED_ACTIONS` to `[_NET_WM_ACTION_CLOSE]` (except on docks and backgrounds)
-* [x] clientMessage: `_NET_CLOSE_WINDOW`
-* [x] better focus follows mouse
-* [x] recognize and maximize the "Desktop" type window
-* [x] BUG: start firefox or atom (or any program?); switch to different desktop; quit WM; restart WM; the windows are no longer displayed
-* [ ] work on StateWrapper: addWindow, activateDesktop, activateWindow
+* [ ] StateWrapper: moveWindowToIndexNext/Prev
+* [ ] StateWrapper: activateWindowNext/Prev
+* [ ] StateWrapper: layout
+* [ ] StateWrapper: x11
+* [ ] StateWrapper: activateWindowBefore/After (on desktop)
+* [ ] StateWrapper: activateWindowBefore/After (in session)
+* [ ] StateWrapper: activateDesktopNext/Prev
+* [ ] StateWrapper: activateDesktopBefore/After
 * [ ] BUG: start program and quickly switch to different desktop: window isn't managed or visible
 * [ ] action: moveWindowToDesktop, handle `follow: false` parameter
 * [-] BUG: start firefox; press Ctrl-N; the new window isn't sized properly
@@ -99,6 +70,8 @@ Later:
 * [ ] read this to make sure I've got stacking order right: <https://smspillaz.wordpress.com/2011/09/18/braindump-how-to-get-window-stacking-right/>
 * [ ] hot-reloading for updates to config?
 * [ ] hot-reloading for changes to source files?
+* [ ] look into compatibility with various pagers and launchers (e.g. dockbarx, docky, candybar, lemonbar)
+* [ ] look into turning the WM into a compositing WM
 
 Multi-screen todos:
 * [ ] test showing a dock on each screen

@@ -255,8 +255,6 @@ describe('StateWrapper', () => {
 
 		builder.moveWindowToScreen(w1, s1);
 		checkList(builder, "moveWindowToScreen(w1, s1)", [
-			`screenIdOrder`, [s1, s2],
-			`desktopIdOrder`, [d1, d2],
 			`windowIdOrder`, [w1],
 			`widgetIdChain`, [d1, s1, d2, s2, w1],
 			`currentScreenId`, s1,
@@ -270,8 +268,6 @@ describe('StateWrapper', () => {
 
 		builder.moveWindowToScreen(w1, s2);
 		checkList(builder, "moveWindowToScreen(w1, s2)", [
-			`screenIdOrder`, [s1, s2],
-			`desktopIdOrder`, [d1, d2],
 			`windowIdOrder`, [w1],
 			`widgetIdChain`, [d1, s1, d2, s2, w1],
 			`currentScreenId`, s1,
@@ -295,8 +291,6 @@ describe('StateWrapper', () => {
 
 		builder.moveWindowToScreen(w1, s1);
 		checkList(builder, "moveWindowToScreen(w1, s1)", [
-			`screenIdOrder`, [s1, s2],
-			`desktopIdOrder`, [d1, d2],
 			`windowIdOrder`, [w1],
 			`widgetIdChain`, [d1, s1, d2, s2, w1],
 			`currentScreenId`, s1,
@@ -310,8 +304,6 @@ describe('StateWrapper', () => {
 
 		builder.moveWindowToScreen(w1, s2);
 		checkList(builder, "moveWindowToScreen(w1, s2)", [
-			`screenIdOrder`, [s1, s2],
-			`desktopIdOrder`, [d1, d2],
 			`windowIdOrder`, [w1],
 			`widgetIdChain`, [d1, s1, d2, s2, w1],
 			`currentScreenId`, s1,
