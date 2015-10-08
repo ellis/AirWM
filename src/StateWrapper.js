@@ -78,6 +78,7 @@ class ListWrapper extends SubWrapper {
 		super(top, path, List());
 	}
 
+	get(i) { return this._get(i); }
 	push(x) { this.top._updateIn(this.path, List(), l => l.push(x)); return this; }
 	unshift(x) { this.top._updateIn(this.path, List(), l => l.push(x)); return this; }
 	insert(x, index) { this.top._updateIn(this.path, List(), l => l.push(x)); return this; }
@@ -110,6 +111,7 @@ class UniqueListWrapper extends SubWrapper {
 		super(top, path, List());
 	}
 
+	get(i) { return this._get(i); }
 	push(x) { this.top._updateIn(this.path, List(), l => listRemove(l, x).push(x)); return this; }
 	unshift(x) { this.top._updateIn(this.path, List(), l => listRemove(l, x).unshift(x)); return this; }
 	insert(x, index) { this.top._updateIn(this.path, List(), l => listRemove(l, x).splice(index, 0, x)); return this; }
@@ -461,6 +463,14 @@ export default class StateWrapper {
 		return this;
 	}
 
+	activateWindowNext(window) {
+		return this._activateWindowDir(window, true);
+	}
+
+	activateWindowPrev(window) {
+		return this._activateWindowDir(window, false);
+	}
+
 	removeWindow(windowId) {
 		//console.log({windowId, state: this.state})
 		this.unparentWindow(windowId);
@@ -533,6 +543,15 @@ export default class StateWrapper {
 		else return ['widgets', id.toString()];
 	}
 
+	_activateWindowDir(window, next) {
+		const result = this._calcWindowIndexDir(window, next);
+		if (result) {
+			const windowId = desktop._childIdOrder(result.indexNew);
+			desktop._childIdChain.unshift(windowId);
+			this._setCurrent();
+		}
+	}
+
 	_addWidget(w) {
 		// Add widget to widgets list
 		const id = this.widgetIdNext;
@@ -542,6 +561,24 @@ export default class StateWrapper {
 		this.state = this.state.setIn(StatePaths.widgetIdNext, id + 1);
 
 		return id;
+	}
+
+	_calcWindowIndexDir(window, next) {
+		if (_.isNumber(window))
+			window = this.windowById(window);
+		if (window) {
+			const desktopId = this._findWidgetDekstopIdById(window.id);
+			const desktop = this.desktopById(desktopId);
+			if (desktop) {
+				const l = desktop.getChildIdOrder();
+				const i = l.indexOf(window.id);
+				const j = (next)
+					? (i + 1) % l.count()
+					: (i == 0) ? l.count() - 1 : i - 1;
+				return {window, desktop, indexNew: j}
+			}
+		}
+		return undefined;
 	}
 
 	_findWidgetDekstopIdById(widgetId) {
@@ -565,20 +602,10 @@ export default class StateWrapper {
 	}
 
 	_moveWindowToIndexDir(window, next) {
-		if (_.isNumber(window))
-			window = this.windowById(window);
-		if (window) {
-			const desktopId = this._findWidgetDekstopIdById(window.id);
-			const desktop = this.desktopById(desktopId);
-			if (desktop) {
-				const l = desktop.getChildIdOrder();
-				const i = l.indexOf(window.id);
-				const j = (next)
-					? (i + 1) % l.count()
-					: (i == 0) ? l.count() - 1 : i - 1;
-				desktop._childIdOrder.insert(window.id, j);
-				this._setCurrent();
-			}
+		const result = this._calcWindowIndexDir(window, next);
+		if (result) {
+			result.desktop._childIdOrder.insert(result.window.id, result.indexNew);
+			this._setCurrent();
 		}
 		return this;
 	}
