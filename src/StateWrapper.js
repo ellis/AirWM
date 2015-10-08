@@ -413,11 +413,11 @@ export default class StateWrapper {
 	}
 
 	moveWindowToIndexNext(window) {
-		return moveWindowToIndexDir(window, true);
+		return this._moveWindowToIndexDir(window, true);
 	}
 
-	moveWindowToIndexPrev() {
-		return moveWindowToIndexDir(window, false);
+	moveWindowToIndexPrev(window) {
+		return this._moveWindowToIndexDir(window, false);
 	}
 
 	activateScreen(screen) {
@@ -572,7 +572,7 @@ export default class StateWrapper {
 			const desktop = this.desktopById(desktopId);
 			if (desktop) {
 				const l = desktop.getChildIdOrder();
-				const i = l.indexOf(windowId);
+				const i = l.indexOf(window.id);
 				const j = (next)
 					? (i + 1) % l.count()
 					: (i == 0) ? l.count() - 1 : i - 1;

@@ -422,7 +422,50 @@ describe('StateWrapper', () => {
 		builder.moveWindowToDesktop(w3, d1);
 		checkList(builder, "setup windows", [
 			`widgets.${d1}.childIdOrder`, [w1, w2, w3],
-			`widgets.${d2}.childIdChain`, [w1, w2, w3]
+			`widgets.${d1}.childIdChain`, [w1, w2, w3],
+			`currentWindowId`, w1,
+		]);
+
+		builder.moveWindowToIndexNext(w1);
+		checkList(builder, "moveWindowToIndexNext #1", [
+			`widgets.${d1}.childIdOrder`, [w2, w1, w3],
+			`widgets.${d1}.childIdChain`, [w1, w2, w3],
+			`currentWindowId`, w1,
+		]);
+
+		builder.moveWindowToIndexNext(w1);
+		checkList(builder, "moveWindowToIndexNext #2", [
+			`widgets.${d1}.childIdOrder`, [w2, w3, w1],
+			`widgets.${d1}.childIdChain`, [w1, w2, w3],
+			`currentWindowId`, w1,
+		]);
+
+		builder.moveWindowToIndexNext(w1);
+		checkList(builder, "moveWindowToIndexNext #3", [
+			`widgets.${d1}.childIdOrder`, [w1, w2, w3],
+			`widgets.${d1}.childIdChain`, [w1, w2, w3],
+			`currentWindowId`, w1,
+		]);
+
+		builder.moveWindowToIndexPrev(w1);
+		checkList(builder, "moveWindowToIndexPrev #1", [
+			`widgets.${d1}.childIdOrder`, [w2, w3, w1],
+			`widgets.${d1}.childIdChain`, [w1, w2, w3],
+			`currentWindowId`, w1,
+		]);
+
+		builder.moveWindowToIndexPrev(w1);
+		checkList(builder, "moveWindowToIndexPrev #2", [
+			`widgets.${d1}.childIdOrder`, [w2, w1, w3],
+			`widgets.${d1}.childIdChain`, [w1, w2, w3],
+			`currentWindowId`, w1,
+		]);
+
+		builder.moveWindowToIndexPrev(w1);
+		checkList(builder, "moveWindowToIndexPrev #3", [
+			`widgets.${d1}.childIdOrder`, [w1, w2, w3],
+			`widgets.${d1}.childIdChain`, [w1, w2, w3],
+			`currentWindowId`, w1,
 		]);
 	});
 });
