@@ -57,7 +57,7 @@ export default function updateLayout(builder) {
 		// Otherwise, set all children to hidden
 		else {
 			desktop.getChildIdOrder().forEach(childId => {
-				builder.set(['widgets', childId.toString(), 'visible'], false);
+				builder._set(['widgets', childId.toString(), 'visible'], false);
 			});
 		}
 	});

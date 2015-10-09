@@ -24,7 +24,7 @@ export default function updateX11(builder) {
 				.setIn(['ewmh', 'WM_STATE', 'icon'], 0);
 			if (isVisible) {
 				const desktop = w.findDesktop();
-				const screen = desktop.findScreen();
+				const screen = w.findScreen();
 				const screenX11 = builder._get(['x11', 'screens', screen.id.toString()], Map());
 				const windowType = w.type;
 				const borderWidth = _.get({
@@ -40,7 +40,7 @@ export default function updateX11(builder) {
 					'background': undefined,
 					'dock': undefined,
 				}, windowType, x11.eventMask.EnterWindow);
-				const desktopNum = builder.getDesktopIdOrder().indexOf(desktop.id);
+				const desktopNum = (desktop) ? builder.getDesktopIdOrder().indexOf(desktop.id) : -1;
 
 				info = info
 					.set('desktopNum', desktopNum)

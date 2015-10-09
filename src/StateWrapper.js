@@ -144,7 +144,8 @@ class WindowWrapper extends WidgetWrapper {
 
 	findDesktopId() { return this.top._findWidgetDekstopIdById(this.id); }
 	findDesktop() { return this.top.desktopById(this.findDesktopId()); }
-	//findScreenId() { ... }
+	findScreenId() { return this.top._findWidgetScreenIdById(this.id); }
+	findScreen() { return this.top.screenById(this.findScreenId()); }
 }
 
 export const StatePaths = {
@@ -437,6 +438,7 @@ export default class StateWrapper {
 					else
 					screen._backgroundId = window.id;
 					this._setCurrent();
+					console.log({window})
 					break;
 				}
 			}
@@ -631,6 +633,22 @@ export default class StateWrapper {
 			}
 		}
 		return undefined;
+	}
+
+	_findWidgetScreenIdById(widgetId) {
+		//console.log(`_findWidgetDekstopIdById(${widgetId})`);
+		//console.log(this.state);
+		const w = this._getWidgetById(widgetId);
+		if (w.get('type') === 'screen') {
+			return widgetId;
+		}
+		const parentId = w.get('parentId', -1);
+		if (parentId >= 0) {
+			return this._findWidgetScreenIdById(parentId);
+		}
+		else {
+			return -1;
+		}
 	}
 
 	_findWidgetDekstopIdById(widgetId) {

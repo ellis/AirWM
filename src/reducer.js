@@ -12,8 +12,8 @@ const handlers = {
 	'@@redux/INIT': () => {},
 
 	'activateDesktop': (builder, action) => {
-		const desktopId = builder.getDesktopIdByNum(action.desktop);
-		builder.activateDesktopByNum(action.num);
+		const desktopId = builder.findDesktopIdByNum(action.desktop);
+		builder.activateDesktop(desktopId);
 	},
 
 	'activateWindow': (builder, action) => {
@@ -33,8 +33,11 @@ const handlers = {
 	},
 
 	'addWindow': (builder, action) => {
+		console.log({action})
 		const id = builder.addWindow(action.window);
 		builder.moveWindowToScreen(id);
+		console.log("after addWindow:")
+		builder.print();
 	},
 
 	'initialize': (builder, action) => {
@@ -49,13 +52,14 @@ const handlers = {
 
 	//'move': () => core.move(state, action),
 	'moveWindowToDesktop': (builder, action) => {
-		const desktopId = builder.getDesktopIdByNum(action.desktop);
+		const desktopId = builder.findDesktopIdByNum(action.desktop);
 		builder.moveWindowToDesktop(undefined, desktopId);
 	},
 
 	'moveWindowToIndexNext': (builder, action) => {
 		builder.moveWindowToIndexNext();
 	},
+
 	'moveWindowToIndexPrev': (builder, action) => {
 		builder.moveWindowToIndexNext();
 	},
@@ -71,17 +75,17 @@ export default function reducer(state = initialState, action) {
 
 	const handler = handlers[action.type];
 	if (handler) {
-		//try {
+		try {
 			const builder = new StateWrapper(state);
 			handler(builder, action);
 			updateLayout(builder);
 			updateX11(builder);
 			return builder.getState();
-		/*}
+		}
 		catch (e) {
 			logger.error(e.message);
 			logger.error(e.stack);
-		}*/
+		}
 	}
 
 	else {

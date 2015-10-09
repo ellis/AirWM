@@ -11,7 +11,7 @@ var keysym = require('keysym');
 
 // Custom libraries
 var conversion = require('../lib/conversion');
-var logger	 = require('../lib/logger').logger;
+var logger = require('../lib/logger').logger;
 import StateWrapper from './StateWrapper.js';
 import makeStore from './store.js';
 import getWindowProperties from '../lib/getWindowProperties.js';
@@ -224,6 +224,7 @@ var destroyNotifyHandler = function(ev){
  * @param  {number} xid - X11 window ID
  */
 function handlePreExistingWindow(xid) {
+	console.log("handlePreExistingWindow: "+xid)
 	global.X.GetWindowAttributes(xid, function(err, attrs) {
 		logger.info(`handlePreExistingWindow(${xid})`);
 		if (err) throw err;
@@ -296,12 +297,12 @@ function createWidgetForXid(xid, props) {
 		console.log("addXwinDock: "+props["_NET_WM_STRUT_PARTIAL"]);
 		//console.log([left, right, top, bottom]);
 		if (top > 0) {
-			action.widget.dockGravity = "top";
-			action.widget.dockSize = top;
+			action.window.dockGravity = "top";
+			action.window.dockSize = top;
 		}
 		else if (bottom > 0) {
-			action.widget.dockGravity = "bottom";
-			action.widget.dockSize = bottom;
+			action.window.dockGravity = "bottom";
+			action.window.dockSize = bottom;
 		}
 	}
 
@@ -451,7 +452,8 @@ function handleStateChange() {
 	try {
 		const state = store.getState();
 		const builder = new StateWrapper(state);
-		builder.print();
+		fs.writeFileSync('state.json', JSON.stringify(state.toJS(), null, '\t'));
+		//builder.print();
 		// If the active window has changed, set ignoreEnterNotify = true
 		if (state.getIn(['x11', 'wmSettings', 'ewmh', '_NET_ACTIVE_WINDOW', 0]) !== statePrev.getIn(['x11', 'wmSettings', 'ewmh', '_NET_ACTIVE_WINDOW', 0])) {
 			//console.log("ignoreEnterNotify = true")

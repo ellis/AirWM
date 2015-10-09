@@ -5,7 +5,9 @@
 * [x] StateWrapper: layout
 * [x] StateWrapper: x11
 * [x] reducer.js: switch to using StateWrapper
-* [ ] seawm.js: switch to using StateWrapper
+* [x] seawm.js: switch to using StateWrapper
+* [x] BUG: dock needs to take up window space
+* [ ] troubleshoot the exisiting shortcut actions
 * [ ] StateWrapper: activateWindowBefore/After (on desktop) (Win-N)
 * [ ] StateWrapper: activateWindowEarlier/Later (in session) (Win-Tab)
 * [ ] StateWrapper: activateDesktopNext/Prev
