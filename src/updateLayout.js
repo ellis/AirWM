@@ -2,7 +2,7 @@ import _ from 'lodash';
 import assert from 'assert';
 import {List, Map} from 'immutable';
 
-export function updateLayout(builder) {
+export default function updateLayout(builder) {
 	//console.log("updateLayout")
 	//console.log(state)
 	// For each screen, update desktop dimensions

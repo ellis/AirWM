@@ -5,7 +5,7 @@ import {assert} from 'chai';
 import diff from 'immutablediff';
 
 import StateWrapper, {initialState} from '../src/StateWrapper.js';
-import {updateLayout} from '../src/layout.js';
+import updateLayout from '../src/updateLayout.js';
 
 const ActionObjects = {
 	screen1: {
@@ -19,28 +19,6 @@ const ActionObjects = {
 		height: 600,
 	},
 };
-
-/*[{
-	actions: b => {
-		const d1 = b.addDesktop({});
-		return {d1}
-	},
-	asserts: x => {
-		'widgetIdNext': x.d1 + 1],
-		'screenIdOrder': [],
-		'desktopIdOrder': [d1],
-		'windowIdOrder': [],
-		'widgetIdChain': [d1],
-		'currentScreenId': -1,
-		'currentDesktopId': -1,
-		'currentWindowId': -1
-	],
-	children: [{
-		actions: b => {
-
-		}
-	}]
-}];*/
 
 /**
  * Take a flat list of JSON path + value pairs and makes sure the state matches.

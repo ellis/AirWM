@@ -45,8 +45,6 @@ class WidgetWrapper extends SubWrapper {
 
 	get type() { return this._get('type', 'window'); }
 	get parentId() { return this._get('parentId', -1); }
-	get visible() { return this._get('visible', false); }
-	set visible(visible) { return this._set('visible', (visible) ? true : false); }
 
 	getRc() { return this._get('rc', List([0, 0, 0, 0])); }
 	setRc(rc) {
@@ -79,6 +77,7 @@ class DesktopWrapper extends WidgetWrapper {
 	get currentWindowId() { return this._get(['childIdChain', 0], -1); }
 
 	findScreenId() { return this._get('parentId', -1); }
+	findScreen() { return this.top.screenById(this.findScreenId()); }
 
 	get _childIdOrder() { return new UniqueListWrapper(this.top, this.path.concat(['childIdOrder'])); }
 	get _childIdChain() { return new UniqueListWrapper(this.top, this.path.concat(['childIdChain'])); }
@@ -91,10 +90,10 @@ class ListWrapper extends SubWrapper {
 	}
 
 	get(i) { return this._get(i); }
-	push(x) { this.top._updateIn(this.path, List(), l => l.push(x)); return this; }
-	unshift(x) { this.top._updateIn(this.path, List(), l => l.push(x)); return this; }
-	insert(x, index) { this.top._updateIn(this.path, List(), l => l.push(x)); return this; }
-	remove(x) { this.top._updateIn(this.path, List(), l => listRemove(l, x)); return this; }
+	push(x) { this.top._update(this.path, List(), l => l.push(x)); return this; }
+	unshift(x) { this.top._update(this.path, List(), l => l.push(x)); return this; }
+	insert(x, index) { this.top._update(this.path, List(), l => l.push(x)); return this; }
+	remove(x) { this.top._update(this.path, List(), l => listRemove(l, x)); return this; }
 }
 
 class ScreenWrapper extends WidgetWrapper {
@@ -125,10 +124,10 @@ class UniqueListWrapper extends SubWrapper {
 	}
 
 	get(i) { return this._get(i); }
-	push(x) { this.top._updateIn(this.path, List(), l => listRemove(l, x).push(x)); return this; }
-	unshift(x) { this.top._updateIn(this.path, List(), l => listRemove(l, x).unshift(x)); return this; }
-	insert(x, index) { this.top._updateIn(this.path, List(), l => listRemove(l, x).splice(index, 0, x)); return this; }
-	remove(x) { this.top._updateIn(this.path, List(), l => listRemove(l, x)); return this; }
+	push(x) { this.top._update(this.path, List(), l => listRemove(l, x).push(x)); return this; }
+	unshift(x) { this.top._update(this.path, List(), l => listRemove(l, x).unshift(x)); return this; }
+	insert(x, index) { this.top._update(this.path, List(), l => listRemove(l, x).splice(index, 0, x)); return this; }
+	remove(x) { this.top._update(this.path, List(), l => listRemove(l, x)); return this; }
 }
 
 class WindowWrapper extends WidgetWrapper {
@@ -138,7 +137,13 @@ class WindowWrapper extends WidgetWrapper {
 		assert(['window', 'dock', 'background'].indexOf(this._get('type')) >= 0, "invalid window type:" +this._get('type'));
 	}
 
-	//findDesktopId() { ... }
+	get type() { return this._get('type', 'window'); }
+	get visible() { return this._get('visible', false); }
+	set visible(visible) { return this._set('visible', (visible) ? true : false); }
+	get xid() { return this._get('xid'); }
+
+	findDesktopId() { return this.top._findWidgetDekstopIdById(this.id); }
+	findDesktop() { return this.top.desktopById(this.findDesktopId()); }
 	//findScreenId() { ... }
 }
 
@@ -506,17 +511,25 @@ export default class StateWrapper {
 
 	mapEachScreen(fn) {
 		const result = [];
-		this.getScreenIdOrder().forEach(screenId => {
-			const screen = this.screenById(screenId);
+		this.getScreenIdOrder().forEach(id => {
+			const screen = this.screenById(id);
 			result.push(fn(screen));
 		});
 		return result;
 	}
 
 	forEachDesktop(fn) {
-		this.getDesktopIdOrder().forEach(desktopId => {
-			const desktop = this.desktopById(desktopId);
+		this.getDesktopIdOrder().forEach(id => {
+			const desktop = this.desktopById(id);
 			fn(desktop);
+		});
+		return this;
+	}
+
+	forEachWindow(fn) {
+		this.getWindowIdOrder().forEach(id => {
+			const window = this.windowById(id);
+			fn(window);
 		});
 		return this;
 	}
@@ -542,7 +555,7 @@ export default class StateWrapper {
 		return this;
 	}
 
-	_updateIn(path, dflt, fn) {
+	_update(path, dflt, fn) {
 		if (_.isString(path))
 			path = [path];
 		//console.log({path, dflt, fn})
