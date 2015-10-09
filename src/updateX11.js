@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import assert from 'assert';
-import {List, Map} from 'immutable';
+import {List, Map, Set} from 'immutable';
 import x11 from 'x11';
 
 import x11consts from './x11consts.js';
@@ -11,7 +11,11 @@ export default function updateX11(builder) {
 		return;
 	const desktop = builder.currentDesktop;
 	const currentWindowId = builder.currentWindowId;
+	let remainingKeys = Set(builder.state.getIn(['x11', 'windowSettings'], Map()).keys());
+	//console.log({remainingKeys});
 	builder.forEachWindow(w => {
+		//console.log(w.id);
+		remainingKeys = remainingKeys.delete(w.id.toString());
 		const xid = w.xid;
 		const isVisible = w.visible;
 		if (xid) {
@@ -141,4 +145,10 @@ export default function updateX11(builder) {
 		}
 		*/
 	}
+
+	// Delete entries for windows which have been removed
+	//console.log({remainingKeys});
+	remainingKeys.forEach(id => {
+		builder.state = builder.state.deleteIn(['x11', 'windowSettings', id.toString()]);
+	});
 }
