@@ -13,13 +13,14 @@ export function updateLayout(builder) {
 		const backgroundId = screen.backgroundId;
 		if (backgroundId >= 0) {
 			const w = builder.windowById(backgroundId);
-			w.set('rc', List(rc));
+			w.visible = true;
+			w.setRc(rc);
 		}
 		// Dock layout
 		screen.getDockIdOrder().forEach(id => {
 			const w = builder.windowById(id);
-			const gravity = w.get('dockGravity', 'bottom');
-			const size = w.get('dockSize', 50);
+			const gravity = w._get('dockGravity', 'bottom');
+			const size = w._get('dockSize', 50);
 			let rc2;
 			switch (gravity) {
 				case 'left':
@@ -34,10 +35,11 @@ export function updateLayout(builder) {
 					rc[3] -= size;
 					break;
 			}
-			w.set('rc', List(rc2));
+			w.visible = true;
+			w.setRc(rc2);
 		});
 		// Desktop layout
-		screen.currentDesktop._set('rc', List(rc));
+		screen.currentDesktop.setRc(rc);
 	});
 
 	const layoutEngines = {
