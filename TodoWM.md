@@ -7,17 +7,11 @@
 * [x] reducer.js: switch to using StateWrapper
 * [x] seawm.js: switch to using StateWrapper
 * [x] BUG: dock needs to take up window space
-* [ ] troubleshoot the exisiting shortcut actions
-	* [x] activateDesktop
-	* [x] moveWindowToDesktop
-	* [x] activateWindowNext/Prev
-	* [ ] moveWindowToIndexNext/Prev
-	* [ ] closeWindow
+* [x] troubleshoot the exisiting shortcut actions
 * [ ] StateWrapper: activateWindowBefore/After (on desktop) (Win-N)
 * [ ] StateWrapper: activateWindowEarlier/Later (in session) (Win-Tab)
 * [ ] StateWrapper: activateDesktopNext/Prev
 * [ ] StateWrapper: activateDesktopEarlier/Later (in session)
-* [ ] BUG: start program and quickly switch to different desktop: window isn't managed or visible
 * [ ] action: moveWindowToDesktop, handle `follow: false` parameter
 * [-] BUG: start firefox; press Ctrl-N; the new window isn't sized properly
 * [ ] activate window on mouse click
@@ -35,6 +29,7 @@
 	* [ ] clientMessage: handle WM_CHANGE_STATE
 	* [ ] ewmh: `_NET_WM_STATE_HIDDEN`, `_NET_WM_STATE_FOCUSED`
 * [ ] for better focus-follows-mouse: detect layout changes and use a timer to limit duration that EnterNotify is ignored.
+* [ ] close programs more gracefully, check for 'delete' protocol (or whatever it's called)
 
 Naming:
 * jetwm jetwm howmoo lowmo light flowm flowmo flowmotion
