@@ -14,12 +14,12 @@ describe('reducer', () => {
 			desktops: [
 				{
 					name: "web",
-					layout: "tile-right"
+					layout: "default"
 				}
 			],
 			screens: [
 				{
-					xidRoot: ex.screen0_xidRoot,
+					xid: ex.screen0_xidRoot,
 					width: 800,
 					height: 600,
 				}
@@ -34,15 +34,15 @@ describe('reducer', () => {
 	it('handles setX11ScreenColors', () => {
 		const action1 = {
 			type: 'setX11ScreenColors',
-			screenId: 0,
+			screen: 0,
 			colors: {
 				'a': 1,
 				'b': 2
 			}
 		};
-		const state1 = reducer(ex.state112, action1);
-		expect(state1.getIn(['x11', 'screens', '0', 'colors', 'a'])).to.equal(1);
-		expect(state1.getIn(['x11', 'screens', '0', 'colors', 'b'])).to.equal(2);
+		const state1 = reducer(ex.state110, action1);
+		expect(state1.getIn(['x11', 'screens', '1', 'colors', 'a'])).to.equal(1);
+		expect(state1.getIn(['x11', 'screens', '1', 'colors', 'b'])).to.equal(2);
 	});
 
 });

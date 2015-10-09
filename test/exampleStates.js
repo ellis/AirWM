@@ -8,30 +8,29 @@ export const state110 = fromJS({
 		0: {
 			type: "desktop",
 			name: "web",
-			screenId: 0,
+			parentId: 1,
 			rc: [0, 0, 800, 600],
-			layout: "tile-right",
+			layout: "default",
 			childIdOrder: [],
-			childIdStack: []
-		}
-	},
-	screens: {
-		0: {
-			xidRoot: screen0_xidRoot,
+			childIdChain: []
+		},
+		1: {
+			type: 'screen',
+			xid: screen0_xidRoot,
 			width: 800,
 			height: 600,
-			desktopIdStack: [0]
+			desktopIdChain: [0]
 		}
 	},
-	widgetIdNext: 1,
-	screenIdOrder: [0],
-	screenIdStack: [0],
+	widgetIdNext: 2,
+	screenIdOrder: [1],
 	desktopIdOrder: [0],
-	desktopIdStack: [0],
 	windowIdOrder: [],
-	windowIdStack: [],
+	widgetIdChain: [0, 1],
+	currentScreenId: 1,
+	currentDesktopId: 0,
+	currentWindowId: -1,
 	x11: {
-		desktopNum: 0,
 		wmSettings: {
 			SetInputFocus: [screen0_xidRoot]
 		}

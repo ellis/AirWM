@@ -198,6 +198,9 @@ export default class StateWrapper {
 	get currentDesktop() { return this.desktopById(this.currentDesktopId); }
 	get currentWindow() { return this.windowById(this.currentWindowId); }
 
+	findScreenIdByNum(num) { return this._get(StatePaths.screenIdOrder.concat(num), -1); }
+	findDesktopIdByNum(num) { return this._get(StatePaths.desktopIdOrder.concat(num), -1); }
+
 	addDesktop(w) {
 		w = fromJS(w);
 		// Default values
@@ -375,10 +378,13 @@ export default class StateWrapper {
 	}
 
 	moveWindowToDesktop(window, desktop) {
-		if (_.isNumber(window))
+		if (_.isUndefined(window))
+			window = this.currentWindow;
+		else if (_.isNumber(window))
 			window = this.windowById(window);
 		if (_.isNumber(desktop))
 			desktop = this.desktopById(desktop);
+
 		const desktopId0 = this._findWidgetDekstopIdById(window.id);
 		// Add window to given desktop
 		if (desktop && desktop.id !== desktopId0) {
@@ -491,6 +497,9 @@ export default class StateWrapper {
 	}
 
 	removeWindow(windowId) {
+		if (_.isUndefined(windowId))
+			windowId = this.currentWindowId;
+
 		//console.log({windowId, state: this.state})
 		this.unparentWindow(windowId);
 		this._windowIdOrder.remove(windowId);
@@ -502,6 +511,7 @@ export default class StateWrapper {
 	}
 
 	forEachScreen(fn) {
+		//this.print();
 		this.getScreenIdOrder().forEach(screenId => {
 			const screen = this.screenById(screenId);
 			fn(screen);

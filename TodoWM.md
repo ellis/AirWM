@@ -3,7 +3,7 @@
 * [x] StateWrapper: moveWindowToIndexNext/Prev
 * [x] StateWrapper: activateWindowNext/Prev (Win-J)
 * [x] StateWrapper: layout
-* [ ] StateWrapper: x11
+* [x] StateWrapper: x11
 * [ ] reducer.js: switch to using StateWrapper
 * [ ] seawm.js: switch to using StateWrapper
 * [ ] StateWrapper: activateWindowBefore/After (on desktop) (Win-N)

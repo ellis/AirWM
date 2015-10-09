@@ -4,34 +4,86 @@ import {List, Map} from 'immutable';
 import Immutable from 'immutable';
 import {logger} from '../lib/logger.js';
 
-import * as core from './core.js';
+import StateWrapper, {initialState} from './StateWrapper.js';
+import updateLayout from '../src/updateLayout.js';
+import updateX11 from '../src/updateX11.js';
 
+const handlers = {
+	'@@redux/INIT': () => {},
 
-export default function reducer(state = core.empty, action) {
+	'activateDesktop': (builder, action) => {
+		const desktopId = builder.getDesktopIdByNum(action.desktop);
+		builder.activateDesktopByNum(action.num);
+	},
+
+	//'activateWindow': () => core.activateWindow(state, action),
+
+	'activateWindowNext': (builder, action) => {
+		builder.activateWindowNext();
+	},
+
+	'activateWindowPrev': (builder, action) => {
+		builder.activateWindowPrev();
+	},
+
+	'removeWindow': (builder, action) => {
+		builder.removeWindow();
+	},
+
+	'addWindow': (builder, action) => {
+		builder.addWindow(action.window);
+	},
+
+	'initialize': (builder, action) => {
+		builder.state = initialState;
+		for (const desktop of action.desktops) {
+			builder.addDesktop(desktop);
+		}
+		for (const screen of action.screens) {
+			builder.addScreen(screen);
+		}
+	},
+
+	//'move': () => core.move(state, action),
+	'moveWindowToDesktop': (builder, action) => {
+		const desktopId = builder.getDesktopIdByNum(action.desktop);
+		builder.moveWindowToDesktop(undefined, desktopId);
+	},
+
+	'moveWindowToIndexNext': (builder, action) => {
+		builder.moveWindowToIndexNext();
+	},
+	'moveWindowToIndexPrev': (builder, action) => {
+		builder.moveWindowToIndexNext();
+	},
+
+	'setX11ScreenColors': (builder, action) => {
+		const screenId = builder.findScreenIdByNum(action.screen);
+		builder.state = builder.state.mergeIn(['x11', 'screens', screenId.toString(), 'colors'], Map(action.colors));
+	}
+};
+
+export default function reducer(state = initialState, action) {
 	logger.info("reducer: "+JSON.stringify(action));
-	const handlers = {
-		'@@redux/INIT': () => state,
-		'activateDesktop': () => core.activateDesktop(state, action),
-		'activateWindow': () => core.activateWindow(state, action),
-		'activateWindowNext': () => core.activateWindowNext(state, action),
-		'activateWindowPrev': () => core.focus_movePrev(state, action),
-		'closeWindow': () => core.closeWindow(state, action),
-		'createWidget': () => core.createWidget(state, action),
-		'destroyWidget': () => core.destroyWidget(state, action),
-		'initialize': () => core.initialize(action.desktops, action.screens),
-		//'move': () => core.move(state, action),
-		'moveWindowToDesktop': () => core.moveWindowToDesktop(state, action),
-		'moveWindowToIndexNext': () => core.moveWindowToIndexNext(state, action),
-		'moveWindowToIndexPrev': () => core.moveWindowToIndexPrev(state, action),
-		'setX11ScreenColors': () => core.setX11ScreenColors(state, action.screenId, action.colors)
-	};
+
 	const handler = handlers[action.type];
 	if (handler) {
-		return handler();
+		//try {
+			const builder = new StateWrapper(state);
+			handler(builder, action);
+			updateLayout(builder);
+			updateX11(builder);
+			return builder.getState();
+		/*}
+		catch (e) {
+			logger.error(e.message);
+			logger.error(e.stack);
+		}*/
 	}
+
 	else {
 		logger.warning("reducer: unknown action:")
 		logger.warning(JSON.stringify(action));
-		return state;
 	}
+	return state;
 }
