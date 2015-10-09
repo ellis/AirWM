@@ -13,7 +13,7 @@ init:
 	DISPLAY=:1 xclock &
 	DISPLAY=:1 lxqt-panel &
 	#sleep 1
-	DISPLAY=:1 ./node_modules/.bin/babel-node src/seawm.js
+	DISPLAY=:1 ./node_modules/.bin/babel-node src/wm.js
 
 testing:
 	killall Xephyr || true
@@ -21,11 +21,11 @@ testing:
 	sleep 1
 	DISPLAY=:1 lxqt-panel &
 	sleep 2
-	DISPLAY=:1 ./node_modules/.bin/babel-node src/seawm.js
+	DISPLAY=:1 ./node_modules/.bin/babel-node src/wm.js
 
 
 restart:
-	DISPLAY=:1 ./node_modules/.bin/babel-node src/seawm.js
+	DISPLAY=:1 ./node_modules/.bin/babel-node src/wm.js
 
 examplewm:
 	Xephyr :1 -ac -screen 800x600 &

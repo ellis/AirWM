@@ -12,8 +12,7 @@ var keysym = require('keysym');
 // Custom libraries
 var conversion = require('../lib/conversion');
 var logger	 = require('../lib/logger').logger;
-import State from './state.js';
-import {empty} from './core.js';
+import StateWrapper from './StateWrapper.js';
 import makeStore from './store.js';
 import getWindowProperties from '../lib/getWindowProperties.js';
 import x11consts from './x11consts.js';
@@ -184,7 +183,7 @@ function handleClientMessage(ev) {
 			break;
 
 		case '_NET_CURRENT_DESKTOP':
-			store.dispatch({type: 'activateDesktop', num: ev.data[0]});
+			store.dispatch({type: 'activateDesktop', desktop: ev.data[0]});
 			break;
 
 		case '_NET_WM_DESKTOP':
@@ -210,7 +209,7 @@ var destroyNotifyHandler = function(ev){
 	logger.info("DestroyNotifier got triggered, removing the window that got destroyed.");
 	const id = findWidgetIdForXid(ev.wid);
 	if (id >= 0) {
-		store.dispatch({type: 'destroyWidget', id: id});
+		store.dispatch({type: 'removeWindow', id: id});
 	}
 }
 
@@ -285,8 +284,8 @@ function createWidgetForXid(xid, props) {
 	}[props['_NET_WM_WINDOW_TYPE']] || "window");
 
 	const action = {
-		type: 'createWidget',
-		widget: {
+		type: 'addWindow',
+		window: {
 			type: widgetType,
 			xid
 		}
@@ -447,10 +446,12 @@ function initLogger(logDir) {
 		fs.mkdirSync(logDir);
 }
 
-let statePrev = empty;
+let statePrev = Map();
 function handleStateChange() {
 	try {
 		const state = store.getState();
+		const builder = new StateWrapper(state);
+		builder.print();
 		// If the active window has changed, set ignoreEnterNotify = true
 		if (state.getIn(['x11', 'wmSettings', 'ewmh', '_NET_ACTIVE_WINDOW', 0]) !== statePrev.getIn(['x11', 'wmSettings', 'ewmh', '_NET_ACTIVE_WINDOW', 0])) {
 			//console.log("ignoreEnterNotify = true")
@@ -500,14 +501,14 @@ function handleStateChange() {
 		// Set the X11 focus
 		const SetInputFocus = state.getIn(['x11', 'wmSettings', 'SetInputFocus']);
 		if (SetInputFocus && SetInputFocus !== statePrev.getIn(['x11', 'wmSettings', 'SetInputFocus'])) {
-			//console.log("SetInputFocus:", SetInputFocus);
+			console.log("SetInputFocus:", SetInputFocus);
 			global.X.SetInputFocus.apply(global.X, SetInputFocus.toJS());
 		}
 
 		// Set EWMH (extended window manager hints)
 		if (true) {
-			const screen = State.getCurrentScreen(state);
-			const xid = screen.get('xidRoot');
+			const screen = builder.currentScreen;
+			const xid = screen.xid;
 			state.getIn(['x11', 'wmSettings', 'ewmh']).forEach((value, name) => {
 				if (value !== statePrev.getIn(['x11', 'wmSettings', 'ewmh', name])) {
 					const value2 = Map({value}).toJS().value;
@@ -592,7 +593,7 @@ var airClientCreator = function(err, display) {
 				{name: "prog", layout: "tile-right"},
 			],
 			screens: _.map(display.screen, (screen) => { return {
-				xidRoot: screen.root,
+				xid: screen.root,
 				width: screen.pixel_width,
 				height: screen.pixel_height
 			}; })
@@ -601,13 +602,13 @@ var airClientCreator = function(err, display) {
 
 		_.forEach(display.screen, (screen, i) => {
 			global.X.AllocColor( screen.default_colormap, 0x5E00, 0x9D00, 0xC800, function(err, color) {
-				store.dispatch({type: 'setX11ScreenColors', screenId: i, colors: {focus: color.pixel}});
+				store.dispatch({type: 'setX11ScreenColors', screen: i, colors: {focus: color.pixel}});
 			});
 			global.X.AllocColor( screen.default_colormap, 0xDC00, 0xF000, 0xF700, function(err, color) {
-				store.dispatch({type: 'setX11ScreenColors', screenId: i, colors: {normal: color.pixel}});
+				store.dispatch({type: 'setX11ScreenColors', screen: i, colors: {normal: color.pixel}});
 			});
 			global.X.AllocColor( screen.default_colormap, 0x0C00, 0x2C00, 0x5200, function(err, color) {
-				store.dispatch({type: 'setX11ScreenColors', screenId: i, colors: {alert: color.pixel}});
+				store.dispatch({type: 'setX11ScreenColors', screen: i, colors: {alert: color.pixel}});
 			});
 		});
 

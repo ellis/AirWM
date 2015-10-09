@@ -409,12 +409,17 @@ export default class StateWrapper {
 	}
 
 	moveWindowToScreen(window, screen) {
-		if (_.isNumber(window))
+		if (_.isUndefined(window))
+			window = this.currentWindow;
+		else if (_.isNumber(window))
 			window = this.windowById(window);
-		if (_.isNumber(screen))
+		if (_.isUndefined(screen))
+			screen = this.currentScreen;
+		else if (_.isNumber(screen))
 			screen = this.screenById(screen);
+
 		// Add window to given screen
-		if (screen && window.parentId !== screen.id) {
+		if (screen && window && window.parentId !== screen.id) {
 			switch (window.type) {
 				case 'window': {
 					const desktopId = screen.currentDesktopId;

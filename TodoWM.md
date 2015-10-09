@@ -4,7 +4,7 @@
 * [x] StateWrapper: activateWindowNext/Prev (Win-J)
 * [x] StateWrapper: layout
 * [x] StateWrapper: x11
-* [ ] reducer.js: switch to using StateWrapper
+* [x] reducer.js: switch to using StateWrapper
 * [ ] seawm.js: switch to using StateWrapper
 * [ ] StateWrapper: activateWindowBefore/After (on desktop) (Win-N)
 * [ ] StateWrapper: activateWindowEarlier/Later (in session) (Win-Tab)

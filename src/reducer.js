@@ -16,7 +16,9 @@ const handlers = {
 		builder.activateDesktopByNum(action.num);
 	},
 
-	//'activateWindow': () => core.activateWindow(state, action),
+	'activateWindow': (builder, action) => {
+		builder.activateWindow(action.id);
+	},
 
 	'activateWindowNext': (builder, action) => {
 		builder.activateWindowNext();
@@ -27,11 +29,12 @@ const handlers = {
 	},
 
 	'removeWindow': (builder, action) => {
-		builder.removeWindow();
+		builder.removeWindow(action.id);
 	},
 
 	'addWindow': (builder, action) => {
-		builder.addWindow(action.window);
+		const id = builder.addWindow(action.window);
+		builder.moveWindowToScreen(id);
 	},
 
 	'initialize': (builder, action) => {

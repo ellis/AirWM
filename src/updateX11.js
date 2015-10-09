@@ -7,6 +7,8 @@ import x11consts from './x11consts.js';
 
 export default function updateX11(builder) {
 	const screen = builder.currentScreen;
+	if (!screen)
+		return;
 	const desktop = builder.currentDesktop;
 	const currentWindowId = builder.currentWindowId;
 	builder.forEachWindow(w => {
@@ -90,7 +92,7 @@ export default function updateX11(builder) {
 	const focusXid = (currentWindowId >= 0)
 		? builder.currentWindow.xid
 		: screen.xid;
-	//console.log({focusCurrentId, focusCurrentKey, focusXid, screenCurrentId});
+	//console.log({currentWindowId, currentWindow: builder.currentWindow, focusXid, screen: _.omit(screen, 'top')});
 	builder._update(['x11', 'wmSettings', 'SetInputFocus'], l => {
 		if (l) return l.set(0, focusXid);
 		else return List.of(focusXid);
