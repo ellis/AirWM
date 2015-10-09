@@ -38,8 +38,8 @@ function checkList(builder, desc, stuff) {
 	})
 }
 
-describe('updateLayout', () => {
-	it('with normal windows', () => {
+describe('updateX11', () => {
+	it('with a normal window', () => {
 		const builder = new StateWrapper(initialState);
 		const d1 = builder.addDesktop({});
 		const d2 = builder.addDesktop({});
@@ -48,34 +48,68 @@ describe('updateLayout', () => {
 		builder.moveWindowToDesktop(w1, d1);
 
 		updateLayout(builder);
+		updateX11(builder);
+		//builder.print();
 		checkList(builder, "one window", [
-			`widgets.${w1}.visible`, true,
-			`widgets.${w1}.rc`, [5, 5, 790, 590],
-		]);
+			`x11`, {
+				"windowSettings": {
+					"3": {
+						"xid": 1000,
+						"visible": true,
+						"ewmh": {
+							"WM_STATE": {
+								"state": 1,
+								"icon": 0
+							},
+							"_NET_WM_DESKTOP": [
+								0
+							],
+							"_NET_WM_ALLOWED_ACTIONS": [
+								"_NET_WM_ACTION_CLOSE"
+							]
+						},
+						"desktopNum": 0,
+						"ChangeWindowAttributes": [
+							1000,
+							{
+								"borderPixel": 0,
+								"eventMask": 16
+							}
+						],
+						"ConfigureWindow": [
+							1000,
+							{
+								"x": 5,
+								"y": 5,
+								"width": 780,
+								"height": 580,
+								"borderWidth": 5,
+								"stackMode": 0
+							}
+						]
+					}
+				},
+				"wmSettings": {
+					"SetInputFocus": [
+						1000
+					],
+					"ewmh": {
+						"_NET_NUMBER_OF_DESKTOPS": [
+							2
+						],
+						"_NET_ACTIVE_WINDOW": [
+							1000
+						],
+						"_NET_CLIENT_LIST": [
+							1000
+						]
+					}
+				}
 
-		const w2 = builder.addWindow({xid: 1001});
-		builder.moveWindowToDesktop(w2, d1);
-		updateLayout(builder);
-		checkList(builder, "two windows", [
-			`widgets.${w1}.visible`, true,
-			`widgets.${w1}.rc`, [5, 5, 392, 590],
-			`widgets.${w2}.visible`, true,
-			`widgets.${w2}.rc`, [402, 5, 392, 590],
-		]);
-
-		const w3 = builder.addWindow({xid: 1002});
-		builder.moveWindowToDesktop(w3, d1);
-		updateLayout(builder);
-		checkList(builder, "three windows", [
-			`widgets.${w1}.visible`, true,
-			`widgets.${w1}.rc`, [5, 5, 392, 590],
-			`widgets.${w2}.visible`, true,
-			`widgets.${w2}.rc`, [402, 5, 392, 292],
-			`widgets.${w3}.visible`, true,
-			`widgets.${w3}.rc`, [402, 302, 392, 292],
+			}
 		]);
 	});
-
+/*
 	it('with background', () => {
 		const builder = new StateWrapper(initialState);
 		const d1 = builder.addDesktop({});
@@ -123,4 +157,5 @@ describe('updateLayout', () => {
 			`widgets.${w2}.rc`, [5, 5, 790, 580],
 		]);
 	});
+*/
 });

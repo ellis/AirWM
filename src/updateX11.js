@@ -1,6 +1,9 @@
 import _ from 'lodash';
 import assert from 'assert';
 import {List, Map} from 'immutable';
+import x11 from 'x11';
+
+import x11consts from './x11consts.js';
 
 export default function updateX11(builder) {
 	const screen = builder.currentScreen;
@@ -11,7 +14,7 @@ export default function updateX11(builder) {
 		const isVisible = w.visible;
 		if (xid) {
 			const hasFocus = (w.id === currentWindowId);
-			let info = builder._get(['x11', 'windowSettings', key], Map());
+			let info = builder._get(['x11', 'windowSettings', w.id.toString()], Map());
 			info = info
 				.set('xid', xid)
 				.set('visible', isVisible)
@@ -113,23 +116,27 @@ export default function updateX11(builder) {
 		builder._update(
 			['x11', 'wmSettings', 'ewmh', '_NET_ACTIVE_WINDOW'],
 			List.of(0),
-			l => l.set(0, (focusCurrentId >= 0) ? focusXid : 0)
+			l => l.set(0, (currentWindowId >= 0) ? focusXid : 0)
 		);
 		// Window order
 		const windowIdOrder = builder.getWindowIdOrder();
 		builder._update(['x11', 'wmSettings', 'ewmh', '_NET_CLIENT_LIST'], List(), l => l.setSize(windowIdOrder.count()));
 		for (let i = 0; i < windowIdOrder.count(); i++) {
-			const xid = builder.widgetById(windowIdOrder.get(i)).xid;
+			const xid = builder.windowById(windowIdOrder.get(i)).xid;
 			if (xid)
 				builder._set(['x11', 'wmSettings', 'ewmh', '_NET_CLIENT_LIST', i], xid);
 		}
+		/*
 		// Window stacking
-		const windowIdStack = builder.getWindowIdStack();
+		const widgetIdStack = builder.getWidgetIdStack();
 		builder.update(['x11', 'wmSettings', 'ewmh', '_NET_CLIENT_LIST_STACKING'], List(), l => l.setSize(windowIdStack.count()));
-		for (let i = 0; i < windowIdStack.count(); i++) {
-			const xid = builder.widgetById(windowIdOrder.get(i)).xid;
-			if (xid)
+		for (let i = 0; i < widgetIdStack.count(); i++) {
+			const id = widgetIdStack.get(i);
+			const xid = builder._get(['widgets', id.toString(), 'xid']);
+			const type = builder._get(['widgets', id.toString(), 'type']);
+			if (xid && type !== 'screen')
 				builder._set(['x11', 'wmSettings', 'ewmh', '_NET_CLIENT_LIST_STACKING', i], xid);
 		}
+		*/
 	}
 }
