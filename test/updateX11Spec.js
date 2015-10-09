@@ -158,4 +158,29 @@ describe('updateX11', () => {
 		]);
 	});
 */
+	it('after removeWindow', () => {
+		const builder = new StateWrapper(initialState);
+		const d1 = builder.addDesktop({});
+		const s1 = builder.addScreen(ActionObjects.screen1);
+		const w1 = builder.addWindow({xid: 1000});
+		const w2 = builder.addWindow({xid: 1001});
+		builder.moveWindowToDesktop(w1, d1);
+		builder.moveWindowToDesktop(w2, d1);
+		updateLayout(builder);
+		updateX11(builder);
+
+		expect(builder.getState().hasIn(['widgets', w1.toString()]), 'w1 #1').to.equal(true);
+		expect(builder.getState().hasIn(['widgets', w2.toString()]), 'w2 #1').to.equal(true);
+		expect(builder.getState().hasIn(['x11', 'windowSettings', w1.toString()]), 'x11 w1 #1').to.equal(true);
+		expect(builder.getState().hasIn(['x11', 'windowSettings', w2.toString()]), 'x11 w2 #1').to.equal(true);
+
+		builder.removeWindow(w1);
+		updateLayout(builder);
+		updateX11(builder);
+
+		expect(builder.getState().hasIn(['widgets', w1.toString()]), 'w1 #2').to.equal(false);
+		expect(builder.getState().hasIn(['widgets', w2.toString()]), 'w2 #2').to.equal(true);
+		expect(builder.getState().hasIn(['x11', 'windowSettings', w1.toString()]), 'x11 w1 #2').to.equal(false);
+		expect(builder.getState().hasIn(['x11', 'windowSettings', w2.toString()]), 'x11 w2 #2').to.equal(true);
+	});
 });

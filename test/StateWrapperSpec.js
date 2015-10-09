@@ -394,12 +394,14 @@ describe('StateWrapper', () => {
 		builder.removeWindow(w1);
 		expect(builder.getWindowIdOrder(), 'window order #1').to.equal(List([]));
 		expect(builder.getWidgetIdChain(), 'widget chain #1').to.equal(List([d1, s1, d2]));
+		expect(builder.getState().hasIn(['widgets', w1.toString()]), 'widget 1').to.equal(false);
 
 		const w2 = builder.addWindow({xid: 1000});
 		builder.moveWindowToDesktop(w2, d2);
 		builder.removeWindow(w2);
 		expect(builder.getWindowIdOrder(), 'window order #2').to.equal(List([]));
 		expect(builder.getWidgetIdChain(), 'widget chain #2').to.equal(List([d1, s1, d2]));
+		expect(builder.getState().hasIn(['widgets', w2.toString()]), 'widget 2').to.equal(false);
 
 		const w3 = builder.addWindow({xid: 1000});
 		const w4 = builder.addWindow({xid: 1000});
@@ -408,6 +410,8 @@ describe('StateWrapper', () => {
 		builder.removeWindow(w3);
 		expect(builder.getWindowIdOrder(), 'window order #3').to.equal(List([w4]));
 		expect(builder.getWidgetIdChain(), 'widget chain #3').to.equal(List([d1, s1, d2, w4]));
+		expect(builder.getState().hasIn(['widgets', w3.toString()]), 'widget 3').to.equal(false);
+		expect(builder.getState().hasIn(['widgets', w4.toString()]), 'widget 4').to.equal(true);
 	});
 
 	it('moveWindowToIndexNext/Prev', () => {

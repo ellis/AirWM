@@ -33,11 +33,11 @@ const handlers = {
 	},
 
 	'addWindow': (builder, action) => {
-		console.log({action})
+		//console.log({action})
 		const id = builder.addWindow(action.window);
 		builder.moveWindowToScreen(id);
-		console.log("after addWindow:")
-		builder.print();
+		//console.log("after addWindow:")
+		//builder.print();
 	},
 
 	'initialize': (builder, action) => {
@@ -61,7 +61,7 @@ const handlers = {
 	},
 
 	'moveWindowToIndexPrev': (builder, action) => {
-		builder.moveWindowToIndexNext();
+		builder.moveWindowToIndexPrev();
 	},
 
 	'setX11ScreenColors': (builder, action) => {
@@ -89,8 +89,7 @@ export default function reducer(state = initialState, action) {
 	}
 
 	else {
-		logger.warning("reducer: unknown action:")
-		logger.warning(JSON.stringify(action));
+		logger.warn("reducer: unknown action", action);
 	}
 	return state;
 }

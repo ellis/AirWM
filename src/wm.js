@@ -294,7 +294,7 @@ function createWidgetForXid(xid, props) {
 
 	if (widgetType === 'dock') {
 		let [left, right, top, bottom, left_start_y, left_end_y, right_start_y, right_end_y, top_start_x, top_end_x, bottom_start_x, bottom_end_x] = props["_NET_WM_STRUT_PARTIAL"];
-		console.log("addXwinDock: "+props["_NET_WM_STRUT_PARTIAL"]);
+		//console.log("addXwinDock: "+props["_NET_WM_STRUT_PARTIAL"]);
 		//console.log([left, right, top, bottom]);
 		if (top > 0) {
 			action.window.dockGravity = "top";

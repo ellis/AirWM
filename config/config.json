@@ -30,7 +30,7 @@
 		{"key": "j", "modifier" : ["super","shift"], "action": {"type": "moveWindowToIndexNext"}},
 		{"key": "k", "modifier" : ["super","shift"], "action": {"type": "moveWindowToIndexPrev"}},
 
-		{"key": "c", "modifier" : ["super","shift"], "action": {"type": "closeWindow"}},
+		{"key": "c", "modifier" : ["super","shift"], "action": {"type": "removeWindow"}},
 		{
 			"key"      : "d",
 			"modifier" : ["super"],

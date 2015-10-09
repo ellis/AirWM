@@ -436,9 +436,9 @@ export default class StateWrapper {
 					if (window.type === 'dock')
 						screen._dockIdOrder.push(window.id);
 					else
-					screen._backgroundId = window.id;
+						screen._backgroundId = window.id;
 					this._setCurrent();
-					console.log({window})
+					//console.log({window})
 					break;
 				}
 			}
@@ -512,6 +512,7 @@ export default class StateWrapper {
 		this._windowIdOrder.remove(windowId);
 		this._windowIdStack.remove(windowId);
 		this._widgetIdChain.remove(windowId);
+		this.state = this.state.deleteIn(['widgets', windowId.toString()]);
 		this._setCurrent();
 		//console.log({windowId, state: this.state})
 		return this;

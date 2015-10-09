@@ -8,6 +8,11 @@
 * [x] seawm.js: switch to using StateWrapper
 * [x] BUG: dock needs to take up window space
 * [ ] troubleshoot the exisiting shortcut actions
+	* [x] activateDesktop
+	* [x] moveWindowToDesktop
+	* [x] activateWindowNext/Prev
+	* [ ] moveWindowToIndexNext/Prev
+	* [ ] closeWindow
 * [ ] StateWrapper: activateWindowBefore/After (on desktop) (Win-N)
 * [ ] StateWrapper: activateWindowEarlier/Later (in session) (Win-Tab)
 * [ ] StateWrapper: activateDesktopNext/Prev
