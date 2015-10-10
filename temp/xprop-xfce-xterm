@@ -1,0 +1,29 @@
+_NET_WM_ICON_GEOMETRY(CARDINAL) = 1720, 0, 200, 30
+_NET_FRAME_EXTENTS(CARDINAL) = 3, 3, 29, 3
+_NET_WM_ALLOWED_ACTIONS(ATOM) = _NET_WM_ACTION_CLOSE, _NET_WM_ACTION_ABOVE, _NET_WM_ACTION_BELOW, _NET_WM_ACTION_FULLSCREEN, _NET_WM_ACTION_MOVE, _NET_WM_ACTION_RESIZE, _NET_WM_ACTION_MAXIMIZE_HORZ, _NET_WM_ACTION_MAXIMIZE_VERT, _NET_WM_ACTION_SHADE, _NET_WM_ACTION_MINIMIZE, _NET_WM_ACTION_CHANGE_DESKTOP, _NET_WM_ACTION_STICK
+WM_STATE(WM_STATE):
+		window state: Normal
+		icon window: 0x45a66e00
+_NET_WM_DESKTOP(CARDINAL) = 0
+_NET_WM_STATE(ATOM) = 
+WM_PROTOCOLS(ATOM): protocols  WM_DELETE_WINDOW
+_NET_WM_PID(CARDINAL) = 607
+SM_CLIENT_ID(STRING) = "27e46def4-718e-481e-969d-c8268ff4e3db"
+WM_CLIENT_LEADER(WINDOW): window id # 0x220000f
+WM_LOCALE_NAME(STRING) = "en_US.UTF-8"
+WM_CLASS(STRING) = "xterm", "XTerm"
+WM_HINTS(WM_HINTS):
+		Client accepts input or input focus: True
+		Initial state is Normal State.
+		bitmap id # to use for icon: 0x220001d
+		bitmap id # of mask for icon: 0x220001f
+WM_NORMAL_HINTS(WM_SIZE_HINTS):
+		program specified size: 484 by 316
+		program specified minimum size: 10 by 17
+		program specified resize increment: 6 by 13
+		program specified base size: 4 by 4
+		window gravity: NorthWest
+WM_CLIENT_MACHINE(STRING) = "osboxes"
+WM_COMMAND(STRING) = { "xterm" }
+WM_ICON_NAME(STRING) = "osboxes@osboxes: ~/src/AirWM/temp"
+WM_NAME(STRING) = "osboxes@osboxes: ~/src/AirWM/temp"

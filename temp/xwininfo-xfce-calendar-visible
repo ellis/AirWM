@@ -1,0 +1,24 @@
+
+xwininfo: Window id: 0x1a00355 "xfce4-panel"
+
+  Absolute upper-left X:  1533
+  Absolute upper-left Y:  31
+  Relative upper-left X:  0
+  Relative upper-left Y:  0
+  Width: 248
+  Height: 174
+  Depth: 24
+  Visual: 0x21
+  Visual Class: TrueColor
+  Border width: 0
+  Class: InputOutput
+  Colormap: 0x20 (installed)
+  Bit Gravity State: NorthWestGravity
+  Window Gravity State: NorthWestGravity
+  Backing Store State: NotUseful
+  Save Under State: no
+  Map State: IsViewable
+  Override Redirect State: no
+  Corners:  +1533+31  -139+31  -139-781  +1533-781
+  -geometry 248x174+1533+31
+

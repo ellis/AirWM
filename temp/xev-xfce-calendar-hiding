@@ -1,0 +1,30 @@
+
+LeaveNotify event, serial 18, synthetic NO, window 0x1a00355,
+    root 0x170, subw 0x0, time 173555997, (31,-15), root:(1564,16),
+    mode NotifyUngrab, detail NotifyNonlinear, same_screen YES,
+    focus NO, state 256
+
+FocusOut event, serial 18, synthetic NO, window 0x1a00355,
+    mode NotifyUngrab, detail NotifyInferior
+
+UnmapNotify event, serial 18, synthetic NO, window 0x1a00355,
+    event 0x1a00355, window 0x1a00355, from_configure NO
+
+FocusOut event, serial 18, synthetic NO, window 0x1a00355,
+    mode NotifyNormal, detail NotifyVirtual
+
+ReparentNotify event, serial 18, synthetic NO, window 0x1a00355,
+    event 0x1a00355, window 0x1a00355, parent 0x170,
+    (1533,31), override NO
+
+PropertyNotify event, serial 18, synthetic NO, window 0x1a00355,
+    atom 0x15a (WM_STATE), time 173555999, state PropertyNewValue
+
+PropertyNotify event, serial 18, synthetic NO, window 0x1a00355,
+    atom 0x125 (_NET_WM_STATE), time 173555999, state PropertyDelete
+
+PropertyNotify event, serial 18, synthetic NO, window 0x1a00355,
+    atom 0x11f (_NET_WM_DESKTOP), time 173555999, state PropertyDelete
+
+PropertyNotify event, serial 18, synthetic NO, window 0x1a00355,
+    atom 0x1b8 (_NET_WM_ALLOWED_ACTIONS), time 173555999, state PropertyDelete

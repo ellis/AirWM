@@ -313,11 +313,11 @@ function createWidgetForXid(xid, props) {
 
 let eventNamePrev = undefined;
 var eventHandler = function(ev){
+	let id = undefined;
+	if (ev.wid)
+		id = findWidgetIdForXid(ev.wid);
 	// Only log first of sequential MotionNotify events
 	if (ev.name !== "MotionNotify" || eventNamePrev !== "MotionNotify") {
-		let id = undefined;
-		if (ev.wid)
-			id = findWidgetIdForXid(ev.wid);
 		logger.info(`event ${id} ${ev.name}`);//`: ${JSON.stringify(ev)}`);
 	}
 	eventNamePrev = ev.name;
@@ -348,12 +348,19 @@ var eventHandler = function(ev){
 			break;
 		// Show a window
 		case "MapRequest":
-			handleNewWindow(ev.wid);
+			if (id >= 0) {
+				// do nothing
+			}
+			else {
+				handleNewWindow(ev.wid);
+			}
 			break;
 		case "MotionNotify":
 			handleMotionNotify(ev);
 			break;
 		case "UnmapNotify":
+			if (id >= 0)
+				handleUnmapNotify(ev, id);
 			break;
 		default:
 			//logger.error("Unhandled event: "+ev.name);
@@ -447,6 +454,16 @@ function handleMotionNotify(ev) {
 		_focusId = undefined;
 		store.dispatch({type: 'activateWindow', id});
 	}*/
+}
+
+function handleUnmapNotify(ev, id) {
+	const builder = new StateWrapper(store.getState());
+	const w = builder.windowById(id);
+	if (w) {
+		if (w.visible) {
+			store.dispatch({type: 'removeWindow', id: id});
+		}
+	}
 }
 
 //creates the logDir directory when it doesn't exist (otherwise Winston fails)

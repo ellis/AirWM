@@ -11,7 +11,7 @@
 * [x] save state to console after every change, for debugging
 * [-?] BUG: start firefox; press Ctrl-N; the new window isn't sized properly
 * [x] display xfce's panel on top
-* [ ] BUG: click on time in xfce panel twice: a bad window is left over
+* [x] BUG: click on time in xfce panel twice: a bad window is left over
 * [ ] make sure xfce's panel works
 	* [ ] start xfce session and get xprop on xterm and application finder (started by clicking the magnifying glass on the bottom panel)
 	* [ ] figure out how to display windows in
