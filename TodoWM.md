@@ -8,36 +8,47 @@
 * [x] seawm.js: switch to using StateWrapper
 * [x] BUG: dock needs to take up window space
 * [x] troubleshoot the exisiting shortcut actions
-* [ ] StateWrapper: activateWindowBefore/After (on desktop) (Win-N)
-* [ ] StateWrapper: activateWindowEarlier/Later (in session) (Win-Tab)
-* [ ] StateWrapper: activateDesktopNext/Prev
-* [ ] StateWrapper: activateDesktopEarlier/Later (in session)
-* [ ] action: moveWindowToDesktop, handle `follow: false` parameter
-* [-] BUG: start firefox; press Ctrl-N; the new window isn't sized properly
+* [x] save state to console after every change, for debugging
+* [-?] BUG: start firefox; press Ctrl-N; the new window isn't sized properly
+* [x] display xfce's panel on top
+* [ ] BUG: click on time in xfce panel twice: a bad window is left over
+* [ ] make sure xfce's panel works
+	* [ ] start xfce session and get xprop on xterm and application finder (started by clicking the magnifying glass on the bottom panel)
+	* [ ] figure out how to display windows in
+* [ ] BUG: in Atom, press Ctrl-O: a bad window is created
+* [ ] in Atom, press Ctrl-O: should focus the dialog box
+* [ ] get `npm test` to run again by removing old test files
+* [ ] remove unused AirWM files, reorganize AirWM files I still need
+* [ ] create a new repository (flowmo)
 * [ ] activate window on mouse click
-* [ ] ewmh: docks and backgrounds should also be listed in windows
-* [ ] state: add orphanId lists
+* [ ] figure out how `--replace` flag works in xmonad so that I can use the WM in xfce (see Main.hs:replace)
+* [ ] allow for custom handling of specific EWMH flags?
 * [ ] ewmh: set `_NET_WM_STATE` to empty by default
 * [ ] implement more commandHandlers() as actions
-* [ ] save state to console after every change, for debugging
-* [ ] BUG: start two xterms; click 'xterm' on lxqt-panel's task bar then move mouse to one of the xterms; the popup is then drawn below the windows
-* [ ] figure out how `--replace` flag works in xmonad so that I can use the WM in xfce (see Main.hs:replace)
 * [ ] state: add floatId lists
 * [ ] Win-move to move floating windows (see <https://github.com/jichu4n/basic_wm>)
 * [ ] ewmh: handle `_NET_WM_WINDOW_TYPE_DIALOG`, sometimes make it floating
 * [ ] state: support hidden/iconified windows
 	* [ ] clientMessage: handle WM_CHANGE_STATE
 	* [ ] ewmh: `_NET_WM_STATE_HIDDEN`, `_NET_WM_STATE_FOCUSED`
-* [ ] for better focus-follows-mouse: detect layout changes and use a timer to limit duration that EnterNotify is ignored.
+	* [ ] set `WM_STATE` to iconified for all non-visible windows (e.g. on hidden desktops)
 * [ ] close programs more gracefully, check for 'delete' protocol (or whatever it's called)
+* [ ] properly set X11 sibling above/below relationships
+* [ ] StateWrapper: activateWindowBefore/After (on desktop) (Win-N)
+* [ ] StateWrapper: activateWindowEarlier/Later (in session) (Win-Tab)
+* [ ] StateWrapper: activateDesktopNext/Prev
+* [ ] StateWrapper: activateDesktopEarlier/Later (in session)
+* [ ] BUG: start two xterms; click 'xterm' on lxqt-panel's task bar then move mouse to one of the xterms; the popup is then drawn below the windows
+* [ ] for better focus-follows-mouse: detect layout changes and use a timer to limit duration that EnterNotify is ignored.
+* [ ] xfce4-panel: the bottom panel should be centered
 
 Naming:
-* jetwm jetwm howmoo lowmo light flowm flowmo flowmotion
+* jetwm jetzwm lowmo lightwm flowm flowmo flowmotion
 
 Testing:
 * [ ] test `moveWindowToIndex`
-* [ ] test 'desktop.raise' more thoroughly
-* [ ] test multiple docks and different dock gravities
+* [ ] test 'xdesktop.raise' more thoroughly
+* [ ] test multiple docks and different dock gravities (still need to test left and right docks)
 * [ ] test 'move' action
 * [ ] test 'closeWindow' (perhaps put it in destroyWidgetSpec.js?)
 
@@ -48,7 +59,7 @@ Refactoring:
 * [ ] use 'activate' for 'focus.move*' => 'window.active*', and 'desktop.activate'
 * [ ] handleStateChange: don't call DestroyWindow on a window that was already destroyed
 * [ ] consider using `activeChildIndex` and `activeDesktopIndex` instead of IDs
-* [ ] move `x11.wmSettings` to `x11.windowsSettings[xidRoot]`
+* [ ] move some stuff in `x11.wmSettings` to `x11.windowsSettings[xidRoot]`
 * [ ] rename 'seawm.js' to 'wm.js'
 
 Later:
@@ -77,6 +88,7 @@ Later:
 * [ ] look into compatibility with various pagers and launchers (e.g. dockbarx, docky, candybar, lemonbar)
 * [ ] look into turning the WM into a compositing WM
 * [ ] for inspiration, lookup videos on Mac's Mission Control, Compiz F12, Ubuntu window management
+* [ ] handle startup notification (<http://www.freedesktop.org/wiki/Software/startup-notification/> and <http://standards.freedesktop.org/startup-notification-spec/startup-notification-latest.txt>)
 
 Multi-screen todos:
 * [ ] test showing a dock on each screen

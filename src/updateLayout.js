@@ -8,14 +8,16 @@ export default function updateLayout(builder) {
 	// For each screen, update desktop dimensions
 	builder.forEachScreen(screen => {
 		// Screen dimensions
-		const rc = [0, 0, screen.width, screen.height];
+		const rc0 = [0, 0, screen.width, screen.height];
 		// Background layout
 		const backgroundId = screen.backgroundId;
 		if (backgroundId >= 0) {
 			const w = builder.windowById(backgroundId);
 			w.visible = true;
-			w.setRc(rc);
+			w.setRc(rc0);
 		}
+		// Dimenions left over for desktop windows after dock placement
+		const rc = _.clone(rc0);
 		// Dock layout
 		screen.getDockIdOrder().forEach(id => {
 			const w = builder.windowById(id);
@@ -26,12 +28,13 @@ export default function updateLayout(builder) {
 				case 'left':
 				case 'right':
 				case 'top':
-					rc2 = [rc[0], rc[1], rc[2], size];
+					rc2 = [rc0[0], rc0[1], rc0[2], size];
 					rc[1] += size;
 					rc[3] -= size;
 					break;
+				case 'bottom':
 				default:
-					rc2 = [rc[0], rc[3] - size + 1, rc[2], size];
+					rc2 = [rc0[0], rc0[3] - size + 1, rc0[2], size];
 					rc[3] -= size;
 					break;
 			}

@@ -122,4 +122,34 @@ describe('updateLayout', () => {
 			`widgets.${w2}.rc`, [5, 5, 790, 580],
 		]);
 	});
+
+	it('with docks on bottom and top', () => {
+		const builder = new StateWrapper(initialState);
+		const d1 = builder.addDesktop({});
+		const s1 = builder.addScreen(ActionObjects.screen1);
+		const w1 = builder.addWindow({type: 'dock', dockGravity: 'top', dockSize: 10, xid: 1000});
+		const w2 = builder.addWindow({type: 'dock', dockGravity: 'bottom', dockSize: 10, xid: 1001});
+		builder.moveWindowToScreen(w1, s1);
+		builder.moveWindowToScreen(w2, s1);
+
+		updateLayout(builder);
+		checkList(builder, "dock without other windows", [
+			`widgets.${w1}.visible`, true,
+			`widgets.${w1}.rc`, [0, 0, 800, 10],
+			`widgets.${w2}.visible`, true,
+			`widgets.${w2}.rc`, [0, 591, 800, 10],
+		]);
+
+		const w3 = builder.addWindow({xid: 1001});
+		builder.moveWindowToDesktop(w3, d1);
+		updateLayout(builder);
+		checkList(builder, "dock with a normal window", [
+			`widgets.${w1}.visible`, true,
+			`widgets.${w1}.rc`, [0, 0, 800, 10],
+			`widgets.${w2}.visible`, true,
+			`widgets.${w2}.rc`, [0, 591, 800, 10],
+			`widgets.${w3}.visible`, true,
+			`widgets.${w3}.rc`, [5, 15, 790, 570],
+		]);
+	});
 });

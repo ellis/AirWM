@@ -94,6 +94,7 @@ var errorHandler = function(err){
 
 function widgetDestroy(w) {
 	const xid = w.get('xid');
+	logger.info("widgetDestroy", {w, xid});
 	if (xid) {
 		global.X.DestroyWindow(xid);
 	}
@@ -206,8 +207,9 @@ function findWidgetIdForXid(xid) {
 }
 
 var destroyNotifyHandler = function(ev){
-	logger.info("DestroyNotifier got triggered, removing the window that got destroyed.");
 	const id = findWidgetIdForXid(ev.wid);
+	logger.info(`destroyNotifyHandler(${id})`);
+	console.log(JSON.stringify(ev));
 	if (id >= 0) {
 		store.dispatch({type: 'removeWindow', id: id});
 	}
@@ -312,8 +314,12 @@ function createWidgetForXid(xid, props) {
 let eventNamePrev = undefined;
 var eventHandler = function(ev){
 	// Only log first of sequential MotionNotify events
-	if (ev.name !== "MotionNotify" || eventNamePrev !== "MotionNotify")
-		logger.info(`event ${ev.name}`);//: ${JSON.stringify(ev)}`);
+	if (ev.name !== "MotionNotify" || eventNamePrev !== "MotionNotify") {
+		let id = undefined;
+		if (ev.wid)
+			id = findWidgetIdForXid(ev.wid);
+		logger.info(`event ${id} ${ev.name}`);//`: ${JSON.stringify(ev)}`);
+	}
 	eventNamePrev = ev.name;
 	try {
 		switch( ev.name ) {
@@ -328,13 +334,6 @@ var eventHandler = function(ev){
 			// automatically by AirWM again anyway.
 			X.ResizeWindow(ev.wid, ev.width, ev.height);
 			break
-		// Show a window
-		case "MapRequest":
-			handleNewWindow(ev.wid);
-			break;
-		case "MotionNotify":
-			handleMotionNotify(ev);
-			break;
 		case "DestroyNotify":
 			destroyNotifyHandler(ev);
 			break;
@@ -346,6 +345,15 @@ var eventHandler = function(ev){
 		//	break;
 		case "KeyPress":
 			keyPressHandler(ev);
+			break;
+		// Show a window
+		case "MapRequest":
+			handleNewWindow(ev.wid);
+			break;
+		case "MotionNotify":
+			handleMotionNotify(ev);
+			break;
+		case "UnmapNotify":
 			break;
 		default:
 			//logger.error("Unhandled event: "+ev.name);
