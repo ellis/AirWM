@@ -244,6 +244,8 @@ function handleEvent() {
 					? "#"+ev.wid
 					: "undefined";
 			logger.info(`event ${idText} ${ev.name}`);//`: ${JSON.stringify(ev)}`);
+			if (id === 6)
+				console.log(_.omit(ev, 'rawData'));
 		}
 		eventNamePrev = ev.name;
 
@@ -310,13 +312,25 @@ function handleClientMessage(ev) {
 	});
 }
 
-function handleConfigureRequest(ev) {
-	return new Promise((resolve, reject) => {
-		// Allow requested resize for optimization. Window gets resized
-		// automatically by WM again anyway.
-		X.ResizeWindow(ev.wid, ev.width, ev.height);
-		resolve();
-	})
+function handleConfigureRequest(ev, id) {
+	let {width, height} = ev;
+
+	if (id >= 0) {
+		const state = store.getState();
+		const ConfigureWindow = state.getIn(['x11', 'windowSettings', id.toString(), 'ConfigureWindow']);
+		// Ignore request for know windows
+		// This should be changed to allow them on floating windows.
+		if (ConfigureWindow) {
+			//width = ConfigureWindow.getIn([1, 'width']);
+			//height = ConfigureWindow.getIn([1, 'height']);
+			//return Promise.resolve();
+		}
+	}
+
+	// Allow requested resize for optimization. Window gets resized
+	// automatically by WM again anyway.
+	X.ResizeWindow(ev.wid, width, height);
+	return Promise.resolve();
 }
 
 function handleDestroyNotify(ev) {
@@ -606,6 +620,7 @@ function handleStateChange() {
 
 			const ConfigureWindow = settings1.get('ConfigureWindow');
 			if (ConfigureWindow !== settings0.get('ConfigureWindow')) {
+				console.log({ConfigureWindow})
 				global.X.ConfigureWindow.apply(global.X, ConfigureWindow.toJS());
 			}
 

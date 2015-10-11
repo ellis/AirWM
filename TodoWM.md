@@ -13,8 +13,8 @@
 * [x] display xfce's panel on top
 * [x] BUG: click on time in xfce panel twice: a bad window is left over
 * [x] start xfce session and get xprop on xterm and calendar
-* [ ] BUG: in gnome-terminal, press Ctrl+Shift+F: an extra window is created
-	* [ ] big issue: need to process events in order, because two MapRequest events are coming in before we can notice for the second one that the window has already been created.
+* [x] big issue: need to process events in order, because two MapRequest events are coming in before we can notice for the second one that the window has already been created.
+* [ ] BUG: in gnome-terminal, press Ctrl+Shift+F or goto Help: why is the window sized incorrectly?
 * [ ] in gnome-terminal, open Edit|Preferences: the dialog should placed immediately after gnome-terminal and focused, because it has 'WM_CLIENT_LEADER' set.
 * [ ] in gvim, goto File|Open: the dialog should float over it's leader window
 * [ ] BUG: in gvim, goto File|Open: shouldn't be allowed to put focus back on the gvim window because of the MODAL dialog
