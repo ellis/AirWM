@@ -18,10 +18,12 @@ init:
 testing:
 	killall Xephyr || true
 	Xephyr :1 -ac -screen 800x600 &
-	sleep 1
-	DISPLAY=:1 xterm &
-	DISPLAY=:1 xfce4-panel &
-	sleep 1
+	sleep 0.5
+	#DISPLAY=:1 xterm &
+	DISPLAY=:1 gnome-terminal &
+	#DISPLAY=:1 xfce4-panel &
+	#DISPLAY=:1 lxqt-panel &
+	#	sleep 1
 	DISPLAY=:1 ./node_modules/.bin/babel-node src/wm.js
 
 

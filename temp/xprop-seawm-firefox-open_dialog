@@ -1,0 +1,32 @@
+_NET_WM_ALLOWED_ACTIONS(ATOM) = _NET_WM_ACTION_CLOSE
+_NET_WM_DESKTOP(CARDINAL) = 0
+WM_STATE(WM_STATE):
+                window state: Normal
+                icon window: 0x0
+_NET_WM_STATE(ATOM) = _NET_WM_STATE_MODAL
+WM_HINTS(WM_HINTS):
+                Client accepts input or input focus: True
+                Initial state is Normal State.
+                window id # of group leader: 0xe00001
+XdndAware(ATOM) = BITMAP
+_MOTIF_DRAG_RECEIVER_INFO(_MOTIF_DRAG_RECEIVER_INFO) = 0x6c, 0x0, 0x5, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x10, 0x0, 0x0, 0x0
+WM_WINDOW_ROLE(STRING) = "GtkFileChooserDialog"
+WM_TRANSIENT_FOR(WINDOW): window id # 0xe00082
+_NET_WM_SYNC_REQUEST_COUNTER(CARDINAL) = 14682932
+_NET_WM_WINDOW_TYPE(ATOM) = _NET_WM_WINDOW_TYPE_DIALOG
+_NET_WM_USER_TIME(CARDINAL) = 195608010
+_NET_WM_USER_TIME_WINDOW(WINDOW): window id # 0xe00b33
+WM_CLIENT_LEADER(WINDOW): window id # 0xe00001
+_NET_WM_PID(CARDINAL) = 2803
+WM_LOCALE_NAME(STRING) = "en_US.UTF-8"
+WM_CLIENT_MACHINE(STRING) = "osboxes"
+WM_NORMAL_HINTS(WM_SIZE_HINTS):
+                program specified location: 0, 0
+                program specified minimum size: 226 by 217
+                window gravity: NorthWest
+WM_PROTOCOLS(ATOM): protocols  WM_DELETE_WINDOW, WM_TAKE_FOCUS, _NET_WM_PING, _NET_WM_SYNC_REQUEST
+WM_CLASS(STRING) = "firefox", "Firefox"
+WM_ICON_NAME(STRING) = "Open File"
+_NET_WM_ICON_NAME(UTF8_STRING) = "Open File"
+WM_NAME(STRING) = "Open File"
+_NET_WM_NAME(UTF8_STRING) = "Open File"

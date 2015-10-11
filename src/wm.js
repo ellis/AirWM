@@ -28,27 +28,140 @@ var programs	= config.startup_applications;
 var keybindings = config.keybindings;
 var ks2kc;
 
-/*
-function forEachWindow(fn) {
+var clientCreator = function(err, display) {
+	initLogger('logs');
+	logger.info("Initializing WM client.");
 	try {
-		const state = store.getState().toJS();
-		for (let w of state.widgets) {
-			if (w.has('xid')) {
-				fn(w);
-			}
+		// Set the connection to the X server in global namespace
+		// as a hack since almost every file uses it
+		global.X = display.client;
+		ewmhPropTypeFormatInfos = {
+			'WM_STATE': ['WM_STATE', 32],
+			'_NET_ACTIVE_WINDOW': [global.X.atoms.WINDOW, 32],
+			'_NET_CLIENT_LIST': [global.X.atoms.WINDOW, 32],
+			'_NET_CLIENT_LIST_STACKING': [global.X.atoms.WINDOW, 32],
+			'_NET_CURRENT_DESKTOP': [global.X.atoms.CARDINAL, 32],
+			'_NET_NUMBER_OF_DESKTOPS': [global.X.atoms.CARDINAL, 32],
+			'_NET_WM_ALLOWED_ACTIONS': [global.X.atoms.ATOM, 32],
+			'_NET_WM_DESKTOP': [global.X.atoms.CARDINAL, 32],
+			'_NET_WM_STATE': ['_NET_WM_STATE', 32],
+		};
+
+		const action1 = {
+			type: 'initialize',
+			desktops: [
+				{name: "web", layout: "tile-right"},
+				{name: "text", layout: "tile-right"},
+				{name: "cli", layout: "tile-right"},
+				{name: "prog", layout: "tile-right"},
+			],
+			screens: _.map(display.screen, (screen) => { return {
+				xid: screen.root,
+				width: screen.pixel_width,
+				height: screen.pixel_height
+			}; })
+		};
+		store.dispatch(action1);
+
+		_.forEach(display.screen, (screen, i) => {
+			global.X.AllocColor( screen.default_colormap, 0x5E00, 0x9D00, 0xC800, function(err, color) {
+				store.dispatch({type: 'setX11ScreenColors', screen: i, colors: {focus: color.pixel}});
+			});
+			global.X.AllocColor( screen.default_colormap, 0xDC00, 0xF000, 0xF700, function(err, color) {
+				store.dispatch({type: 'setX11ScreenColors', screen: i, colors: {normal: color.pixel}});
+			});
+			global.X.AllocColor( screen.default_colormap, 0x0C00, 0x2C00, 0x5200, function(err, color) {
+				store.dispatch({type: 'setX11ScreenColors', screen: i, colors: {alert: color.pixel}});
+			});
+		});
+
+
+		const min_keycode = display.min_keycode;
+		const max_keycode = display.max_keycode;
+		X.GetKeyboardMapping(min_keycode, max_keycode-min_keycode, function(err, key_list) {
+			ks2kc = conversion.buildKeyMap(key_list,min_keycode);
+
+			// Grab all key combinations which are specified in the configuration file.
+			grabKeyBindings(ks2kc, display);
+		});
+
+		const eventMask = {
+			eventMask:
+				x11.eventMask.ButtonPress |
+				x11.eventMask.EnterWindow |
+				//x11.eventMask.LeaveWindow |
+				x11.eventMask.SubstructureNotify |
+				x11.eventMask.SubstructureRedirect |
+				//x11.eventMask.StructureNotify |
+				x11.eventMask.PointerMotion |
+				x11.eventMask.PropertyChange |
+				x11.eventMask.ResizeRedirect
 		}
+
+		// By adding the substructure redirect you become the window manager.
+		logger.info("Registering SeaWM as the current Window Manager.");
+		global.X.ChangeWindowAttributes(display.screen[0].root, eventMask, changeWindowAttributeErrorHandler);
+
+		/*
+		//NOTE: Using EWMH stops the client from receiving a bunch of messages.
+		//I think that it's probably overwriting the eventMask.
+
+		ewmh = new EWMH(display.client, display.screen[0].root);
+		ewmh.set_number_of_desktops(action1.desktops.length, function(err) {
+			if (err) {
+				throw err;
+			}
+			ewmh.set_current_desktop(0);
+		});
+
+		ewmh.on('CurrentDesktop', function(d) {
+			console.log('Client requested current desktop to be: ' + d);
+			//screens[0].setWorkspace(d);
+		});
+		*/
+
+		const SUPPORTED_ATOMS = [
+			'_NET_CURRENT_DESKTOP',
+			'_NET_NUMBER_OF_DESKTOPS',
+			'_NET_SUPPORTED',
+			'_NET_WM_ALLOWED_ACTIONS',
+			//'_NET_WM_STATE_FULLSCREEN',
+			//'_NET_SUPPORTING_WM_CHECK',
+			//'_NET_WM_NAME',
+			//'_NET_WM_STRUT',
+			'_NET_WM_STATE',
+			'_NET_WM_STRUT_PARTIAL',
+			'_NET_WM_WINDOW_TYPE',
+			'_NET_WM_WINDOW_TYPE_DESKTOP',
+			'_NET_WM_WINDOW_TYPE_DOCK',
+			// _NET_WM_WINDOW_TYPE_TOOLBAR, _NET_WM_WINDOW_TYPE_MENU, _NET_WM_WINDOW_TYPE_UTILITY, _NET_WM_WINDOW_TYPE_SPLASH, _NET_WM_WINDOW_TYPE_DIALOG, _NET_WM_WINDOW_TYPE_DROPDOWN_MENU, _NET_WM_WINDOW_TYPE_POPUP_MENU, _NET_WM_WINDOW_TYPE_TOOLTIP, _NET_WM_WINDOW_TYPE_NOTIFICATION, _NET_WM_WINDOW_TYPE_COMBO, _NET_WM_WINDOW_TYPE_DND,
+			'_NET_WM_WINDOW_TYPE_NORMAL',
+		];
+		const cb = (err) => { if(err) throw err; };
+		x11prop.set_property(global.X, display.screen[0].root, '_NET_SUPPORTED', global.X.atoms.ATOM, 32, SUPPORTED_ATOMS, cb);
+
+		global.X.QueryTree(display.screen[0].root, function(err, tree) {
+			console.log({err, tree});
+			if (err) throw err;
+			tree.children.forEach(handlePreExistingWindow);
+		});
+
+		store.subscribe(handleStateChange);
+
+		// Load the programs that should get started and start them
+		logger.info("Launching startup applications.");
+		//programs.forEach(execHandler);
 	}
 	catch (e) {
-		logger.error("forEachWindow: ERROR");
+		logger.error("clientCreator: ERROR:")
 		logger.error(e.message);
 		logger.error(e.stack);
 	}
 }
-*/
 
 var changeWindowAttributeErrorHandler = function(err) {
 	if( err.error === 10 ) {
-		logger.error("Another Window Manager is already running, AirWM will now terminate.");
+		logger.error("Another Window Manager is already running -- flowmo will now terminate.");
 	}
 	logger.error("changeWindowAttributeErrorHandler:")
 	logger.error(JSON.stringify(err));
@@ -92,30 +205,93 @@ var errorHandler = function(err){
 	logger.error(JSON.stringify(err));
 }
 
-function widgetDestroy(w) {
-	const xid = w.get('xid');
-	logger.info("widgetDestroy", {w, xid});
-	if (xid) {
-		global.X.DestroyWindow(xid);
+let eventNamePrev = undefined;
+var handleEvent = function(ev) {
+	let id = undefined;
+	if (ev.wid)
+		id = findWidgetIdForXid(ev.wid);
+	// Only log first of sequential MotionNotify events
+	if (ev.name !== "MotionNotify" || eventNamePrev !== "MotionNotify") {
+		const idText = (id >= 0)
+			? "@"+id
+			: (ev.wid >= 0)
+				//? "@ 0x"+ev.wid.toString(16)
+				? "#"+ev.wid
+				: "undefined";
+		logger.info(`event ${idText} ${ev.name}`);//`: ${JSON.stringify(ev)}`);
+	}
+	eventNamePrev = ev.name;
+	try {
+		switch( ev.name ) {
+		case 'ClientMessage':
+			handleClientMessage(ev);
+			break;
+		/*case "ConfigureNotify":
+			console.log(ev)
+			break;*/
+		case "ConfigureRequest":
+			// Allow requested resize for optimization. Window gets resized
+			// automatically by AirWM again anyway.
+			X.ResizeWindow(ev.wid, ev.width, ev.height);
+			break
+		case "DestroyNotify":
+			destroyNotifyHandler(ev);
+			break;
+		case "EnterNotify":
+			handleEnterNotify(ev);
+			break;
+		//case "LeaveNotify":
+		//	handleLeaveNotify(ev);
+		//	break;
+		case "KeyPress":
+			keyPressHandler(ev);
+			break;
+		// Show a window
+		case "MapRequest":
+			if (id >= 0) {
+				// do nothing
+			}
+			else {
+				handleMapRequest(ev.wid);
+			}
+			break;
+		case "MotionNotify":
+			handleMotionNotify(ev);
+			break;
+		case "UnmapNotify":
+			if (id >= 0)
+				handleUnmapNotify(ev, id);
+			break;
+		default:
+			//logger.error("Unhandled event: "+ev.name);
+		}
+	}
+	catch (e) {
+		logger.error("handleEvent: "+JSON.stringify(ev));
+		logger.error(e.message);
+		logger.error(e.stack);
 	}
 }
 
-/*
-var closeAllWindows = function(close_id) {
-	logger.info("Closing all windows.");
-	forEachWindow(widgetDestroy);
-}
-*/
-
-/*
-// when all windows have been closed, set the focus to the root window
-var setFocusToRootIfNecessary = function(){
-	var screen = screens[0];
-	if (screen.workspace.getWindowList().length === 0){
-		logger.info("Setting focus to the root window");
-		global.X.SetInputFocus(screen.root_xid);
+var keyPressHandler = function(ev){
+	logger.info("KeyPressHandler is going through all possible keybindings.");
+	for(var i = 0; i < keybindings.length; ++i){
+		var binding =  keybindings[i];
+		// Check if this is the binding which we are seeking.
+		if(ks2kc[keysym.fromName(binding.key).keysym] === ev.keycode){
+			if( (ev.buttons&(~146)) === binding.mod ){
+				if(binding.hasOwnProperty("command")){
+					commandHandler(binding.command);
+				} else if(binding.hasOwnProperty("program")){
+					execHandler(binding.program);
+				}
+				else if (binding.hasOwnProperty("action")) {
+					store.dispatch(binding.action);
+				}
+			}
+		}
 	}
-}*/
+}
 
 var commandHandler = function(command) {
 	logger.info("Launching airwm-command: '%s'.", command);
@@ -148,29 +324,9 @@ var execHandler = function(program) {
 	exec(program);
 }
 
-var keyPressHandler = function(ev){
-	logger.info("KeyPressHandler is going through all possible keybindings.");
-	for(var i = 0; i < keybindings.length; ++i){
-		var binding =  keybindings[i];
-		// Check if this is the binding which we are seeking.
-		if(ks2kc[keysym.fromName(binding.key).keysym] === ev.keycode){
-			if( (ev.buttons&(~146)) === binding.mod ){
-				if(binding.hasOwnProperty("command")){
-					commandHandler(binding.command);
-				} else if(binding.hasOwnProperty("program")){
-					execHandler(binding.program);
-				}
-				else if (binding.hasOwnProperty("action")) {
-					store.dispatch(binding.action);
-				}
-			}
-		}
-	}
-}
-
 function handleClientMessage(ev) {
 	global.X.GetAtomName(ev.type, function(err, name) {
-		console.log({name, ev})
+		logger.info("handleClientMessage: "+name+" "+JSON.stringify(_.omit(ev, 'rawData')));
 		switch (name) {
 		case '_NET_ACTIVE_WINDOW': {
 			const id = findWidgetIdForXid(ev.wid);
@@ -259,8 +415,8 @@ function promiseCatcher(e) {
 	logger.error(e.stack);
 }
 
-function handleNewWindow(xid) {
-	let log = `handleNewWindow(${xid})`;
+function handleMapRequest(xid) {
+	let log = `handleMapRequest(${xid})`;
 	global.X.GetWindowAttributes(xid, function(err, attrs) {
 		if (err) { logger.error(log); throw err; }
 
@@ -309,68 +465,6 @@ function createWidgetForXid(xid, props) {
 	}
 
 	store.dispatch(action);
-}
-
-let eventNamePrev = undefined;
-var eventHandler = function(ev){
-	let id = undefined;
-	if (ev.wid)
-		id = findWidgetIdForXid(ev.wid);
-	// Only log first of sequential MotionNotify events
-	if (ev.name !== "MotionNotify" || eventNamePrev !== "MotionNotify") {
-		logger.info(`event ${id} ${ev.name}`);//`: ${JSON.stringify(ev)}`);
-	}
-	eventNamePrev = ev.name;
-	try {
-		switch( ev.name ) {
-		case 'ClientMessage':
-			handleClientMessage(ev);
-			break;
-		/*case "ConfigureNotify":
-			console.log(ev)
-			break;*/
-		case "ConfigureRequest":
-			// Allow requested resize for optimization. Window gets resized
-			// automatically by AirWM again anyway.
-			X.ResizeWindow(ev.wid, ev.width, ev.height);
-			break
-		case "DestroyNotify":
-			destroyNotifyHandler(ev);
-			break;
-		case "EnterNotify":
-			handleEnterNotify(ev);
-			break;
-		//case "LeaveNotify":
-		//	handleLeaveNotify(ev);
-		//	break;
-		case "KeyPress":
-			keyPressHandler(ev);
-			break;
-		// Show a window
-		case "MapRequest":
-			if (id >= 0) {
-				// do nothing
-			}
-			else {
-				handleNewWindow(ev.wid);
-			}
-			break;
-		case "MotionNotify":
-			handleMotionNotify(ev);
-			break;
-		case "UnmapNotify":
-			if (id >= 0)
-				handleUnmapNotify(ev, id);
-			break;
-		default:
-			//logger.error("Unhandled event: "+ev.name);
-		}
-	}
-	catch (e) {
-		logger.error("eventHandler: "+JSON.stringify(ev));
-		logger.error(e.message);
-		logger.error(e.stack);
-	}
 }
 
 /**
@@ -592,135 +686,5 @@ function handleEwmh(xid, name, value) {
 	}
 }
 
-var airClientCreator = function(err, display) {
-	initLogger('logs');
-	logger.info("Initializing AirWM client.");
-	try {
-		// Set the connection to the X server in global namespace
-		// as a hack since almost every file uses it
-		global.X = display.client;
-		ewmhPropTypeFormatInfos = {
-			'WM_STATE': ['WM_STATE', 32],
-			'_NET_ACTIVE_WINDOW': [global.X.atoms.WINDOW, 32],
-			'_NET_CLIENT_LIST': [global.X.atoms.WINDOW, 32],
-			'_NET_CLIENT_LIST_STACKING': [global.X.atoms.WINDOW, 32],
-			'_NET_CURRENT_DESKTOP': [global.X.atoms.CARDINAL, 32],
-			'_NET_NUMBER_OF_DESKTOPS': [global.X.atoms.CARDINAL, 32],
-			'_NET_WM_ALLOWED_ACTIONS': [global.X.atoms.ATOM, 32],
-			'_NET_WM_DESKTOP': [global.X.atoms.CARDINAL, 32],
-			'_NET_WM_STATE': ['_NET_WM_STATE', 32],
-		};
 
-		const action1 = {
-			type: 'initialize',
-			desktops: [
-				{name: "web", layout: "tile-right"},
-				{name: "text", layout: "tile-right"},
-				{name: "cli", layout: "tile-right"},
-				{name: "prog", layout: "tile-right"},
-			],
-			screens: _.map(display.screen, (screen) => { return {
-				xid: screen.root,
-				width: screen.pixel_width,
-				height: screen.pixel_height
-			}; })
-		};
-		store.dispatch(action1);
-
-		_.forEach(display.screen, (screen, i) => {
-			global.X.AllocColor( screen.default_colormap, 0x5E00, 0x9D00, 0xC800, function(err, color) {
-				store.dispatch({type: 'setX11ScreenColors', screen: i, colors: {focus: color.pixel}});
-			});
-			global.X.AllocColor( screen.default_colormap, 0xDC00, 0xF000, 0xF700, function(err, color) {
-				store.dispatch({type: 'setX11ScreenColors', screen: i, colors: {normal: color.pixel}});
-			});
-			global.X.AllocColor( screen.default_colormap, 0x0C00, 0x2C00, 0x5200, function(err, color) {
-				store.dispatch({type: 'setX11ScreenColors', screen: i, colors: {alert: color.pixel}});
-			});
-		});
-
-
-		const min_keycode = display.min_keycode;
-		const max_keycode = display.max_keycode;
-		X.GetKeyboardMapping(min_keycode, max_keycode-min_keycode, function(err, key_list) {
-			ks2kc = conversion.buildKeyMap(key_list,min_keycode);
-
-			// Grab all key combinations which are specified in the configuration file.
-			grabKeyBindings(ks2kc,display);
-		});
-
-		const eventMask = {
-			eventMask:
-				x11.eventMask.ButtonPress |
-				x11.eventMask.EnterWindow |
-				//x11.eventMask.LeaveWindow |
-				x11.eventMask.SubstructureNotify |
-				x11.eventMask.SubstructureRedirect |
-				//x11.eventMask.StructureNotify |
-				x11.eventMask.PointerMotion |
-				x11.eventMask.PropertyChange |
-				x11.eventMask.ResizeRedirect
-		}
-
-		// By adding the substructure redirect you become the window manager.
-		logger.info("Registering SeaWM as the current Window Manager.");
-		global.X.ChangeWindowAttributes(display.screen[0].root, eventMask, changeWindowAttributeErrorHandler);
-
-		/*
-		//NOTE: Using EWMH stops the client from receiving a bunch of messages.
-		//I think that it's probably overwriting the eventMask.
-
-		ewmh = new EWMH(display.client, display.screen[0].root);
-		ewmh.set_number_of_desktops(action1.desktops.length, function(err) {
-			if (err) {
-				throw err;
-			}
-			ewmh.set_current_desktop(0);
-		});
-
-		ewmh.on('CurrentDesktop', function(d) {
-			console.log('Client requested current desktop to be: ' + d);
-			//screens[0].setWorkspace(d);
-		});
-		*/
-
-		const SUPPORTED_ATOMS = [
-			'_NET_CURRENT_DESKTOP',
-			'_NET_NUMBER_OF_DESKTOPS',
-			'_NET_SUPPORTED',
-			'_NET_WM_ALLOWED_ACTIONS',
-			//'_NET_WM_STATE_FULLSCREEN',
-			//'_NET_SUPPORTING_WM_CHECK',
-			//'_NET_WM_NAME',
-			//'_NET_WM_STRUT',
-			'_NET_WM_STATE',
-			'_NET_WM_STRUT_PARTIAL',
-			'_NET_WM_WINDOW_TYPE',
-			'_NET_WM_WINDOW_TYPE_DESKTOP',
-			'_NET_WM_WINDOW_TYPE_DOCK',
-			// _NET_WM_WINDOW_TYPE_TOOLBAR, _NET_WM_WINDOW_TYPE_MENU, _NET_WM_WINDOW_TYPE_UTILITY, _NET_WM_WINDOW_TYPE_SPLASH, _NET_WM_WINDOW_TYPE_DIALOG, _NET_WM_WINDOW_TYPE_DROPDOWN_MENU, _NET_WM_WINDOW_TYPE_POPUP_MENU, _NET_WM_WINDOW_TYPE_TOOLTIP, _NET_WM_WINDOW_TYPE_NOTIFICATION, _NET_WM_WINDOW_TYPE_COMBO, _NET_WM_WINDOW_TYPE_DND,
-			'_NET_WM_WINDOW_TYPE_NORMAL',
-		];
-		const cb = (err) => { if(err) throw err; };
-		x11prop.set_property(global.X, display.screen[0].root, '_NET_SUPPORTED', global.X.atoms.ATOM, 32, SUPPORTED_ATOMS, cb);
-
-		global.X.QueryTree(display.screen[0].root, function(err, tree) {
-			console.log({err, tree});
-			if (err) throw err;
-			tree.children.forEach(handlePreExistingWindow);
-		});
-
-		store.subscribe(handleStateChange);
-
-		// Load the programs that should get started and start them
-		logger.info("Launching startup applications.");
-		//programs.forEach(execHandler);
-	}
-	catch (e) {
-		logger.error("airClientCreator: ERROR:")
-		logger.error(e.message);
-		logger.error(e.stack);
-	}
-}
-
-x11.createClient({debug: true}, airClientCreator).on('error', errorHandler).on('event', eventHandler);
+x11.createClient({debug: true}, clientCreator).on('error', errorHandler).on('event', handleEvent);

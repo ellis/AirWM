@@ -12,9 +12,13 @@
 * [-?] BUG: start firefox; press Ctrl-N; the new window isn't sized properly
 * [x] display xfce's panel on top
 * [x] BUG: click on time in xfce panel twice: a bad window is left over
-* [ ] make sure xfce's panel works
-	* [ ] start xfce session and get xprop on xterm and application finder (started by clicking the magnifying glass on the bottom panel)
-	* [ ] figure out how to display windows in
+* [x] start xfce session and get xprop on xterm and calendar
+* [ ] BUG: in gnome-terminal, press Ctrl+Shift+F: an extra window is created
+	* [ ] big issue: need to process events in order, because two MapRequest events are coming in before we can notice for the second one that the window has already been created.
+* [ ] in gnome-terminal, open Edit|Preferences: the dialog should placed immediately after gnome-terminal and focused, because it has 'WM_CLIENT_LEADER' set.
+* [ ] in gvim, goto File|Open: the dialog should float over it's leader window
+* [ ] BUG: in gvim, goto File|Open: shouldn't be allowed to put focus back on the gvim window because of the MODAL dialog
+* [ ] xfce4-panel: should display window buttons for task switching
 * [ ] BUG: in Atom, press Ctrl-O: a bad window is created
 * [ ] in Atom, press Ctrl-O: should focus the dialog box
 * [ ] get `npm test` to run again by removing old test files
@@ -89,6 +93,12 @@ Later:
 * [ ] look into turning the WM into a compositing WM
 * [ ] for inspiration, lookup videos on Mac's Mission Control, Compiz F12, Ubuntu window management
 * [ ] handle startup notification (<http://www.freedesktop.org/wiki/Software/startup-notification/> and <http://standards.freedesktop.org/startup-notification-spec/startup-notification-latest.txt>)
+
+xfce todos:
+* [ ] it'd be nice if the calendar popup weren't made into a screen
+* [ ] it'd be nice if clicking the application finder on the bottom panel multiple times didn't open multiple application finder windows
+* [ ] after clicking on a window on the bottom panel, it'd be nice if the window got focus when it pops up
+
 
 Multi-screen todos:
 * [ ] test showing a dock on each screen
