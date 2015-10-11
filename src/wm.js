@@ -231,51 +231,51 @@ function handleEvent() {
 	eventHandlerRunning = true;
 	const ev = eventQueue.shift();
 
-	const next = function() {
-		if (eventQueue.length > 0) {
-			return handleEvent();
+	try {
+		let id = undefined;
+		if (ev.wid)
+			id = findWidgetIdForXid(ev.wid);
+		// Only log first of sequential MotionNotify events
+		if (ev.name !== "MotionNotify" || eventNamePrev !== "MotionNotify") {
+			const idText = (id >= 0)
+				? "@"+id
+				: (ev.wid >= 0)
+					//? "@ 0x"+ev.wid.toString(16)
+					? "#"+ev.wid
+					: "undefined";
+			logger.info(`event ${idText} ${ev.name}`);//`: ${JSON.stringify(ev)}`);
 		}
-		else {
-			eventHandlerRunning = false;
-			return Promise.resolve();
-		}
-	}
+		eventNamePrev = ev.name;
 
-	new Promise((resolve, reject) => {
-		try {
-			let id = undefined;
-			if (ev.wid)
-				id = findWidgetIdForXid(ev.wid);
-			// Only log first of sequential MotionNotify events
-			if (ev.name !== "MotionNotify" || eventNamePrev !== "MotionNotify") {
-				const idText = (id >= 0)
-					? "@"+id
-					: (ev.wid >= 0)
-						//? "@ 0x"+ev.wid.toString(16)
-						? "#"+ev.wid
-						: "undefined";
-				logger.info(`event ${idText} ${ev.name}`);//`: ${JSON.stringify(ev)}`);
+		const handler = _.get(eventHandlers, ev.name);
+		//if (!handler) console.log("unhandled event")
+		const promise = (handler) ? handler(ev, id) : Promise.resolve();
+		promise.then(() => {
+			if (eventQueue.length > 0) {
+				return handleEvent();
 			}
-			eventNamePrev = ev.name;
-
-			const handler = _.get(eventHandlers, ev.name);
-			if (handler)
-				return handler(ev, id);
 			else {
+				eventHandlerRunning = false;
 				return Promise.resolve();
 			}
-		}
-		catch (e) {
-			reject(e);
-		}
-	}).then(() => {
-		next();
-	}).catch((err) => {
+		}).catch(err => {
+			logger.error("handleEvent: "+JSON.stringify(ev));
+			logger.error(e.message);
+			logger.error(e.stack);
+			if (eventQueue.length > 0) {
+				return handleEvent();
+			}
+			else {
+				eventHandlerRunning = false;
+				return Promise.resolve();
+			}
+		});
+	}
+	catch (e) {
 		logger.error("handleEvent: "+JSON.stringify(ev));
 		logger.error(e.message);
 		logger.error(e.stack);
-		next();
-	});
+	}
 }
 
 function handleClientMessage(ev) {
@@ -321,8 +321,6 @@ function handleConfigureRequest(ev) {
 
 function handleDestroyNotify(ev) {
 	const id = findWidgetIdForXid(ev.wid);
-	logger.info(`handleDestroyNotify(${id})`);
-	console.log(JSON.stringify(ev));
 	if (id >= 0) {
 		store.dispatch({type: 'removeWindow', id: id});
 	}
@@ -385,7 +383,8 @@ function handleEnterNotify(ev, id) {
 	return Promise.resolve();
 }
 
-var handleKeyPress = function(ev){
+function handleKeyPress(ev){
+	//console.log(ev)
 	for(var i = 0; i < keybindings.length; ++i){
 		var binding =  keybindings[i];
 		// Check if this is the binding which we are seeking.
