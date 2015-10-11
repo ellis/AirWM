@@ -560,6 +560,17 @@ function createWidgetForXid(xid, props) {
 		}
 	}
 
+	console.log(_.omit(props, '_NET_WM_ICON'));
+	const transientForXid = _.get(props, 'WM_TRANSIENT_FOR[0]');
+	console.log({transientForXid})
+	if (transientForXid > 0) {
+		const transientForId = findWidgetIdForXid(transientForXid);
+		console.log({transientForId})
+		if (transientForId >= 0) {
+			action.window.transientForId = transientForId;
+		}
+	}
+
 	store.dispatch(action);
 }
 
