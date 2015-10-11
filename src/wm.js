@@ -321,15 +321,21 @@ function handleConfigureRequest(ev, id) {
 		// Ignore request for know windows
 		// This should be changed to allow them on floating windows.
 		if (ConfigureWindow) {
-			//width = ConfigureWindow.getIn([1, 'width']);
-			//height = ConfigureWindow.getIn([1, 'height']);
+			width = ConfigureWindow.getIn([1, 'width']);
+			height = ConfigureWindow.getIn([1, 'height']);
 			//return Promise.resolve();
 		}
 	}
 
 	// Allow requested resize for optimization. Window gets resized
 	// automatically by WM again anyway.
-	X.ResizeWindow(ev.wid, width, height);
+	console.log({id, wid: ev.wid, width, height, width2: ev.width, height2: ev.height})
+	X.ResizeWindow(ev.wid, ev.width, ev.height);
+	// HACK: I'm not sure why, but we need to resize twice in order for some
+	// windows to paint themselves correctly: first to the requested size, then
+	// to the desired size.
+	if (id >= 0)
+		X.ResizeWindow(ev.wid, width, height);
 	return Promise.resolve();
 }
 
