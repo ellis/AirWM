@@ -202,19 +202,23 @@ export default class StateWrapper {
 	findScreenIdByNum(num) { return this._get(StatePaths.screenIdOrder.concat(num), -1); }
 	findDesktopIdByNum(num) { return this._get(StatePaths.desktopIdOrder.concat(num), -1); }
 
-	findWindowNum(window) {
+	findWindowNum(window, desktop, offset) {
 		if (_.isUndefined(window))
 			window = this.currentWindow;
 		else if (_.isNumber(window))
 			window = this.windowById(window);
 
 		if (window) {
-			const desktopId = this._findWidgetDekstopIdById(window.id);
-			const desktop = this.desktopById(desktopId);
+			if (_.isUndefined(desktop))
+				desktop = window.findDesktop();
 			if (desktop) {
 				const l = desktop.getChildIdOrder();
 				const num = l.indexOf(window.id);
-				return {window, desktop, num}
+				let num2 = (_.isNumber(offset)) ? num + offset : num;
+				num2 = num2 % l.count();
+				if (num2 < 0)
+					num2 = l.count() + num2;
+				return {window, desktop, num: num2}
 			}
 		}
 		return undefined;
@@ -334,10 +338,8 @@ export default class StateWrapper {
 						// Put the window on the ref's desktop
 						this.moveWindowToDesktop(w, desktop);
 						// Put it right after the ref
-						const {num: refNum} = this.findWindowNum(ref);
-						const index = refNum + 1;
-						this.moveWindowToIndex(w, index);
-						console.log({refNum: desktop.getChildIdChain().get(0), refId: ref.id, and: desktop.getChildIdChain().get(0) === ref.id})
+						const {num} = this.findWindowNum(ref, desktop, 1);
+						this.moveWindowToIndex(w, num);
 						// Focus it, if the reference has focus
 						if (desktop.getChildIdChain().get(0) === ref.id) {
 							desktop._childIdChain.unshift(id);
@@ -681,12 +683,10 @@ export default class StateWrapper {
 	}
 
 	_calcWindowIndexDir(window, next) {
-		const {desktop, num} = this.findWindowNum(window) || {};
+		const offset = (next) ? 1 : -1;
+		const {desktop, num} = this.findWindowNum(window, undefined, offset) || {};
 		if (num >= 0) {
-			const j = (next)
-				? (num + 1) % l.count()
-				: (num == 0) ? l.count() - 1 : num - 1;
-			return {window, desktop, indexNew: j}
+			return {window, desktop, indexNew: num};
 		}
 		return undefined;
 	}

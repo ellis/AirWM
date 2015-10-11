@@ -19,9 +19,9 @@ testing:
 	killall Xephyr || true
 	Xephyr :1 -ac -screen 800x600 &
 	sleep 0.5
-	DISPLAY=:1 gnome-terminal &
-	sleep 1
-	DISPLAY=:1 xterm &
+	#DISPLAY=:1 gnome-terminal &
+	#DISPLAY=:1 xterm &
+	DISPLAY=:1 gvim &
 	#DISPLAY=:1 xfce4-panel &
 	#DISPLAY=:1 lxqt-panel &
 	#	sleep 1
