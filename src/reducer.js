@@ -34,8 +34,7 @@ const handlers = {
 
 	'addWindow': (builder, action) => {
 		//console.log({action})
-		const id = builder.addWindow(action.window);
-		builder.moveWindowToScreen(id);
+		builder.addWindow_user(action.window);
 		//console.log("after addWindow:")
 		//builder.print();
 	},

@@ -202,6 +202,24 @@ export default class StateWrapper {
 	findScreenIdByNum(num) { return this._get(StatePaths.screenIdOrder.concat(num), -1); }
 	findDesktopIdByNum(num) { return this._get(StatePaths.desktopIdOrder.concat(num), -1); }
 
+	findWindowNum(window) {
+		if (_.isUndefined(window))
+			window = this.currentWindow;
+		else if (_.isNumber(window))
+			window = this.windowById(window);
+
+		if (window) {
+			const desktopId = this._findWidgetDekstopIdById(window.id);
+			const desktop = this.desktopById(desktopId);
+			if (desktop) {
+				const l = desktop.getChildIdOrder();
+				const num = l.indexOf(window.id);
+				return {window, desktop, num}
+			}
+		}
+		return undefined;
+	}
+
 	addDesktop(w) {
 		w = fromJS(w);
 		// Default values
@@ -302,6 +320,37 @@ export default class StateWrapper {
 
 		return id;
 	}
+
+	addWindow_user(spec) {
+		const id = this.addWindow(spec);
+		const w = this.windowById(id);
+		if (w) {
+			const transientForId = w._get('transientForId');
+			if (transientForId >= 0) {
+				const ref = this.windowById(transientForId);
+				if (ref) {
+					const desktop = ref.findDesktop();
+					if (desktop) {
+						// Put the window on the ref's desktop
+						this.moveWindowToDesktop(w, desktop);
+						// Put it right after the ref
+						const {num: refNum} = this.findWindowNum(ref);
+						const index = refNum + 1;
+						this.moveWindowToIndex(w, index);
+						console.log({refNum: desktop.getChildIdChain().get(0), refId: ref.id, and: desktop.getChildIdChain().get(0) === ref.id})
+						// Focus it, if the reference has focus
+						if (desktop.getChildIdChain().get(0) === ref.id) {
+							desktop._childIdChain.unshift(id);
+						}
+						this._setCurrent();
+						return;
+					}
+				}
+			}
+			this.moveWindowToScreen(w);
+		}
+	}
+
 
 	/**
 	 * Remove window from desktop.  Window will not be visible.
@@ -444,6 +493,21 @@ export default class StateWrapper {
 			}
 		}
 		return this;
+	}
+
+	moveWindowToIndex(window, index) {
+		if (_.isUndefined(window))
+			window = this.currentWindow;
+		else if (_.isNumber(window))
+			window = this.windowById(window);
+
+		if (window) {
+			const desktop = window.findDesktop();
+			if (desktop) {
+				desktop._childIdOrder.insert(window.id, index);
+				this._setCurrent();
+			}
+		}
 	}
 
 	moveWindowToIndexNext(window) {
@@ -617,21 +681,12 @@ export default class StateWrapper {
 	}
 
 	_calcWindowIndexDir(window, next) {
-		if (_.isUndefined(window))
-			window = this.currentWindow;
-		else if (_.isNumber(window))
-			window = this.windowById(window);
-		if (window) {
-			const desktopId = this._findWidgetDekstopIdById(window.id);
-			const desktop = this.desktopById(desktopId);
-			if (desktop) {
-				const l = desktop.getChildIdOrder();
-				const i = l.indexOf(window.id);
-				const j = (next)
-					? (i + 1) % l.count()
-					: (i == 0) ? l.count() - 1 : i - 1;
-				return {window, desktop, indexNew: j}
-			}
+		const {desktop, num} = this.findWindowNum(window) || {};
+		if (num >= 0) {
+			const j = (next)
+				? (num + 1) % l.count()
+				: (num == 0) ? l.count() - 1 : num - 1;
+			return {window, desktop, indexNew: j}
 		}
 		return undefined;
 	}

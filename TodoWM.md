@@ -15,7 +15,7 @@
 * [x] start xfce session and get xprop on xterm and calendar
 * [x] big issue: need to process events in order, because two MapRequest events are coming in before we can notice for the second one that the window has already been created.
 * [x] BUG: in gnome-terminal, press Ctrl+Shift+F or goto Help: why is the window sized incorrectly?
-* [ ] in gnome-terminal, open Edit|Preferences: the dialog should placed immediately after gnome-terminal and focused, because it has 'WM_CLIENT_LEADER' set.
+* [x] in gnome-terminal, open Edit|Preferences: the dialog should placed immediately after gnome-terminal and focused, because it has 'WM_CLIENT_LEADER' set.
 * [ ] in gvim, goto File|Open: the dialog should float over it's leader window
 * [ ] BUG: in gvim, goto File|Open: shouldn't be allowed to put focus back on the gvim window because of the MODAL dialog
 * [ ] xfce4-panel: should display window buttons for task switching
@@ -50,6 +50,7 @@ Naming:
 * jetwm jetzwm lowmo lightwm flowm flowmo flowmotion
 
 Testing:
+* [ ] test adding transient windows (both when the reference has focus and when not)
 * [ ] test `moveWindowToIndex`
 * [ ] test 'xdesktop.raise' more thoroughly
 * [ ] test multiple docks and different dock gravities (still need to test left and right docks)
