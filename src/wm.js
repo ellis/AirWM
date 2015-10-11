@@ -205,76 +205,187 @@ var errorHandler = function(err){
 	logger.error(JSON.stringify(err));
 }
 
+let eventQueue = [];
+let eventHandlerRunning = false;
+function enqueueEvent(ev) {
+	eventQueue.push(ev);
+	if (!eventHandlerRunning)
+		handleEvent();
+}
+
+const eventHandlers = {
+	'ClientMessage': handleClientMessage,
+	"ConfigureRequest": handleConfigureRequest,
+	"DestroyNotify": handleDestroyNotify,
+	"EnterNotify": handleEnterNotify,
+	//case "LeaveNotify":
+	'KeyPress': handleKeyPress,
+	// Show a window
+	'MapRequest': handleMapRequest,
+	//'MotionNotify': handleMotionNotify,
+	'UnmapNotify': handleUnmapNotify,
+};
+
 let eventNamePrev = undefined;
-var handleEvent = function(ev) {
-	let id = undefined;
-	if (ev.wid)
-		id = findWidgetIdForXid(ev.wid);
-	// Only log first of sequential MotionNotify events
-	if (ev.name !== "MotionNotify" || eventNamePrev !== "MotionNotify") {
-		const idText = (id >= 0)
-			? "@"+id
-			: (ev.wid >= 0)
-				//? "@ 0x"+ev.wid.toString(16)
-				? "#"+ev.wid
-				: "undefined";
-		logger.info(`event ${idText} ${ev.name}`);//`: ${JSON.stringify(ev)}`);
-	}
-	eventNamePrev = ev.name;
-	try {
-		switch( ev.name ) {
-		case 'ClientMessage':
-			handleClientMessage(ev);
-			break;
-		/*case "ConfigureNotify":
-			console.log(ev)
-			break;*/
-		case "ConfigureRequest":
-			// Allow requested resize for optimization. Window gets resized
-			// automatically by AirWM again anyway.
-			X.ResizeWindow(ev.wid, ev.width, ev.height);
-			break
-		case "DestroyNotify":
-			destroyNotifyHandler(ev);
-			break;
-		case "EnterNotify":
-			handleEnterNotify(ev);
-			break;
-		//case "LeaveNotify":
-		//	handleLeaveNotify(ev);
-		//	break;
-		case "KeyPress":
-			keyPressHandler(ev);
-			break;
-		// Show a window
-		case "MapRequest":
-			if (id >= 0) {
-				// do nothing
-			}
-			else {
-				handleMapRequest(ev.wid);
-			}
-			break;
-		case "MotionNotify":
-			handleMotionNotify(ev);
-			break;
-		case "UnmapNotify":
-			if (id >= 0)
-				handleUnmapNotify(ev, id);
-			break;
-		default:
-			//logger.error("Unhandled event: "+ev.name);
+function handleEvent() {
+	eventHandlerRunning = true;
+	const ev = eventQueue.shift();
+
+	const next = function() {
+		if (eventQueue.length > 0) {
+			return handleEvent();
+		}
+		else {
+			eventHandlerRunning = false;
+			return Promise.resolve();
 		}
 	}
-	catch (e) {
+
+	new Promise((resolve, reject) => {
+		try {
+			let id = undefined;
+			if (ev.wid)
+				id = findWidgetIdForXid(ev.wid);
+			// Only log first of sequential MotionNotify events
+			if (ev.name !== "MotionNotify" || eventNamePrev !== "MotionNotify") {
+				const idText = (id >= 0)
+					? "@"+id
+					: (ev.wid >= 0)
+						//? "@ 0x"+ev.wid.toString(16)
+						? "#"+ev.wid
+						: "undefined";
+				logger.info(`event ${idText} ${ev.name}`);//`: ${JSON.stringify(ev)}`);
+			}
+			eventNamePrev = ev.name;
+
+			const handler = _.get(eventHandlers, ev.name);
+			if (handler)
+				return handler(ev, id);
+			else {
+				return Promise.resolve();
+			}
+		}
+		catch (e) {
+			reject(e);
+		}
+	}).then(() => {
+		next();
+	}).catch((err) => {
 		logger.error("handleEvent: "+JSON.stringify(ev));
 		logger.error(e.message);
 		logger.error(e.stack);
-	}
+		next();
+	});
 }
 
-var keyPressHandler = function(ev){
-	logger.info("KeyPressHandler is going through all possible keybindings.");
+function handleClientMessage(ev) {
+	return new Promise((resolve, reject) => {
+		global.X.GetAtomName(ev.type, function(err, name) {
+			if (err) return reject(err);
+
+			logger.info("handleClientMessage: "+name+" "+JSON.stringify(_.omit(ev, 'rawData')));
+			switch (name) {
+			case '_NET_ACTIVE_WINDOW': {
+				const id = findWidgetIdForXid(ev.wid);
+				if (id >= 0) {
+					store.dispatch({type: 'activateWindow', id: id});
+				}
+				break;
+			}
+			case '_NET_CLOSE_WINDOW':
+				return handleDestroyNotify(ev);
+
+			case '_NET_CURRENT_DESKTOP':
+				store.dispatch({type: 'activateDesktop', desktop: ev.data[0]});
+				break;
+
+			case '_NET_WM_DESKTOP':
+				// FIXME: need to use ev.wid rather than assuming that this is for the current window
+				store.dispatch({type: 'moveWindowToDesktop', desktop: ev.data[0]});
+				break;
+			}
+
+			resolve();
+		});
+	});
+}
+
+function handleConfigureRequest(ev) {
+	return new Promise((resolve, reject) => {
+		// Allow requested resize for optimization. Window gets resized
+		// automatically by WM again anyway.
+		X.ResizeWindow(ev.wid, ev.width, ev.height);
+		resolve();
+	})
+}
+
+function handleDestroyNotify(ev) {
+	const id = findWidgetIdForXid(ev.wid);
+	logger.info(`handleDestroyNotify(${id})`);
+	console.log(JSON.stringify(ev));
+	if (id >= 0) {
+		store.dispatch({type: 'removeWindow', id: id});
+	}
+	return Promise.resolve();
+}
+
+/**
+ * This event handler is responsible "focus follows mouse".
+ * Unfortunately, the implementation is complicated.
+ * The EnterNotify event is sent whenever the mouse "enters" a window,
+ * but that may occur when windows are moved or opened, or the desktop
+ * is switched.
+ * However, focus-follows-mouse should only occur in response to the
+ * MOVEMENT of the mouse cursor into a new window.
+ *
+ * In order to address this problem, I use a buggy hack:
+ * - in handleStateChange(), after the active window changes, set ignoreEnterNotify = true.
+ * - This will lead ignoring one EnterNotify event (the next one).
+ * - Also check the coordinates of the last EnterNotify event, and
+ *   ignore if the coordinates haven't changed.
+ * - set ignoreEnterNotify=false at end of handleEnterNotify(),
+ *
+ * Solves:
+ * - when the user switches desktops, the window under the mouse
+ *   doesn't get automatically selected.
+ * - when user moves windows around the layout with shortcut keys.
+ *
+ * Doesn't solve:
+ * - This strategy won't handle
+ *   the case of a new window opening, where we also shouldn't automatically
+ *   switch to the window under the cursor!
+ * - Layout changes that lead to a different window being under the cursor.
+ * - when the user uses shortcuts to activate a window, the next time the mouse
+ *   moves to a new window, EnterNotify might be ignored.
+ *
+ * Possible better solutions:
+ * 1. set ignoreEnterNotify=true whenever there is a layout change, and use
+ *    a timer to limit how long EnterNotify will be ignored.
+ * 2. use XInput to detect mouse movement, and only use EnterNotify it's for
+ *    the window that was under the last mouse movement.
+ */
+let handleEnterNotifyCoordsPrev = {};
+let ignoreEnterNotify = true;
+function handleEnterNotify(ev, id) {
+	const coords = _.pick(ev, ['rootx', 'rooty']);
+	let state = store.getState();
+	//_focusId = id;
+	if (id >= 0) {
+		//console.log({coords, ev, handleEnterNotifyCoordsPrev});
+		if (!ignoreEnterNotify && !_.isEqual(coords, handleEnterNotifyCoordsPrev)) {
+			store.dispatch({type: 'activateWindow', id: id});
+		}
+		else {
+			//console.log("ignored EnterNotify");
+		}
+		ignoreEnterNotify = false;
+		//console.log("ignoreEnterNotify = false")
+	}
+	handleEnterNotifyCoordsPrev = coords;
+	return Promise.resolve();
+}
+
+var handleKeyPress = function(ev){
 	for(var i = 0; i < keybindings.length; ++i){
 		var binding =  keybindings[i];
 		// Check if this is the binding which we are seeking.
@@ -291,6 +402,7 @@ var keyPressHandler = function(ev){
 			}
 		}
 	}
+	return Promise.resolve();
 }
 
 var commandHandler = function(command) {
@@ -322,53 +434,6 @@ var commandHandler = function(command) {
 var execHandler = function(program) {
 	logger.info("Launching external application: '%s'.", program);
 	exec(program);
-}
-
-function handleClientMessage(ev) {
-	global.X.GetAtomName(ev.type, function(err, name) {
-		logger.info("handleClientMessage: "+name+" "+JSON.stringify(_.omit(ev, 'rawData')));
-		switch (name) {
-		case '_NET_ACTIVE_WINDOW': {
-			const id = findWidgetIdForXid(ev.wid);
-			if (id >= 0) {
-				store.dispatch({type: 'activateWindow', id: id});
-			}
-			break;
-		}
-		case '_NET_CLOSE_WINDOW':
-			destroyNotifyHandler(ev);
-			break;
-
-		case '_NET_CURRENT_DESKTOP':
-			store.dispatch({type: 'activateDesktop', desktop: ev.data[0]});
-			break;
-
-		case '_NET_WM_DESKTOP':
-			// FIXME: need to use ev.wid rather than assuming that this is for the current window
-			store.dispatch({type: 'moveWindowToDesktop', desktop: ev.data[0]});
-			break;
-		}
-	});
-}
-
-function findWidgetIdForXid(xid) {
-	let id;
-	store.getState().get('widgets').forEach((w, key) => {
-		if (w.get('xid') === xid) {
-			id = parseInt(key);
-			return false;
-		}
-	});
-	return id;
-}
-
-var destroyNotifyHandler = function(ev){
-	const id = findWidgetIdForXid(ev.wid);
-	logger.info(`destroyNotifyHandler(${id})`);
-	console.log(JSON.stringify(ev));
-	if (id >= 0) {
-		store.dispatch({type: 'removeWindow', id: id});
-	}
 }
 
 /**
@@ -415,23 +480,35 @@ function promiseCatcher(e) {
 	logger.error(e.stack);
 }
 
-function handleMapRequest(xid) {
-	let log = `handleMapRequest(${xid})`;
-	global.X.GetWindowAttributes(xid, function(err, attrs) {
-		if (err) { logger.error(log); throw err; }
+function handleMapRequest(ev, id) {
+	// ignore request for already existing windows
+	if (id >= 0) {
+		return Promise.resolve();
+	}
 
+	const xid = ev.wid;
+	let log = `handleMapRequest(${xid})`;
+	const p1 = new Promise((resolve, reject) => {
+		global.X.GetWindowAttributes(xid, function(err, attrs) {
+			if (err) return reject(err);
+			return resolve(attrs);
+		});
+	});
+	const p2 = p1.then(attrs => {
 		// If the override-redirect flag is set, don't manage, just show:
 		if (attrs.overrideRedirect) {
 			logger.info(log+": window has overrideRedirect");
 			X.MapWindow(xid);
-			//return;
+			return Promise.resolve();
 		}
 		else {
-			getWindowProperties(global.X, xid).then(props => {
+			return getWindowProperties(global.X, xid).then(props => {
 				createWidgetForXid(xid, props);
-			}).catch(promiseCatcher);
+				return Promise.resolve();
+			});
 		}
 	});
+	return p2;
 }
 
 function createWidgetForXid(xid, props) {
@@ -467,97 +544,28 @@ function createWidgetForXid(xid, props) {
 	store.dispatch(action);
 }
 
-/**
- * This event handler is responsible "focus follows mouse".
- * Unfortunately, the implementation is complicated.
- * The EnterNotify event is sent whenever the mouse "enters" a window,
- * but that may occur when windows are moved or opened, or the desktop
- * is switched.
- * However, focus-follows-mouse should only occur in response to the
- * MOVEMENT of the mouse cursor into a new window.
- *
- * In order to address this problem, I use a buggy hack:
- * - in handleStateChange(), after the active window changes, set ignoreEnterNotify = true.
- * - This will lead ignoring one EnterNotify event (the next one).
- * - Also check the coordinates of the last EnterNotify event, and
- *   ignore if the coordinates haven't changed.
- * - set ignoreEnterNotify=false at end of handleEnterNotify(),
- *
- * Solves:
- * - when the user switches desktops, the window under the mouse
- *   doesn't get automatically selected.
- * - when user moves windows around the layout with shortcut keys.
- *
- * Doesn't solve:
- * - This strategy won't handle
- *   the case of a new window opening, where we also shouldn't automatically
- *   switch to the window under the cursor!
- * - Layout changes that lead to a different window being under the cursor.
- * - when the user uses shortcuts to activate a window, the next time the mouse
- *   moves to a new window, EnterNotify might be ignored.
- *
- * Possible better solutions:
- * 1. set ignoreEnterNotify=true whenever there is a layout change, and use
- *    a timer to limit how long EnterNotify will be ignored.
- * 2. use XInput to detect mouse movement, and only use EnterNotify it's for
- *    the window that was under the last mouse movement.
- */
-let handleEnterNotifyCoordsPrev = {};
-let ignoreEnterNotify = true;
-function handleEnterNotify(ev) {
-	//console.log(ev);
-	const coords = _.pick(ev, ['rootx', 'rooty']);
-	let state = store.getState();
-	var id = undefined;
-	state.get('widgets').forEach((w, key) => {
-		if (w.get('xid') === ev.wid) {
-			switch (w.get('type')) {
-				case 'window':
-					id = parseInt(key);
-					break;
-				default:
-					break;
-			}
-			return false;
-		}
-	});
-	//_focusId = id;
-	if (id >= 0) {
-		//console.log({coords, ev, handleEnterNotifyCoordsPrev});
-		if (!ignoreEnterNotify && !_.isEqual(coords, handleEnterNotifyCoordsPrev)) {
-			store.dispatch({type: 'activateWindow', id: id});
-		}
-		else {
-			//console.log("ignored EnterNotify");
-		}
-		ignoreEnterNotify = false;
-		//console.log("ignoreEnterNotify = false")
-	}
-	handleEnterNotifyCoordsPrev = coords;
-}
-
 /*function handleLeaveNotify(ev) {
 	const coords = _.pick(ev, ['rootx', 'rooty']);
 	//console.log({coords, ev, handleEnterNotifyCoordsPrev});
 	handleEnterNotifyCoordsPrev = coords;
 }*/
 
+/*
 function handleMotionNotify(ev) {
-	/*if (_focusId >= 0) {
-		const id = _focusId;
-		_focusId = undefined;
-		store.dispatch({type: 'activateWindow', id});
-	}*/
 }
+*/
 
 function handleUnmapNotify(ev, id) {
-	const builder = new StateWrapper(store.getState());
-	const w = builder.windowById(id);
-	if (w) {
-		if (w.visible) {
-			store.dispatch({type: 'removeWindow', id: id});
+	if (id >= 0) {
+		const builder = new StateWrapper(store.getState());
+		const w = builder.windowById(id);
+		if (w) {
+			if (w.visible) {
+				store.dispatch({type: 'removeWindow', id: id});
+			}
 		}
 	}
+	return Promise.resolve();
 }
 
 //creates the logDir directory when it doesn't exist (otherwise Winston fails)
@@ -686,5 +694,16 @@ function handleEwmh(xid, name, value) {
 	}
 }
 
+function findWidgetIdForXid(xid) {
+	let id;
+	store.getState().get('widgets').forEach((w, key) => {
+		if (w.get('xid') === xid) {
+			id = parseInt(key);
+			return false;
+		}
+	});
+	return id;
+}
 
-x11.createClient({debug: true}, clientCreator).on('error', errorHandler).on('event', handleEvent);
+
+x11.createClient({debug: true}, clientCreator).on('error', errorHandler).on('event', enqueueEvent);
