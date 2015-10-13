@@ -17,6 +17,7 @@
 * [x] BUG: in gnome-terminal, press Ctrl+Shift+F or goto Help: why is the window sized incorrectly?
 * [x] in gnome-terminal, open Edit|Preferences: the dialog should placed immediately after gnome-terminal and focused, because it has 'WM_TRANSIENT_FOR' set.
 * [ ] get `npm test` to run again by removing old test files
+	* [ ] test/actions/activateDesktopSpec.js
 * [ ] test adding transient windows (both when the reference has focus and when not)
 * [ ] handle floating windows
 * [ ] test floating windows

@@ -2,18 +2,24 @@ import {List, Map, fromJS} from 'immutable';
 import {expect} from 'chai';
 import diff from 'immutablediff';
 
+import checkList from '../checkList.js';
 import reducer from '../../src/reducer.js';
 import State from '../../src/state.js';
+import StateWrapper from '../../src/StateWrapper.js';
 import * as ex from '../exampleStates.js';
 
 describe('activateDesktop', () => {
 	describe('with one screen, one dock, no windows', () => {
 		describe('raise desktop 2', () => {
-			const state = reducer(ex.state120, {type: 'activateDesktop', num: 1});
+			const state = reducer(ex.state120, {type: 'activateDesktop', desktop: 1});
+			const builder = new StateWrapper(state);
+			builder.print()
 			it('should show desktop 2', () => {
-				expect(State.getCurrentDesktopId(state, 0)).to.equal(1);
-				expect(state.getIn(['widgets', '0', 'screenId'])).to.be.undefined;
-				expect(state.getIn(['widgets', '1', 'screenId'])).to.equal(0);
+				checkList(builder, "activateDesktop 1", [
+					`widgets.0.parentId`, -1,
+					`widgets.1.parentId`, 2,
+					`currentDesktopId`, 1
+				]);
 			});
 			it('should leave x11 focus on root', () => {
 				expect(state.getIn(['x11', 'wmSettings', 'SetInputFocus', 0])).to.equal(ex.screen0_xidRoot);
@@ -23,34 +29,32 @@ describe('activateDesktop', () => {
 
 	describe("with one screen, one dock, one window", () => {
 		const action1 = {
-			type: 'createWidget',
+			type: 'addWindow',
 			widget: {
 				type: 'window',
 				xid: 1001
 			}
 		};
 		const state121 = reducer(ex.state120, action1);
-		const state1 = reducer(state121, {type: 'activateDesktop', num: 1});
+		const state1 = reducer(state121, {type: 'activateDesktop', desktop: 1});
 		describe('raise desktop 2', () => {
+			const builder = new StateWrapper(state1);
 			const state = state1;
 			it('should show desktop 2', () => {
-				expect(State.getCurrentDesktopId(state, 0)).to.equal(1);
-				expect(state.getIn(['widgets', '0', 'screenId'])).to.be.undefined;
-				expect(state.getIn(['widgets', '1', 'screenId'])).to.equal(0);
-			});
-			it('hides previously visible window', () => {
-				expect(state.getIn(['widgets', '3', 'visible'])).to.equal(false);
-			});
-			it('should not have a focus window', () => {
-				expect(state.getIn(['focusCurrentId'])).to.be.undefined;
-			});
-			it('should set x11 focus on root', () => {
-				expect(state.getIn(['x11', 'wmSettings', 'SetInputFocus', 0])).to.equal(ex.screen0_xidRoot);
+				checkList(builder, "activateDesktop 1", [
+					`widgets.0.parentId`, -1,
+					`widgets.1.parentId`, 2,
+					`currentDesktopId`, 1,
+					// hides previously visible window:
+					`currentWindowId`, -1,
+					// Focus on root:
+					`x11.wmSettings.SetInputFocus`, [ex.screen0_xidRoot]
+				]);
 			});
 		});
 
 		describe('switch back to desktop 1', () => {
-			const state2 = reducer(state1, {type: 'activateDesktop', num: 0});
+			const state2 = reducer(state1, {type: 'activateDesktop', desktop: 0});
 			it('should be the same as before', () => {
 				const expected2 = state121.setIn(['widgets', '1', 'rc'], List.of(0, 0, 800, 600));
 				//State.print(state2)

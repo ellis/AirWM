@@ -205,47 +205,53 @@ export const state120 = fromJS({
 	widgets: {
 		0: {
 			type: "desktop",
-			name: "1",
-			screenId: 0,
-			rc: [0, 0, 800, 600],
-			layout: "tile-right"
+			name: "web",
+			parentId: 1,
+			rc: [0, 0, 800, 590],
+			layout: "default",
+			childIdOrder: [],
+			childIdChain: []
 		},
 		1: {
 			type: "desktop",
-			name: "2",
-			layout: "tile-right"
+			name: "web",
+			rc: [0, 0, 800, 590],
+			layout: "default",
+			childIdOrder: [],
+			childIdChain: []
 		},
 		2: {
-			type: "dock",
-			xid: 2002,
-			screenId: 0,
-			dockGravity: "bottom",
-			dockSize: "20",
-			rc: [0, 590, 0, 800]
-		}
-	},
-	screens: {
-		0: {
-			xidRoot: screen0_xidRoot,
+			type: 'screen',
+			xid: screen0_xidRoot,
 			width: 800,
 			height: 600,
-			desktopIdStack: [0, 1]
+			desktopIdChain: [0],
+			dockIdOrder: [3]
+		},
+		3: {
+			type: "dock",
+			xid: 2002,
+			parentId: 2,
+			dockGravity: "bottom",
+			dockSize: "20",
+			rc: [0, 590, 800, 10]
 		}
 	},
-	widgetIdNext: 3,
-	screenIdOrder: [0],
-	screenIdStack: [0],
+	widgetIdNext: -1,
+	screenIdOrder: [2],
 	desktopIdOrder: [0, 1],
-	desktopIdStack: [0, 1],
 	windowIdOrder: [],
-	windowIdStack: [],
+	widgetIdChain: [0, 2, 1],
+	currentScreenId: 2,
+	currentDesktopId: 0,
+	currentWindowId: -1,
 	x11: {
 		desktopNum: 0,
 		wmSettings: {
 			SetInputFocus: [screen0_xidRoot]
 		},
 		windowSettings: {
-			"2": {
+			"3": {
 				"xid": 2000,
 				"visible": true,
 				"desktopNum": -1,
