@@ -684,9 +684,9 @@ export default class StateWrapper {
 
 	_calcWindowIndexDir(window, next) {
 		const offset = (next) ? 1 : -1;
-		const {desktop, num} = this.findWindowNum(window, undefined, offset) || {};
+		const {window: window2, desktop, num} = this.findWindowNum(window, undefined, offset) || {};
 		if (num >= 0) {
-			return {window, desktop, indexNew: num};
+			return {window: window2, desktop, indexNew: num};
 		}
 		return undefined;
 	}
@@ -729,6 +729,7 @@ export default class StateWrapper {
 
 	_moveWindowToIndexDir(window, next) {
 		const result = this._calcWindowIndexDir(window, next);
+		//console.log({window, next, result})
 		if (result) {
 			result.desktop._childIdOrder.insert(result.window.id, result.indexNew);
 			this._setCurrent();
