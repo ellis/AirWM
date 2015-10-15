@@ -9,7 +9,7 @@ import StateWrapper from '../../src/StateWrapper.js';
 import * as ex from '../exampleStates.js';
 
 describe('activateDesktop', () => {
-	describe('with one screen, one dock, no windows', () => {
+	/*describe('with one screen, one dock, no windows', () => {
 		describe('raise desktop 2', () => {
 			const state = reducer(ex.state120, {type: 'activateDesktop', desktop: 1});
 			const builder = new StateWrapper(state);
@@ -26,7 +26,7 @@ describe('activateDesktop', () => {
 			});
 		});
 	});
-
+*/
 	describe("with one screen, one dock, one window", () => {
 		const action1 = {
 			type: 'addWindow',
@@ -56,10 +56,12 @@ describe('activateDesktop', () => {
 		describe('switch back to desktop 1', () => {
 			const state2 = reducer(state1, {type: 'activateDesktop', desktop: 0});
 			it('should be the same as before', () => {
-				const expected2 = state121.setIn(['widgets', '1', 'rc'], List.of(0, 0, 800, 600));
+				const expected2 = state121
+					.setIn(['widgets', '1', 'parentId'], -1)
+					.setIn(['widgets', '2', 'desktopIdChain', 1], 1);
 				//State.print(state2)
 				//console.log(diff(state2, expected2));
-				expect(state2).to.equal(expected2);
+				expect(state2).to.deep.equal(expected2);
 			});
 		});
 	});

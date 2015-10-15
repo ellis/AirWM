@@ -206,7 +206,7 @@ export const state120 = fromJS({
 		0: {
 			type: "desktop",
 			name: "web",
-			parentId: 1,
+			parentId: 2,
 			rc: [0, 0, 800, 590],
 			layout: "default",
 			childIdOrder: [],
@@ -233,11 +233,12 @@ export const state120 = fromJS({
 			xid: 2002,
 			parentId: 2,
 			dockGravity: "bottom",
-			dockSize: "20",
-			rc: [0, 590, 800, 10]
+			dockSize: 10,
+			rc: [0, 591, 800, 10],
+			visible: true
 		}
 	},
-	widgetIdNext: -1,
+	widgetIdNext: 4,
 	screenIdOrder: [2],
 	desktopIdOrder: [0, 1],
 	windowIdOrder: [],
@@ -248,7 +249,11 @@ export const state120 = fromJS({
 	x11: {
 		desktopNum: 0,
 		wmSettings: {
-			SetInputFocus: [screen0_xidRoot]
+			SetInputFocus: [screen0_xidRoot],
+			ewmh: {
+				"_NET_NUMBER_OF_DESKTOPS": [2],
+				"_NET_CURRENT_DESKTOP": [0]
+			}
 		},
 		windowSettings: {
 			"3": {
@@ -266,7 +271,7 @@ export const state120 = fromJS({
 					2000,
 					{
 						"x": 0,
-						"y": 590,
+						"y": 591,
 						"width": 800,
 						"height": 10,
 						"borderWidth": 0,

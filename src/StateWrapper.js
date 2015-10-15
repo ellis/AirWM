@@ -224,6 +224,48 @@ export default class StateWrapper {
 		return undefined;
 	}
 
+	check() {
+		assert(this.widgetIdNext >= 0, "`widgetIdNext` must be >= 0");
+		
+		// Each screen has a desktop, and that desktop references the screen
+		this.forEachScreen(screen => {
+			const desktop = screen.currentDesktop;
+			if (desktop) {
+				assert.equal(desktop.parentId, screen.id);
+			}
+		});
+
+		// Desktops and their children
+		this.forEachDesktop(desktop => {
+			const childIdOrder = desktop.getChildIdOrder();
+			const childIdChain = desktop.getChildIdChain();
+			// childIdStack is a permutation of childIdOrder
+			assert(childIdOrder.isSubset(childIdChain) && childIdStack.isSubset(childIdOrder), `should be permutations: childIdOrder=${childIdOrder} and childIdChain=${childIdChain}`);
+			// Each child references this desktop
+			childIdOrder.forEach(childId => {
+				const w = this.state.getIn(['widgets', childId.toString]);
+				assert.equal(w.get('parentId'), desktopId);
+			});
+		});
+
+		/*this.state.get('widgetIdChain').forEach(id => {
+			assert(this.state.hasIn(['widgets', id.toString()]), "widgetIdChain contain an ID that isn't in the widgets list: "+id);
+		});*/
+		this.state.get('windowIdOrder').forEach(id => {
+			assert(this.state.hasIn(['widgets', id.toString()]), "widgetIdChain contain an ID that isn't in the widgets list: "+id);
+		});
+		this.state.get('windowIdStack').forEach(id => {
+			assert(this.state.hasIn(['widgets', id.toString()]), "widgetIdChain contain an ID that isn't in the widgets list: "+id);
+		});
+
+		// Check that current focus widgets are at the top of the relevant stacks
+		/*if (true) {
+			const screenId = currentScreenId;
+			const desktopId = currentDesktopId;
+			const windowId = currentWindowId;
+		}*/
+	}
+
 	addDesktop(w) {
 		w = fromJS(w);
 		// Default values
@@ -316,6 +358,7 @@ export default class StateWrapper {
 
 		// Add widget to widgets list
 		const id = this._addWidget(w);
+		assert(id >= 0, "addWidget() returned -1: "+JSON.stringify(w.toJS()));
 
 		// Append to window lists
 		this._windowIdOrder.push(id);
@@ -613,6 +656,13 @@ export default class StateWrapper {
 	forEachWindow(fn) {
 		this.getWindowIdOrder().forEach(id => {
 			const window = this.windowById(id);
+			// FIXME: for debug only
+			if (!window) {
+				this.print();
+				console.log({id});
+				assert(false);
+			}
+			// ENDFIX
 			fn(window);
 		});
 		return this;
@@ -674,6 +724,7 @@ export default class StateWrapper {
 	_addWidget(w) {
 		// Add widget to widgets list
 		const id = this.widgetIdNext;
+		assert(id >= 0, "`widgetIdNext` must be >= 0");
 		this.state = this.state.setIn(['widgets', id.toString()], w);
 
 		// Increment ID counter

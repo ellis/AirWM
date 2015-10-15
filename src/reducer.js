@@ -79,6 +79,7 @@ export default function reducer(state = initialState, action) {
 			handler(builder, action);
 			updateLayout(builder);
 			updateX11(builder);
+			builder.check();
 			return builder.getState();
 		}
 		catch (e) {
