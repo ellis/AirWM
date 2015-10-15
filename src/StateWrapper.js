@@ -226,7 +226,7 @@ export default class StateWrapper {
 
 	check() {
 		assert(this.widgetIdNext >= 0, "`widgetIdNext` must be >= 0");
-		
+
 		// Each screen has a desktop, and that desktop references the screen
 		this.forEachScreen(screen => {
 			const desktop = screen.currentDesktop;
@@ -240,11 +240,12 @@ export default class StateWrapper {
 			const childIdOrder = desktop.getChildIdOrder();
 			const childIdChain = desktop.getChildIdChain();
 			// childIdStack is a permutation of childIdOrder
-			assert(childIdOrder.isSubset(childIdChain) && childIdStack.isSubset(childIdOrder), `should be permutations: childIdOrder=${childIdOrder} and childIdChain=${childIdChain}`);
+			assert(childIdOrder.isSubset(childIdChain) && childIdChain.isSubset(childIdOrder), `should be permutations: childIdOrder=${childIdOrder} and childIdChain=${childIdChain}`);
 			// Each child references this desktop
 			childIdOrder.forEach(childId => {
-				const w = this.state.getIn(['widgets', childId.toString]);
-				assert.equal(w.get('parentId'), desktopId);
+				const w = this.state.getIn(['widgets', childId.toString()]);
+				assert(w, "desktop with id="+desktop.id+" reference non-existent child with id "+childId);
+				assert.equal(w.get('parentId'), desktop.id);
 			});
 		});
 
@@ -252,10 +253,7 @@ export default class StateWrapper {
 			assert(this.state.hasIn(['widgets', id.toString()]), "widgetIdChain contain an ID that isn't in the widgets list: "+id);
 		});*/
 		this.state.get('windowIdOrder').forEach(id => {
-			assert(this.state.hasIn(['widgets', id.toString()]), "widgetIdChain contain an ID that isn't in the widgets list: "+id);
-		});
-		this.state.get('windowIdStack').forEach(id => {
-			assert(this.state.hasIn(['widgets', id.toString()]), "widgetIdChain contain an ID that isn't in the widgets list: "+id);
+			assert(this.state.hasIn(['widgets', id.toString()]), "widgetIdOrder contain an ID that isn't in the widgets list: "+id);
 		});
 
 		// Check that current focus widgets are at the top of the relevant stacks
