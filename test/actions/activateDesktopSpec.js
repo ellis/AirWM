@@ -4,12 +4,11 @@ import diff from 'immutablediff';
 
 import checkList from '../checkList.js';
 import reducer from '../../src/reducer.js';
-import State from '../../src/state.js';
 import StateWrapper from '../../src/StateWrapper.js';
 import * as ex from '../exampleStates.js';
 
 describe('activateDesktop', () => {
-	/*describe('with one screen, one dock, no windows', () => {
+	describe('with one screen, one dock, no windows', () => {
 		describe('raise desktop 2', () => {
 			const state = reducer(ex.state120, {type: 'activateDesktop', desktop: 1});
 			const builder = new StateWrapper(state);
@@ -26,7 +25,7 @@ describe('activateDesktop', () => {
 			});
 		});
 	});
-*/
+
 	describe("with one screen, one dock, one window", () => {
 		const action1 = {
 			type: 'addWindow',

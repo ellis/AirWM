@@ -42,138 +42,44 @@ export const state111 = fromJS({
 		0: {
 			type: "desktop",
 			name: "web",
-			screenId: 0,
+			parentId: 1,
 			rc: [0, 0, 800, 600],
-			layout: "tile-right",
-			childIdOrder: [1],
-			childIdStack: [1]
+			layout: "default",
+			childIdOrder: [2],
+			childIdChain: [2]
 		},
 		1: {
-			type: "window",
-			xid: 1001,
-			parentId: 0,
-			rc: [5, 5, 790, 590],
-			visible: true
-		}
-	},
-	screens: {
-		0: {
-			xidRoot: screen0_xidRoot,
+			type: 'screen',
+			xid: screen0_xidRoot,
 			width: 800,
 			height: 600,
-			desktopIdStack: [0]
-		}
-	},
-	widgetIdNext: 2,
-	screenIdOrder: [0],
-	screenIdStack: [0],
-	desktopIdOrder: [0],
-	desktopIdStack: [0],
-	windowIdOrder: [1],
-	windowIdStack: [1],
-	x11: {
-		desktopNum: 0,
-		wmSettings: {
-			SetInputFocus: [1001]
-		},
-		windowSettings: {
-			"1": {
-				"xid": 1001,
-				"visible": true,
-				"desktopNum": 0,
-				"ChangeWindowAttributes": [
-					1001,
-					{
-						"borderPixel": 0,
-						eventMask: 16
-					}
-				],
-				"ConfigureWindow": [
-					1001,
-					{
-						x: 5,
-						y: 5,
-						"width": 780,
-						"height": 580,
-						"borderWidth": 5,
-						"stackMode": 0
-					}
-				]
-			}
-		}
-	}
-});
-
-export const state112 = fromJS({
-	widgets: {
-		0: {
-			type: "desktop",
-			name: "web",
-			screenId: 0,
-			rc: [0, 0, 800, 600],
-			layout: "tile-right",
-			childIdOrder: [1, 2],
-			childIdStack: [1, 2]
-		},
-		1: {
-			type: "window",
-			xid: 1001,
-			parentId: 0,
-			rc: [5, 5, 392, 590],
-			visible: true
+			desktopIdChain: [0]
 		},
 		2: {
 			type: "window",
 			xid: 1002,
 			parentId: 0,
-			rc: [402, 5, 392, 590],
+			rc: [5, 5, 790, 590],
 			visible: true
 		}
 	},
-	screens: {
-		0: {
-			xidRoot: screen0_xidRoot,
-			width: 800,
-			height: 600,
-			desktopIdStack: [0]
-		}
-	},
 	widgetIdNext: 3,
-	screenIdOrder: [0],
-	screenIdStack: [0],
+	screenIdOrder: [1],
 	desktopIdOrder: [0],
-	desktopIdStack: [0],
-	windowIdOrder: [1, 2],
-	windowIdStack: [1, 2],
+	windowIdOrder: [2],
+	widgetIdChain: [2, 0, 1],
+	currentScreenId: 1,
+	currentDesktopId: 0,
+	currentWindowId: 2,
 	x11: {
-		desktopNum: 0,
 		wmSettings: {
-			SetInputFocus: [1001]
+			SetInputFocus: [1002],
+			"ewmh": {
+				"_NET_ACTIVE_WINDOW": [1002],
+				"_NET_CLIENT_LIST": [1002]
+			}
 		},
 		windowSettings: {
-			"1": {
-				"xid": 1001,
-				"visible": true,
-				"desktopNum": 0,
-				"ChangeWindowAttributes": [
-					1001,
-					{
-						"borderPixel": 0,
-						eventMask: 16
-					}
-				],
-				"ConfigureWindow": [
-					1001,
-					{
-						"x": 5,
-						"y": 5,
-						"width": 382,
-						"height": 580,
-						"borderWidth": 5,
-						"stackMode": 0
-					}
-				]
-			},
 			"2": {
 				"xid": 1002,
 				"visible": true,
@@ -188,6 +94,135 @@ export const state112 = fromJS({
 				"ConfigureWindow": [
 					1002,
 					{
+						x: 5,
+						y: 5,
+						"width": 780,
+						"height": 580,
+						"borderWidth": 5,
+						"stackMode": 0
+					}
+				],
+				"ewmh": {
+					"WM_STATE": {
+						"state": 1,
+						"icon": 0
+					},
+					"_NET_WM_DESKTOP": [
+						0
+					],
+					"_NET_WM_ALLOWED_ACTIONS": [
+						"_NET_WM_ACTION_CLOSE"
+					]
+				}
+			}
+		}
+	}
+});
+
+export const state112 = fromJS({
+	widgets: {
+		0: {
+			type: "desktop",
+			name: "web",
+			parentId: 1,
+			rc: [0, 0, 800, 600],
+			layout: "default",
+			childIdOrder: [2, 3],
+			childIdChain: [2, 3]
+		},
+		1: {
+			type: 'screen',
+			xid: screen0_xidRoot,
+			width: 800,
+			height: 600,
+			desktopIdChain: [0]
+		},
+		2: {
+			type: "window",
+			xid: 1002,
+			parentId: 0,
+			rc: [5, 5, 392, 590],
+			visible: true
+		},
+		3: {
+			type: "window",
+			xid: 1003,
+			parentId: 0,
+			rc: [402, 5, 392, 590],
+			visible: true
+		}
+	},
+	widgetIdNext: 3,
+	screenIdOrder: [1],
+	desktopIdOrder: [0],
+	windowIdOrder: [2, 3],
+	widgetIdChain: [2, 0, 1, 3],
+	currentScreenId: 1,
+	currentDesktopId: 0,
+	currentWindowId: 2,
+	x11: {
+		wmSettings: {
+			SetInputFocus: [1002],
+			"ewmh": {
+				"_NET_ACTIVE_WINDOW": [
+					1002
+				],
+				"_NET_CLIENT_LIST": [
+					1002,
+					1003
+				]
+			}
+		},
+		windowSettings: {
+			"2": {
+				"xid": 1002,
+				"visible": true,
+				"desktopNum": 0,
+				"ChangeWindowAttributes": [
+					1002,
+					{
+						"borderPixel": 0,
+						eventMask: 16
+					}
+				],
+				"ConfigureWindow": [
+					1002,
+					{
+						x: 5,
+						y: 5,
+						"width": 382,
+						"height": 580,
+						"borderWidth": 5,
+						"stackMode": 0
+					}
+				],
+				"ewmh": {
+					"WM_STATE": {
+						"state": 1,
+						"icon": 0
+					},
+					"_NET_WM_DESKTOP": [
+						0
+					],
+					"_NET_WM_ALLOWED_ACTIONS": [
+						"_NET_WM_ACTION_CLOSE"
+					]
+				}
+			},
+			"3": {
+				"xid": 1003,
+				"visible": true,
+				"desktopNum": 0,
+				"ChangeWindowAttributes": [
+					1003,
+					{
+						"borderPixel": 0,
+						eventMask: 16
+					}
+				],
+				"ConfigureWindow": [
+					1003,
+					{
 						"x": 402,
 						"y": 5,
 						"width": 382,
@@ -195,7 +230,19 @@ export const state112 = fromJS({
 						"borderWidth": 5,
 						"stackMode": 0
 					}
-				]
+				],
+				"ewmh": {
+					"WM_STATE": {
+						"state": 1,
+						"icon": 0
+					},
+					"_NET_WM_DESKTOP": [
+						0
+					],
+					"_NET_WM_ALLOWED_ACTIONS": [
+						"_NET_WM_ACTION_CLOSE"
+					]
+				}
 			}
 		}
 	}
