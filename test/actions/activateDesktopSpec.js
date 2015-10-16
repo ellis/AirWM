@@ -65,34 +65,38 @@ describe('activateDesktop', () => {
 			});
 		});
 	});
-/*
+
 	describe('with two screens, one dock, no windows', () => {
 		describe('raise desktop 2', () => {
-			const state = reducer(ex.state240, {type: 'activateDesktop', num: 1});
+			const state = reducer(ex.state240, {type: 'activateDesktop', desktop: 1});
+			const builder = new StateWrapper(state);
 			it('should switch to desktop 2 on screen 2', () => {
-				expect(state.getIn(['screenCurrentId'])).to.equal(1);
-				expect(State.getCurrentDesktopId(state, 0)).to.equal(0);
-				expect(State.getCurrentDesktopId(state, 1)).to.equal(1);
-				expect(state.getIn(['widgets', '0', 'screenId'])).to.equal(0);
-				expect(state.getIn(['widgets', '1', 'screenId'])).to.equal(1);
-			});
-			it('should set x11 focus to screen 2 root', () => {
-
+				checkList(builder, "activateDesktop 1", [
+					`currentScreenId`, 5,
+					`currentDesktopId`, 1,
+					// hides previously visible window:
+					`currentWindowId`, -1,
+					// Focus on root:
+					`x11.wmSettings.SetInputFocus`, [ex.screen1_xidRoot]
+				]);
 			});
 		});
 		describe('raise desktop 3', () => {
-			const state = reducer(ex.state240, {type: 'activateDesktop', num: 2});
+			const state = reducer(ex.state240, {type: 'activateDesktop', desktop: 2});
+			const builder = new StateWrapper(state);
 			it('should show desktop 3 on screen 1', () => {
-				expect(state.getIn(['screenCurrentId'])).to.equal(0);
-				expect(State.getCurrentDesktopId(state, 0)).to.equal(2);
-				expect(State.getCurrentDesktopId(state, 1)).to.equal(1);
-				expect(state.getIn(['widgets', '0', 'screenId'])).to.be.undefined;
-				expect(state.getIn(['widgets', '1', 'screenId'])).to.equal(1);
-				expect(state.getIn(['widgets', '2', 'screenId'])).to.equal(0);
+				checkList(builder, "activateDesktop 1", [
+					`currentScreenId`, 4,
+					`currentDesktopId`, 2,
+					// hides previously visible window:
+					`currentWindowId`, -1,
+					// Focus on root:
+					`x11.wmSettings.SetInputFocus`, [ex.screen0_xidRoot]
+				]);
 			});
 		});
 	});
-*/
+
 	// TODO: it('hides windows on previous desktop')
 	// TODO: it('shows windows on current desktop')
 });

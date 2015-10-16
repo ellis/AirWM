@@ -76,6 +76,7 @@ export default function reducer(state = initialState, action) {
 	if (handler) {
 		try {
 			const builder = new StateWrapper(state);
+			builder.check();
 			handler(builder, action);
 			updateLayout(builder);
 			updateX11(builder);
