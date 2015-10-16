@@ -99,36 +99,32 @@ describe('activateDesktop', () => {
 
 	// TODO: it('hides windows on previous desktop')
 	// TODO: it('shows windows on current desktop')
-});
-/*
-describe('activateDesktop with two screens', () => {
-	// TODO: move this up
+
 	describe('switch away from desktop with windows', () => {
 		const action1 = {
-			type: 'createWidget',
+			type: 'addWindow',
 			widget: {
 				type: 'window',
 				xid: 1001
 			}
 		};
 		const state241 = reducer(ex.state240, action1);
-		const state = reducer(state241, {type: 'activateDesktop', num: 2});
-		console.log(JSON.stringify(state.toJS(), null, '\t'));
+		const state = reducer(state241, {type: 'activateDesktop', desktop: 2});
+		const builder = new StateWrapper(state);
+		//builder.print();
 		it('should show desktop 3 on screen 1', () => {
-			expect(State.getCurrentDesktopId(state, 0)).to.equal(2);
-			expect(state.getIn(['widgets', '2', 'screenId'])).to.equal(0);
+			checkList(builder, "activateDesktop 1", [
+				`currentScreenId`, 4,
+				`currentDesktopId`, 2,
+				`currentWindowId`, -1,
+				`widgets.2.parentId`, 4,
+				`x11.wmSettings.SetInputFocus`, [ex.screen0_xidRoot]
+			]);
 		});
 		it('hides previously visible window', () => {
-			expect(state.getIn(['widgets', '5', 'visible'])).to.equal(false);
-		});
-		it('should not have a focus window', () => {
-			expect(state.getIn(['focusCurrentId'], -1)).to.equal(-1);
-		});
-		it('should set x11.wmSettings.SetInputFocus to the screen id', () => {
-			console.log(JSON.stringify(state.toJS(), null, '\t'));
-			//console.log(diff(state2, state121));
-			expect(state.getIn(['x11', 'wmSettings', 'SetInputFocus'])).to.equal(List.of(ex.screen1_xidRoot));
+			checkList(builder, "activateDesktop 1", [
+				`widgets.8.visible`, false,
+			]);
 		});
 	});
 });
-*/
