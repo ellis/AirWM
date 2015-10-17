@@ -16,8 +16,7 @@
 * [x] big issue: need to process events in order, because two MapRequest events are coming in before we can notice for the second one that the window has already been created.
 * [x] BUG: in gnome-terminal, press Ctrl+Shift+F or goto Help: why is the window sized incorrectly?
 * [x] in gnome-terminal, open Edit|Preferences: the dialog should placed immediately after gnome-terminal and focused, because it has 'WM_TRANSIENT_FOR' set.
-* [ ] get `npm test` to run again by removing old test files
-	* [ ] test/actions/activateDesktopSpec.js
+* [x] get `npm test` to run again by removing old test files
 * [ ] rename 'test' folder to 'tests'
 * [ ] test adding transient windows (both when the reference has focus and when not)
 * [ ] handle floating windows

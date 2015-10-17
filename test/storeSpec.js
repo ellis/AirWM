@@ -1,28 +1,27 @@
 import {Map, fromJS} from 'immutable';
-import Immutable from 'immutable';
 import {expect} from 'chai';
 import diff from 'immutablediff';
 
 import makeStore from '../src/store.js';
 import * as ex from './exampleStates.js';
-import {empty} from '../src/core.js';
+import {initialState} from '../src/StateWrapper.js';
 
 describe('store', () => {
 	it('is a Redux store configured with the correct reducer', () => {
 		const store = makeStore();
-		expect(store.getState()).to.equal(empty);
+		expect(store.getState()).to.equal(initialState);
 
 		const action1 = {
 			type: 'initialize',
 			desktops: [
 				{
 					name: "web",
-					layout: "tile-right"
+					layout: "default"
 				}
 			],
 			screens: [
 				{
-					xidRoot: ex.screen0_xidRoot,
+					xid: ex.screen0_xidRoot,
 					width: 800,
 					height: 600,
 				}
@@ -36,6 +35,9 @@ describe('store', () => {
 		};*/
 
 		store.dispatch(action1);
-		expect(store.getState()).to.equal(ex.state110);
+		const state = store.getState();
+		//console.log(JSON.stringify(state, null, '\t'));
+		//console.log(diff(state, ex.state110));
+		expect(state).to.equal(ex.state110);
 	});
 });
