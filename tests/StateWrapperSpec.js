@@ -6,6 +6,7 @@ import diff from 'immutablediff';
 
 import checkList from './checkList.js';
 import StateWrapper, {initialState} from '../src/StateWrapper.js';
+import * as ex from './exampleStates.js';
 
 const ActionObjects = {
 	screen1: {
@@ -152,6 +153,19 @@ describe('StateWrapper', () => {
 		expect(builder.currentScreenId, 'current screen').to.equal(s1);
 		expect(builder.currentDesktopId, 'current desktop').to.equal(d1);
 		expect(builder.currentWindowId, 'current window').to.equal(-1);
+	});
+
+	it('addWindow (transient non-dialog)', () => {
+		const builder = new StateWrapper(ex.state111);
+		const d1 = builder.findDesktopIdByNum(0);
+		const w1 = builder.findWindowIdOnDesktopByNum(undefined, 0);
+		const w2 = builder.addWindow_user({transientForId: w1, xid: 1002});
+
+		checkList(builder, undefined, [
+			`widgetIdNext`, w2 + 1,
+			`currentWindowId`, w2,
+			`widgets.${d1}.childIdOrder`, [w1, w2],
+		]);
 	});
 
 	it('moveWindowToDesktop 1 (s1d2 + addWindow)', () => {

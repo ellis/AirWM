@@ -202,6 +202,21 @@ export default class StateWrapper {
 	findScreenIdByNum(num) { return this._get(StatePaths.screenIdOrder.concat(num), -1); }
 	findDesktopIdByNum(num) { return this._get(StatePaths.desktopIdOrder.concat(num), -1); }
 
+	findWindowIdOnDesktopByNum(desktop, num) {
+		assert(_.isNumber(num));
+
+		if (_.isUndefined(desktop))
+			desktop = this.currentDesktop;
+		else if (_.isNumber(desktop))
+			desktop = this.desktopById(desktop);
+
+		if (desktop) {
+			const l = desktop.getChildIdOrder();
+			return l.get(num);
+		}
+		return undefined;
+	}
+
 	findWindowNum(window, desktop, offset) {
 		if (_.isUndefined(window))
 			window = this.currentWindow;
@@ -356,6 +371,7 @@ export default class StateWrapper {
 
 		// Add widget to widgets list
 		const id = this._addWidget(w);
+		//console.log(w);
 		assert(id >= 0, "addWidget() returned -1: "+JSON.stringify(w.toJS()));
 
 		// Append to window lists
@@ -386,11 +402,12 @@ export default class StateWrapper {
 							desktop._childIdChain.unshift(id);
 						}
 						this._setCurrent();
-						return;
+						return id;
 					}
 				}
 			}
 			this.moveWindowToScreen(w);
+			return id;
 		}
 	}
 

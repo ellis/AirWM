@@ -19,6 +19,7 @@
 * [x] get `npm test` to run again by removing old test files
 * [x] rename 'test' folder to 'tests'
 * [ ] test adding transient windows (both when the reference has focus and when not)
+* [ ] remove old code files
 * [ ] handle floating windows
 * [ ] test floating windows
 * [ ] create shortcut to toggle floating (Win-T like xmonad for now, but change it later)
