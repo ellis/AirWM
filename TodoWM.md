@@ -18,6 +18,7 @@
 * [x] in gnome-terminal, open Edit|Preferences: the dialog should placed immediately after gnome-terminal and focused, because it has 'WM_TRANSIENT_FOR' set.
 * [ ] get `npm test` to run again by removing old test files
 	* [ ] test/actions/activateDesktopSpec.js
+* [ ] rename 'test' folder to 'tests'
 * [ ] test adding transient windows (both when the reference has focus and when not)
 * [ ] handle floating windows
 * [ ] test floating windows
