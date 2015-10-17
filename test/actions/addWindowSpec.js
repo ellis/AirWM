@@ -2,27 +2,28 @@ import {List, Map, fromJS} from 'immutable';
 import {expect} from 'chai';
 import diff from 'immutablediff';
 
+import checkList from '../checkList.js';
 import reducer from '../../src/reducer.js';
-import State from '../../src/state.js';
+import StateWrapper from '../../src/StateWrapper.js';
 import * as ex from '../exampleStates.js';
 
 const action1 = {
-	type: 'createWidget',
-	widget: {
+	type: 'addWindow',
+	window: {
 		type: 'window',
 		xid: 1001
 	}
 };
 
 const action2 = {
-	type: 'createWidget',
-	widget: {
+	type: 'addWindow',
+	window: {
 		type: 'window',
 		xid: 1002
 	}
 };
 
-describe('createWidget', () => {
+describe('addWindow', () => {
 	let state1, state2;
 	before(() => {
 		state1 = reducer(ex.state110, action1);
@@ -30,27 +31,28 @@ describe('createWidget', () => {
 		state2 = reducer(state1, action2);
 	});
 
-	describe('adding first window', () => {
-		let state;
-		before(() => {
-			state = reducer(ex.state110, action1);
-		});
-		it('should increment widgetIdNext', () => {
-			expect(state.getIn(['widgetIdNext'])).to.equal(2);
-		})
-		it('should set focus to that window', () => {
-			expect(State.getCurrentWindowId(state)).to.equal(1);
-			expect(state.getIn(['widgets', '0', 'childIdStack', 0])).to.equal(1);
-			expect(state.getIn(['x11', 'wmSettings', 'SetInputFocus'])).to.equal(List.of(1001));
-		});
-		it('should add window to the current desktop', () => {
-			expect(state.getIn(['widgets', '0', 'childIdOrder'])).to.equal(List.of(1));
-			expect(state.getIn(['widgets', '1', 'parentId'])).to.equal(0);
-			expect(state.getIn(['x11', 'windowSettings', '1', 'desktopNum'])).to.equal(0);
-		});
-		it('should make the window visible', () => {
-			expect(state.getIn(['widgets', '1', 'visible'])).to.equal(true);
-		});
+	it('adding first window', () => {
+		const [d1, s1, w1] = [0, 1, 2];
+		console.log("widgetIdNext0: "+ex.state110.get('widgetIdNext'));
+		const state = reducer(ex.state110, action1);
+		const builder = new StateWrapper(state);
+		checkList(builder, "should increment widgetIdNext", [
+			`widgetIdNext`, w1+1,
+		]);
+		checkList(builder, "should set focus to that window", [
+			`currentWindowId`, w1,
+			`widgetIdChain`, [w1, d1, s1],
+			`x11.wmSettings.SetInputFocus[0]`, action1.window.xid,
+		]);
+		checkList(builder, "should add window to the current desktop", [
+			`widgets.${d1}.childIdOrder`, [w1],
+			`widgets.${d1}.childIdChain`, [w1],
+			`widgets.${w1}.parentId`, d1,
+			`x11.windowSettings.${w1}.desktopNum`, 0,
+		]);
+		checkList(builder, "should make the window visible", [
+			`widgets.${w1}.visible`, true,
+		]);
 		it('should equal fully specified state', () => {
 			//State.print(state);
 			//console.log(diff(state, ex.state111));
