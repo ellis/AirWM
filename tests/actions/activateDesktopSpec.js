@@ -12,7 +12,7 @@ describe('activateDesktop', () => {
 		describe('raise desktop 2', () => {
 			const state = reducer(ex.state120, {type: 'activateDesktop', desktop: 1});
 			const builder = new StateWrapper(state);
-			builder.print()
+			//builder.print()
 			it('should show desktop 2', () => {
 				checkList(builder, "activateDesktop 1", [
 					`widgets.0.parentId`, -1,

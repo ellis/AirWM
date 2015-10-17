@@ -45,7 +45,7 @@
   },
   "scripts": {
     "start": "babel-node index.js",
-    "test": "mocha --compilers js:babel/register --require ./test/test_helper.js --recursive test",
+    "test": "mocha --compilers js:babel/register --require ./tests/test_helper.js --recursive tests",
     "test:watch": "npm run test -- --watch"
   }
 }
