@@ -85,9 +85,9 @@ describe('addWindow', () => {
 	describe('adding three windows', () => {
 		it('it should have the propert stack order', () => {
 			let state = ex.state120;
-			state = reducer(state, {type: 'createWidget', widget: {type: 'window', xid: 1001}});
-			state = reducer(state, {type: 'createWidget', widget: {type: 'window', xid: 1002}});
-			state = reducer(state, {type: 'createWidget', widget: {type: 'window', xid: 1003}});
+			state = reducer(state, {type: 'addWidget', window: {type: 'window', xid: 1001}});
+			state = reducer(state, {type: 'addWidget', window: {type: 'window', xid: 1002}});
+			state = reducer(state, {type: 'addWidget', window: {type: 'window', xid: 1003}});
 			expect(state.getIn(['widgets', '0', 'childIdOrder'])).to.equal(List.of(3, 4, 5));
 			expect(state.getIn(['widgets', '0', 'childIdStack'])).to.equal(List.of(3, 5, 4));
 			expect(state.getIn(['windowIdOrder'])).to.equal(List.of(3, 4, 5));
@@ -100,8 +100,8 @@ describe('addWindow', () => {
 		before(() => {
 			const actionA = {type: 'destroyWidget', id: 1};
 			const action3 = {
-				type: 'createWidget',
-				widget: {
+				type: 'addWidget',
+				window: {
 					type: 'window',
 					xid: 1003
 				}
@@ -129,8 +129,8 @@ describe('addWindow', () => {
 
 	describe('add docks (with single window)', () => {
 		const actionB = {
-			type: 'createWidget',
-			widget: {
+			type: 'addWidget',
+			window: {
 				type: 'dock',
 				dockGravity: 'bottom',
 				dockSize: 10,
