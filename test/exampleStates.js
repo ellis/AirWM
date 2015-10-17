@@ -57,8 +57,9 @@ export const state111 = fromJS({
 		},
 		2: {
 			type: "window",
-			xid: 1002,
+			xid: 1001,
 			parentId: 0,
+			state: {},
 			rc: [5, 5, 790, 590],
 			visible: true
 		}
@@ -68,31 +69,32 @@ export const state111 = fromJS({
 	desktopIdOrder: [0],
 	windowIdOrder: [2],
 	widgetIdChain: [2, 0, 1],
+	windowIdStack: [2],
 	currentScreenId: 1,
 	currentDesktopId: 0,
 	currentWindowId: 2,
 	x11: {
 		wmSettings: {
-			SetInputFocus: [1002],
+			SetInputFocus: [1001],
 			"ewmh": {
-				"_NET_ACTIVE_WINDOW": [1002],
-				"_NET_CLIENT_LIST": [1002]
+				"_NET_ACTIVE_WINDOW": [1001],
+				"_NET_CLIENT_LIST": [1001]
 			}
 		},
 		windowSettings: {
 			"2": {
-				"xid": 1002,
+				"xid": 1001,
 				"visible": true,
 				"desktopNum": 0,
 				"ChangeWindowAttributes": [
-					1002,
+					1001,
 					{
 						"borderPixel": 0,
 						eventMask: 16
 					}
 				],
 				"ConfigureWindow": [
-					1002,
+					1001,
 					{
 						x: 5,
 						y: 5,
@@ -139,54 +141,57 @@ export const state112 = fromJS({
 		},
 		2: {
 			type: "window",
-			xid: 1002,
+			xid: 1001,
 			parentId: 0,
+			state: {},
 			rc: [5, 5, 392, 590],
 			visible: true
 		},
 		3: {
 			type: "window",
-			xid: 1003,
+			xid: 1002,
 			parentId: 0,
+			state: {},
 			rc: [402, 5, 392, 590],
 			visible: true
 		}
 	},
-	widgetIdNext: 3,
+	widgetIdNext: 4,
 	screenIdOrder: [1],
 	desktopIdOrder: [0],
 	windowIdOrder: [2, 3],
 	widgetIdChain: [2, 0, 1, 3],
+	windowIdStack: [2, 3],
 	currentScreenId: 1,
 	currentDesktopId: 0,
 	currentWindowId: 2,
 	x11: {
 		wmSettings: {
-			SetInputFocus: [1002],
+			SetInputFocus: [1001],
 			"ewmh": {
 				"_NET_ACTIVE_WINDOW": [
-					1002
+					1001
 				],
 				"_NET_CLIENT_LIST": [
-					1002,
-					1003
+					1001,
+					1002
 				]
 			}
 		},
 		windowSettings: {
 			"2": {
-				"xid": 1002,
+				"xid": 1001,
 				"visible": true,
 				"desktopNum": 0,
 				"ChangeWindowAttributes": [
-					1002,
+					1001,
 					{
 						"borderPixel": 0,
 						eventMask: 16
 					}
 				],
 				"ConfigureWindow": [
-					1002,
+					1001,
 					{
 						x: 5,
 						y: 5,
@@ -210,18 +215,18 @@ export const state112 = fromJS({
 				}
 			},
 			"3": {
-				"xid": 1003,
+				"xid": 1002,
 				"visible": true,
 				"desktopNum": 0,
 				"ChangeWindowAttributes": [
-					1003,
+					1002,
 					{
 						"borderPixel": 0,
 						eventMask: 16
 					}
 				],
 				"ConfigureWindow": [
-					1003,
+					1002,
 					{
 						"x": 402,
 						"y": 5,

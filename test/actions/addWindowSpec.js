@@ -33,7 +33,6 @@ describe('addWindow', () => {
 
 	it('adding first window', () => {
 		const [d1, s1, w1] = [0, 1, 2];
-		console.log("widgetIdNext0: "+ex.state110.get('widgetIdNext'));
 		const state = reducer(ex.state110, action1);
 		const builder = new StateWrapper(state);
 		checkList(builder, "should increment widgetIdNext", [
@@ -53,40 +52,34 @@ describe('addWindow', () => {
 		checkList(builder, "should make the window visible", [
 			`widgets.${w1}.visible`, true,
 		]);
-		it('should equal fully specified state', () => {
-			//State.print(state);
-			//console.log(diff(state, ex.state111));
-			expect(state).to.equal(ex.state111);
-		});
+		// should equal fully specified state
+		//builder.print();
+		//console.log(diff(state, ex.state111));
+		expect(state).to.equal(ex.state111);
 	});
 
-	describe('adding second window', () => {
-		let state;
-		before(() => {
-			const state1 = reducer(ex.state110, action1);
-			state = reducer(state1, action2);
-		});
-		it('should increment widgetIdNext', () => {
-			expect(state.getIn(['widgetIdNext'])).to.equal(3);
-		})
-		it('should leave the focus on the first window', () => {
-			expect(State.getCurrentWindowId(state)).to.equal(1);
-			expect(State.getCurrentWindowIdOnDesktop(state, 0)).to.equal(1);
-			expect(state.getIn(['x11', 'wmSettings', 'SetInputFocus'])).to.equal(List.of(1001));
-		});
-		it('should add window to the current desktop', () => {
-			expect(state.getIn(['widgets', '0', 'childIdOrder'])).to.equal(List.of(1, 2));
-			expect(state.getIn(['widgets', '2', 'parentId'])).to.equal(0);
-			expect(state.getIn(['x11', 'windowSettings', '2', 'desktopNum'])).to.equal(0);
-		});
-		it('should make the window visible', () => {
-			expect(state.getIn(['widgets', '2', 'visible'])).to.equal(true);
-		});
-		it('should equal fully specified state', () => {
-			//console.log(JSON.stringify(state.toJS(), null, '\t'));
-			//console.log(diff(state, ex.state112));
-			expect(state).to.equal(ex.state112);
-		});
+	it('adding second window', () => {
+		const [d1, s1, w1, w2] = [0, 1, 2, 3];
+		const state1 = reducer(ex.state110, action1);
+		const state = reducer(state1, action2);
+		const builder = new StateWrapper(state);
+		checkList(builder, "should leave the focus on the first window", () => [
+			`currentWindowId`, w1,
+			`widgetIdChain`, [w1, d1, s1, w2],
+			`x11.wmSettings.SetInputFocus[0]`, action1.window.xid,
+		]);
+		checkList(builder, 'should add window to the current desktop', () => [
+			`widgets.${d1}.childIdOrder`, List.of(w1, s2),
+			`widgets.${w2}.parentId`, d1,
+			`x11.windowSettings.${w2}.desktopNum`, 0,
+		]);
+		checkList(builder, "should make the window visible", [
+			`widgets.${w2}.visible`, true,
+		]);
+		// should equal fully specified state
+		//builder.print();
+		//console.log(diff(state, ex.state112));
+		expect(state).to.equal(ex.state112);
 	});
 
 	describe('adding three windows', () => {
