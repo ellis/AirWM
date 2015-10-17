@@ -18,7 +18,7 @@
 * [x] in gnome-terminal, open Edit|Preferences: the dialog should placed immediately after gnome-terminal and focused, because it has 'WM_TRANSIENT_FOR' set.
 * [x] get `npm test` to run again by removing old test files
 * [x] rename 'test' folder to 'tests'
-* [ ] test adding transient windows (both when the reference has focus and when not)
+* [x] test adding transient windows (both when the reference has focus and when not)
 * [ ] remove old code files
 * [ ] handle floating windows
 * [ ] test floating windows

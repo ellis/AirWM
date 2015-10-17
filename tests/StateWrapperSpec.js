@@ -155,7 +155,7 @@ describe('StateWrapper', () => {
 		expect(builder.currentWindowId, 'current window').to.equal(-1);
 	});
 
-	it('addWindow (transient non-dialog)', () => {
+	it('addWindow (transient for focused window)', () => {
 		const builder = new StateWrapper(ex.state111);
 		const d1 = builder.findDesktopIdByNum(0);
 		const w1 = builder.findWindowIdOnDesktopByNum(undefined, 0);
@@ -165,6 +165,21 @@ describe('StateWrapper', () => {
 			`widgetIdNext`, w2 + 1,
 			`currentWindowId`, w2,
 			`widgets.${d1}.childIdOrder`, [w1, w2],
+		]);
+	});
+
+	it('addWindow (transient for non-focused window)', () => {
+		const builder = new StateWrapper(ex.state111);
+		const d1 = builder.findDesktopIdByNum(0);
+		const w1 = builder.findWindowIdOnDesktopByNum(undefined, 0);
+		const w2 = builder.addWindow({xid: 1002});
+		builder.moveWindowToDesktop(w2, d1);
+		const w3 = builder.addWindow_user({transientForId: w2, xid: 1003});
+
+		checkList(builder, undefined, [
+			`widgetIdNext`, w3 + 1,
+			`currentWindowId`, w1,
+			`widgets.${d1}.childIdOrder`, [w1, w2, w3],
 		]);
 	});
 
