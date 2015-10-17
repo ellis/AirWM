@@ -82,85 +82,31 @@ describe('addWindow', () => {
 		expect(state).to.equal(ex.state112);
 	});
 
-	describe('adding three windows', () => {
-		it('it should have the propert stack order', () => {
-			let state = ex.state120;
-			state = reducer(state, {type: 'addWidget', window: {type: 'window', xid: 1001}});
-			state = reducer(state, {type: 'addWidget', window: {type: 'window', xid: 1002}});
-			state = reducer(state, {type: 'addWidget', window: {type: 'window', xid: 1003}});
-			expect(state.getIn(['widgets', '0', 'childIdOrder'])).to.equal(List.of(3, 4, 5));
-			expect(state.getIn(['widgets', '0', 'childIdStack'])).to.equal(List.of(3, 5, 4));
-			expect(state.getIn(['windowIdOrder'])).to.equal(List.of(3, 4, 5));
-			expect(state.getIn(['windowIdStack'])).to.equal(List.of(3, 5, 4));
-		});
+	it('adding three windows', () => {
+		const [d1, s1, w1, w2, w3] = [0, 1, 2, 3, 4];
+		let state = ex.state120;
+		state = reducer(state, {type: 'addWindow', window: {type: 'window', xid: 1001}});
+		state = reducer(state, {type: 'addWindow', window: {type: 'window', xid: 1002}});
+		state = reducer(state, {type: 'addWindow', window: {type: 'window', xid: 1003}});
+		const builder = new StateWrapper(state);
+		checkList(builder, 'it should have the propert stack order', () => [
+			`widgets.${d1}.childIdOrder`, List.of(w1, w2, w3),
+			`widgets.${d1}.childIdChain`, List.of(w1, w2, w3),
+			`windowIdOrder`, [w1, w2, w3],
+		]);
 	});
 
-	describe('removing first window, then adding a thrid', () => {
-		let state;
-		before(() => {
-			const actionA = {type: 'destroyWidget', id: 1};
-			const action3 = {
-				type: 'addWidget',
-				window: {
-					type: 'window',
-					xid: 1003
-				}
-			};
-			const state1 = reducer(ex.state112, actionA);
-			//State.print(state1);
-			state = reducer(state1, action3);
-			//console.log(JSON.stringify(state.toJS(), null, '\t'));
-			//console.log(diff(state, ex.state111));
-		});
-		it('should increment widgetIdNext', () => {
-			expect(state.getIn(['widgetIdNext'])).to.equal(4);
-		});
-		it('should leave the focus on the second window', () => {
-			expect(State.getCurrentWindowId(state)).to.equal(2);
-		});
-		it('should add window to the current desktop', () => {
-			expect(state.getIn(['widgets', '0', 'childIdStack'])).to.equal(List.of(2, 3));
-			expect(state.getIn(['widgets', '3', 'parentId'])).to.equal(0);
-			expect(state.getIn(['x11', 'windowSettings', '3', 'desktopNum'])).to.equal(0);
-		});
-	});
-
-	// TODO: when adding dock with no wondows, dock should not receive focus
-
-	describe('add docks (with single window)', () => {
-		const actionB = {
-			type: 'addWidget',
-			window: {
-				type: 'dock',
-				dockGravity: 'bottom',
-				dockSize: 10,
-				xid: 2002
-			}
-		};
-		const stateB = reducer(ex.state111, actionB);
-		describe("add bottom dock", () => {
-			const state = stateB;
-			//console.log(JSON.stringify(state.toJS(), null, '\t'));
-			//console.log(diff(state, ex.state111));
-			it('should increment widgetIdNext', () => {
-				expect(state.getIn(['widgetIdNext'])).to.equal(3);
-			});
-			it('should leave the focus on the first window', () => {
-				expect(State.getCurrentWindowId(state)).to.equal(1);
-			});
-			it('should add window to the current screen', () => {
-				expect(state.getIn(['widgets', '0', 'childIdOrder'])).to.equal(List.of(1));
-				expect(state.getIn(['widgets', '2', 'parentId'])).to.be.undefined;
-				expect(state.getIn(['widgets', '2', 'screenId'])).to.equal(0);
-				expect(state.getIn(['screens', '0', 'dockIds'])).to.equal(List.of(2));
-				expect(state.getIn(['x11', 'windowSettings', '2', 'desktopNum'])).to.equal(-1);
-			});
-			it('should have proper dimensions/configuration', () => {
-				expect(state.getIn(['widgets', '2', 'rc'])).to.equal(List.of(0, 591, 800, 10));
-				expect(state.getIn(['x11', 'windowSettings', '2', 'ConfigureWindow', 1])).to.equal(Map({
-					x: 0, y: 591, width: 800, height: 10, borderWidth: 0, stackMode: 0
-				}));
-			});
-		});
+	it('removing first window, then adding a thrid', () => {
+		const [d1, s1, w1, w2, w3] = [0, 1, 2, 3, 4];
+		const state1 = reducer(ex.state112, {type: 'removeWindow', id: w1});
+		const state = reducer(state, {type: 'addWindow', window: {type: 'window', xid: 1003}});
+		const builder = new StateWrapper(state);
+		checkList(builder, undefined, () => [
+			`widgetIdNext`, 5,
+			`currentWindowId`, w2,
+			`widgets.${d1}.childIdOrder`, List.of(w2, w3),
+			`widgets.${d1}.childIdChain`, List.of(w2, w3),
+			`windowIdOrder`, [w1, w3],
+		]);
 	});
 });
