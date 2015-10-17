@@ -4,7 +4,6 @@ import {expect} from 'chai';
 import diff from 'immutablediff';
 
 import reducer from '../src/reducer.js';
-import State from '../src/state.js';
 import * as ex from './exampleStates.js';
 
 describe('reducer', () => {
