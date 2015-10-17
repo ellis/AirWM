@@ -642,6 +642,28 @@ export default class StateWrapper {
 		return this;
 	}
 
+	/**
+	 * Toggle or set the floating state of a window.
+
+	 * @param {boolean} [value] - value to force, or toggle if undefined.
+	 */
+	toogleFloating(window, value) {
+		if (_.isUndefined(window))
+			window = this.currentWindow;
+		else if (_.isNumber(window))
+			window = this.windowbyId(window);
+
+		if (window) {
+			if (_.isUndefined(value)) {
+				value = !window._get(['state', 'floating']);
+			if (value)
+				window._set(['state', 'floating'], true);
+			else
+				window._delete(['state', 'floating']);
+		}
+		return this;
+	}
+
 	forEachScreen(fn) {
 		//this.print();
 		this.getScreenIdOrder().forEach(screenId => {

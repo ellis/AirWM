@@ -23,6 +23,7 @@
 * [ ] handle floating windows
 * [ ] test floating windows
 * [ ] create shortcut to toggle floating (Win-T like xmonad for now, but change it later)
+* [ ] Win-move to move floating windows (see <https://github.com/jichu4n/basic_wm>)
 * [ ] x11: dialog boxes should be programmed to float over their app window
 * [ ] in gvim, goto File|Open: the dialog should float over it's transient-for window
 * [ ] BUG: in gvim, goto File|Open: shouldn't be allowed to put focus back on the gvim window because of the MODAL dialog
@@ -37,7 +38,6 @@
 * [ ] ewmh: set `_NET_WM_STATE` to empty by default
 * [ ] implement more commandHandlers() as actions
 * [ ] state: add floatId lists
-* [ ] Win-move to move floating windows (see <https://github.com/jichu4n/basic_wm>)
 * [ ] ewmh: handle `_NET_WM_WINDOW_TYPE_DIALOG`, sometimes make it floating
 * [ ] state: support hidden/iconified windows
 	* [ ] clientMessage: handle WM_CHANGE_STATE

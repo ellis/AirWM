@@ -91,8 +91,13 @@ function layout_tileRight(state, desktopId) {
 }
 
 function layout_mainLeft(builder, desktop) {
-	const childIds = desktop.getChildIdOrder();
-	let n = childIds.count();
+	const childIds0 = desktop.getChildIdOrder().toJS();
+	const [childIds, floatIds] = _.partition(childIds0, id => {
+		const w = this.windowById(id);
+		return (w.get(['state', 'floating'], false) == false);
+	});
+
+	let n = childIds.length;
 	let [x, y, w, h] = desktop.getRc().toJS();
 	if (n == 1) {
 		const padding = 5;
@@ -100,7 +105,7 @@ function layout_mainLeft(builder, desktop) {
 		w -= 2 * padding;
 		y += padding;
 		h -= 2 * padding;
-		const childId = childIds.get(0);
+		const childId = childIds[0];
 		const child = builder.windowById(childId);
 		child.setRc([x, y, w, h]);
 		child.visible = true;
@@ -113,18 +118,22 @@ function layout_mainLeft(builder, desktop) {
 		h -= 2 * padding;
 		const w2 = parseInt((w - 1 * padding) / 2);
 		// Dimensions for main window, takes up left half of screen
-		const mainId = childIds.get(0);
+		const mainId = childIds[0];
 		const main = builder.windowById(mainId);
 		main.setRc([x, y, w2, h]);
 		main.visible = true;
 		// Remaining children take up right half of screen
 		const x2 = x + (w2 + padding);
 		const h2 = parseInt((h - (n-2)*padding) / (n - 1));
-		childIds.shift().forEach((childId, i) => {
+		_.rest(childIds).forEach((childId, i) => {
 			const y2 = y + i * (h2 + padding);
 			const child = builder.windowById(childId);
 			child.setRc([x2, y2, w2, h2]);
 			child.visible = true;
 		});
 	}
+
+	floatIds.forEach(id => {
+		CONTINUE
+	});
 }
