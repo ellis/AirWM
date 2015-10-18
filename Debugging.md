@@ -14,7 +14,7 @@ Terminal 1: ``Xephyr :1 -ac -screen 800x600``
 
 Terminal 2: ``xtrace -n -D:2 -d:1 -o xtrace.log``
 
-Terminal 3: ``DISPLAY=:2 ./node_modules/.bin/babel-node src/seawm.js``
+Terminal 3: ``DISPLAY=:2 ./node_modules/.bin/babel-node src/wm.js``
 
 This can also be used with other WMs so see what they are sending to the X11 server.
 

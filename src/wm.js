@@ -64,26 +64,48 @@ var clientCreator = function(err, display) {
 		store.dispatch(action1);
 
 		_.forEach(display.screen, (screen, i) => {
-			global.X.AllocColor( screen.default_colormap, 0x5E00, 0x9D00, 0xC800, function(err, color) {
+			global.X.AllocColor(screen.default_colormap, 0x5E00, 0x9D00, 0xC800, function(err, color) {
 				store.dispatch({type: 'setX11ScreenColors', screen: i, colors: {focus: color.pixel}});
 			});
-			global.X.AllocColor( screen.default_colormap, 0xDC00, 0xF000, 0xF700, function(err, color) {
+			global.X.AllocColor(screen.default_colormap, 0xDC00, 0xF000, 0xF700, function(err, color) {
 				store.dispatch({type: 'setX11ScreenColors', screen: i, colors: {normal: color.pixel}});
 			});
-			global.X.AllocColor( screen.default_colormap, 0x0C00, 0x2C00, 0x5200, function(err, color) {
+			global.X.AllocColor(screen.default_colormap, 0x0C00, 0x2C00, 0x5200, function(err, color) {
 				store.dispatch({type: 'setX11ScreenColors', screen: i, colors: {alert: color.pixel}});
 			});
-			global.X.AllocColor( screen.default_colormap, 0xFF00, 0x8000, 0x8000, function(err, color) {
+			global.X.AllocColor(screen.default_colormap, 0xFF00, 0x8000, 0x8000, function(err, color) {
 				store.dispatch({type: 'setX11ScreenColors', screen: i, colors: {floating: color.pixel}});
 			});
-		});
 
+			/*global.X.GrabButton(
+				screen.root,
+				screen.root, // Don't report events to the window
+				x11.eventMask.ButtonPress | x11.eventMask.ButtonRelease | x11.eventMask.ButtonMotion,
+				1, // GrabModeAsync: async pointer mode
+				1, // GrabModeAsync: async keyboard mode
+				0, //confineTo,
+				0, //cursor,
+				1, // Button1
+				0 // alt (8) + ctrl (4) = 12, "windows" modifier = 64
+			);*/
+
+			global.X.GrabButton(
+				screen.root,
+				0, // Don't report events to the window
+				x11.eventMask.ButtonPress | x11.eventMask.ButtonRelease | x11.eventMask.ButtonMotion,
+				1, // GrabModeAsync: async pointer mode
+				1, // GrabModeAsync: async keyboard mode
+				0, //confineTo,
+				0, //cursor,
+				1, // Button1
+				64 + 4// alt (8) + ctrl (4) = 12, "windows" modifier = 64
+			);
+		});
 
 		const min_keycode = display.min_keycode;
 		const max_keycode = display.max_keycode;
-		X.GetKeyboardMapping(min_keycode, max_keycode-min_keycode, function(err, key_list) {
+		global.X.GetKeyboardMapping(min_keycode, max_keycode-min_keycode, function(err, key_list) {
 			ks2kc = conversion.buildKeyMap(key_list,min_keycode);
-
 			// Grab all key combinations which are specified in the configuration file.
 			grabKeyBindings(ks2kc, display);
 		});
@@ -99,7 +121,7 @@ var clientCreator = function(err, display) {
 				x11.eventMask.PointerMotion |
 				x11.eventMask.PropertyChange |
 				x11.eventMask.ResizeRedirect
-		}
+		};
 
 		// By adding the substructure redirect you become the window manager.
 		logger.info("Registering SeaWM as the current Window Manager.");

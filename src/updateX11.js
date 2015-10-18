@@ -50,6 +50,7 @@ export default function updateX11(builder) {
 					'background': undefined,
 					'dock': undefined,
 				}, windowType, x11.eventMask.EnterWindow);
+				//}, windowType, x11.eventMask.EnterWindow | x11.eventMask.Button1Motion | x11.eventMask.ButtonPress | x11.eventMask.ButtonRelease);
 				const desktopNum = (desktop) ? builder.getDesktopIdOrder().indexOf(desktop.id) : -1;
 
 
