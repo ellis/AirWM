@@ -39,7 +39,7 @@ class SubWrapper {
 	_delete(path) {
 		if (!_.isArray(path))
 			path = [path];
-		return this.top._delete(this.path.concat(path), value);
+		return this.top._delete(this.path.concat(path));
 	}
 
 	_update(path, dflt, fn) {

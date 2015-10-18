@@ -25,8 +25,9 @@
 	* [x] create shortcut to toggle floating (Win-P)
 	* [?] give floating windows a different border
 	* [?] update window stack intelligently
-	* [ ] in updateX11, set the siblings according to the desktop stack
-	* [ ] in updateX11, set the EWMH window stack appropriately
+	* [?] in updateX11, set the siblings according to the desktop stack
+	* [?] in updateX11, set the EWMH window stack appropriately
+	* [ ] BUG: when I send a floating window to another desktop, it doesn't disappear until I move the mouse to another window
 	* [ ] Win-leftclick to move floating windows (see <https://github.com/jichu4n/basic_wm>)
 	* [ ] Win-rightclick to resize floating windows
 	* [ ] set requested coordinates from X11 events/messages/attributes

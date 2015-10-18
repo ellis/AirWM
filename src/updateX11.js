@@ -86,7 +86,6 @@ export default function updateX11(builder) {
 							width: rc[2] - 2*borderWidth,
 							height: rc[3] - 2*borderWidth,
 							borderWidth: borderWidth,
-							sibling: siblingXid,
 							stackMode: (windowType === 'background') ? 1 : 0
 						}))
 					)
@@ -105,6 +104,12 @@ export default function updateX11(builder) {
 							? l.set(0, '_NET_WM_ACTION_CLOSE')
 							: l.clear()
 					);
+
+				if (siblingXid > 0) {
+					info = info.setIn(['ConfigureWindow', 1, 'sibling'], siblingXid);
+				} else {
+					info = info.deleteIn(['ConfigureWindow', 1, 'sibling']);
+				}
 			}
 
 			//console.log("info: "+xid);
