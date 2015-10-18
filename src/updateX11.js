@@ -42,8 +42,8 @@ export default function updateX11(builder) {
 				}, windowType, 1);
 				const color = (hasFocus)
 					? screenX11.getIn(['colors', 'focus'], 0)
-					: (w._get(['state', 'float'], false))
-						? screenX11.getIn(['colors', 'float'], 0)
+					: (w._get(['state', 'floating'], false))
+						? screenX11.getIn(['colors', 'floating'], 0)
 						: screenX11.getIn(['colors', 'normal'], 0);
 				const rc = w.getRc().toJS();
 				const eventMask = _.get({
@@ -52,8 +52,13 @@ export default function updateX11(builder) {
 				}, windowType, x11.eventMask.EnterWindow);
 				const desktopNum = (desktop) ? builder.getDesktopIdOrder().indexOf(desktop.id) : -1;
 
+
+				let stackMode;
 				let siblingXid = 0;
-				if (screenId >= 0) {
+				if (windowType === 'background') {
+					stackMode = 1; // Below all windows
+				}
+				else if (screenId >= 0) {
 					const stackIndex = windowIdStack.indexOf(w.id);
 					assert(stackIndex >= 0);
 					//console.log({id: w.id, screenId, stackIndex, windowIdStack})
@@ -62,8 +67,13 @@ export default function updateX11(builder) {
 						const sibling = builder.windowById(siblingId);
 						const siblingScreenId = sibling.findScreenId();
 						//console.log({id: w.id, screenId, siblingId, siblingScreenId, siblingXid: sibling.xid})
+						// Found sibling to place this window above
 						if (siblingScreenId === screenId) {
 							siblingXid = sibling.xid;
+							stackMode = 0;
+						}
+						else {
+							stackMode = 1; // Below everything
 						}
 					}
 				}
@@ -85,8 +95,7 @@ export default function updateX11(builder) {
 							y: rc[1],
 							width: rc[2] - 2*borderWidth,
 							height: rc[3] - 2*borderWidth,
-							borderWidth: borderWidth,
-							stackMode: (windowType === 'background') ? 1 : 0
+							borderWidth: borderWidth
 						}))
 					)
 					.updateIn(
@@ -109,6 +118,12 @@ export default function updateX11(builder) {
 					info = info.setIn(['ConfigureWindow', 1, 'sibling'], siblingXid);
 				} else {
 					info = info.deleteIn(['ConfigureWindow', 1, 'sibling']);
+				}
+
+				if (_.isUndefined(stackMode)) {
+					info = info.deleteIn(['ConfigureWindow', 1, 'stackMode']);
+				} else {
+					info = info.setIn(['ConfigureWindow', 1, 'stackMode'], stackMode);
 				}
 			}
 

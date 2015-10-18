@@ -68,18 +68,17 @@ export default function updateLayout(builder) {
 		});
 
 		// If this desktop is displayed on a screen, update layout
-		if (screenId >= 0) {
-			layout_mainLeft(builder, desktop, childIds);
+		const isDesktopVisible = (screenId >= 0);
+		if (isDesktopVisible) {
+			layout_mainLeft(builder, desktop, childIds, isDesktopVisible);
+			// Layout the floating windows
+			layout_floating(builder, desktop, floatIds, isDesktopVisible);
 		}
-		// Otherwise, set all children to hidden
 		else {
 			childIds0.forEach(childId => {
 				builder._set(['widgets', childId.toString(), 'visible'], false);
 			});
 		}
-
-		// Layout the floating windows
-		layout_floating(builder, desktop, floatIds);
 
 		// Update stack
 		const childIdChain = desktop.getChildIdChain().toJS();
@@ -107,7 +106,7 @@ export default function updateLayout(builder) {
 	);
 }
 
-function layout_floating(builder, desktop, childIds) {
+function layout_floating(builder, desktop, childIds, isDesktopVisible) {
 	// Try to give floating windows their requested size and position
 	childIds.forEach(childId => {
 		const child = builder.windowById(childId);
@@ -126,11 +125,11 @@ function layout_floating(builder, desktop, childIds) {
 		}
 
 		child.setRc(rc);
-		child.visible = true;
+		child.visible = isDesktopVisible;
 	});
 }
 
-function layout_tileRight(state, desktopId, childIds) {
+function layout_tileRight(state, desktopId, childIds, isDesktopVisible) {
 	const desktop = state.getIn(['widgets', desktopId.toString()]);
 	let n = childIds.count();
 	if (n > 0) {
@@ -147,13 +146,13 @@ function layout_tileRight(state, desktopId, childIds) {
 				setIn(['widgets', childId.toString(), 'rc'], List.of(
 					x2, y, w2, h
 				)).
-				setIn(['widgets', childId.toString(), 'visible'], true);
+				setIn(['widgets', childId.toString(), 'visible'], isDesktopVisible);
 		});
 	}
 	return state;
 }
 
-function layout_mainLeft(builder, desktop, childIds) {
+function layout_mainLeft(builder, desktop, childIds, isDesktopVisible) {
 	let n = childIds.length;
 	let [x, y, w, h] = desktop.getRc().toJS();
 	if (n == 1) {
@@ -165,7 +164,7 @@ function layout_mainLeft(builder, desktop, childIds) {
 		const childId = childIds[0];
 		const child = builder.windowById(childId);
 		child.setRc([x, y, w, h]);
-		child.visible = true;
+		child.visible = isDesktopVisible;
 	}
 	else if (n > 1) {
 		const padding = 5;
@@ -186,7 +185,7 @@ function layout_mainLeft(builder, desktop, childIds) {
 			const y2 = y + i * (h2 + padding);
 			const child = builder.windowById(childId);
 			child.setRc([x2, y2, w2, h2]);
-			child.visible = true;
+			child.visible = isDesktopVisible;
 		});
 	}
 }

@@ -73,8 +73,8 @@ var clientCreator = function(err, display) {
 			global.X.AllocColor( screen.default_colormap, 0x0C00, 0x2C00, 0x5200, function(err, color) {
 				store.dispatch({type: 'setX11ScreenColors', screen: i, colors: {alert: color.pixel}});
 			});
-			global.X.AllocColor( screen.default_colormap, 0x0000, 0x0000, 0x0000, function(err, color) {
-				store.dispatch({type: 'setX11ScreenColors', screen: i, colors: {float: color.pixel}});
+			global.X.AllocColor( screen.default_colormap, 0xFF00, 0x8000, 0x8000, function(err, color) {
+				store.dispatch({type: 'setX11ScreenColors', screen: i, colors: {floating: color.pixel}});
 			});
 		});
 

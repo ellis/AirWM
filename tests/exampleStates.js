@@ -102,8 +102,6 @@ export const state111 = fromJS({
 						"width": 780,
 						"height": 580,
 						"borderWidth": 5,
-						"stackMode": 0,
-						"sibling": 0
 					}
 				],
 				"ewmh": {
@@ -240,8 +238,6 @@ export const state112 = fromJS({
 						"width": 382,
 						"height": 580,
 						"borderWidth": 5,
-						"stackMode": 0,
-						"sibling": 0
 					}
 				],
 				"ewmh": {
