@@ -469,7 +469,10 @@ function handlePreExistingWindow(xid) {
 	console.log("handlePreExistingWindow: "+xid)
 	global.X.GetWindowAttributes(xid, function(err, attrs) {
 		logger.info(`handlePreExistingWindow(${xid})`);
-		if (err) throw err;
+		if (err) {
+			promiseCatcher(e);
+			return;
+		}
 		console.log(attrs);
 
 		// If the override-redirect flag is set, don't manage:
