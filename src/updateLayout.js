@@ -91,6 +91,7 @@ export default function updateLayout(builder) {
 			windowIdStackMiddle.push.apply(windowIdStackMiddle, _.intersection(childIdChain, childIds));
 		}
 	});
+	console.log({windowIdStackMiddle})
 
 	// Find any windows without parents
 	const windowIdStackOrphaned = _.difference(builder.getWindowIdOrder().toJS(), windowIdStackTop, windowIdStackMiddle, windowIdStackBottom);

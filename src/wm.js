@@ -624,7 +624,10 @@ function handleStateChange() {
 		}
 		// Settings for each window
 		let windowSettingsPrev = statePrev.getIn(['x11', 'windowSettings'], Map());
-		state.getIn(['x11', 'windowSettings'], Map()).forEach((settings1, key) => {
+		const windowIdStack = state.getIn(['windowIdStack'], List()).reverse();
+		windowIdStack.forEach(id => {
+			const key = id.toString();
+			const settings1 = state.getIn(['x11', 'windowSettings', key], Map());
 			windowSettingsPrev = windowSettingsPrev.delete(key);
 			const settings0 = statePrev.getIn(['x11', 'windowSettings', key], Map());
 			const xid = settings1.get('xid');

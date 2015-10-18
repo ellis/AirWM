@@ -29,12 +29,10 @@
 	* [x] in updateX11, set the EWMH window stack appropriately
 	* [x] BUG: floating window is displayed on all desktops
 	* [x] BUG: `make init`, move mouse to bottom of clock, Win-P: why is window hidden?
-	* [ ] BUG: floating window not being covered by active window underneath
+	* [x] BUG: floating window not being covered by active window underneath
 	* [ ] Win-leftclick to move floating windows (see <https://github.com/jichu4n/basic_wm>)
 	* [ ] Win-rightclick to resize floating windows
 	* [ ] set requested coordinates from X11 events/messages/attributes
-* [ ] test floating windows
-	* [ ] test window stacking
 * [ ] x11: dialog boxes should be programmed to float over their app window
 * [ ] in gvim, goto File|Open: the dialog should float over it's transient-for window
 * [ ] BUG: in gvim, goto File|Open: shouldn't be allowed to put focus back on the gvim window because of the MODAL dialog
@@ -69,11 +67,10 @@ Naming:
 * jetwm jetzwm lowmo lightwm flowm flowmo flowmotion
 
 Testing:
+* [ ] test floating windows
+* [ ] test window stacking
 * [ ] test `moveWindowToIndex`
-* [ ] test 'xdesktop.raise' more thoroughly
 * [ ] test multiple docks and different dock gravities (still need to test left and right docks)
-* [ ] test 'move' action
-* [ ] test 'closeWindow' (perhaps put it in destroyWidgetSpec.js?)
 
 Refactoring:
 * [ ] consider switching from Immutable to <https://github.com/rtfeldman/seamless-immutable>
