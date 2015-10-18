@@ -38,7 +38,9 @@ export default function updateX11(builder) {
 				}, windowType, 1);
 				const color = (hasFocus)
 					? screenX11.getIn(['colors', 'focus'], 0)
-					: screenX11.getIn(['colors', 'normal'], 0);
+					: (w._get(['state', 'float'], false))
+						? screenX11.getIn(['colors', 'float'], 0)
+						: screenX11.getIn(['colors', 'normal'], 0);
 				const rc = w.getRc().toJS();
 				const eventMask = _.get({
 					'background': undefined,

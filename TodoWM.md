@@ -21,9 +21,16 @@
 * [x] test adding transient windows (both when the reference has focus and when not)
 * [x] remove old code files
 * [ ] handle floating windows
+	* [x] pull floating windows out of usual layout
+	* [x] create shortcut to toggle floating (Win-P)
+	* [?] give floating windows a different border
+	* [ ] desktops need a window stack that gets updated by the layout
+	* [ ] in updateX11, set the siblings according to the desktop stack
+	* [ ] in updateX11, set the EWMH window stack appropriately
+	* [ ] Win-leftclick to move floating windows (see <https://github.com/jichu4n/basic_wm>)
+	* [ ] Win-rightclick to resize floating windows
+	* [ ] set requested coordinates from X11 events/messages/attributes
 * [ ] test floating windows
-* [ ] create shortcut to toggle floating (Win-T like xmonad for now, but change it later)
-* [ ] Win-move to move floating windows (see <https://github.com/jichu4n/basic_wm>)
 * [ ] x11: dialog boxes should be programmed to float over their app window
 * [ ] in gvim, goto File|Open: the dialog should float over it's transient-for window
 * [ ] BUG: in gvim, goto File|Open: shouldn't be allowed to put focus back on the gvim window because of the MODAL dialog
