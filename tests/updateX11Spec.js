@@ -84,7 +84,8 @@ describe('updateX11', () => {
 								"width": 780,
 								"height": 580,
 								"borderWidth": 5,
-								"stackMode": 0
+								"stackMode": 0,
+								"sibling": 0
 							}
 						]
 					}
@@ -101,6 +102,9 @@ describe('updateX11', () => {
 							1000
 						],
 						"_NET_CLIENT_LIST": [
+							1000
+						],
+						"_NET_CLIENT_LIST_STACKING": [
 							1000
 						]
 					}
