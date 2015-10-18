@@ -3,6 +3,10 @@ import assert from 'assert';
 import {List, Map} from 'immutable';
 
 export default function updateLayout(builder) {
+	const windowIdStackTop = [];
+	const windowIdStackBottom = [];
+	const windowIdStackMiddle = [];
+
 	//console.log("updateLayout")
 	//console.log(state)
 	// For each screen, update desktop dimensions
@@ -15,6 +19,7 @@ export default function updateLayout(builder) {
 			const w = builder.windowById(backgroundId);
 			w.visible = true;
 			w.setRc(rc0);
+			windowIdStackBottom.push(backgroundId);
 		}
 		// Dimenions left over for desktop windows after dock placement
 		const rc = _.clone(rc0);
@@ -40,6 +45,7 @@ export default function updateLayout(builder) {
 			}
 			w.visible = true;
 			w.setRc(rc2);
+			windowIdStackTop.push(id);
 		});
 		// Desktop layout
 		screen.currentDesktop.setRc(rc);
@@ -53,22 +59,79 @@ export default function updateLayout(builder) {
 	// For each screen's desktop, update child dimensions
 	builder.forEachDesktop(desktop => {
 		const screenId = desktop.findScreenId();
+
+		// Separate managed vs floating windows
+		const childIds0 = desktop.getChildIdOrder().toJS();
+		const [childIds, floatIds] = _.partition(childIds0, id => {
+			const w = builder.windowById(id);
+			return (w._get(['state', 'floating'], false) == false);
+		});
+
 		// If this desktop is displayed on a screen, update layout
 		if (screenId >= 0) {
-			layout_mainLeft(builder, desktop);
+			layout_mainLeft(builder, desktop, childIds);
 		}
 		// Otherwise, set all children to hidden
 		else {
-			desktop.getChildIdOrder().forEach(childId => {
+			childIds0.forEach(childId => {
 				builder._set(['widgets', childId.toString(), 'visible'], false);
 			});
 		}
+
+		// Layout the floating windows
+		layout_floating(builder, desktop, floatIds);
+
+		// Update stack
+		const childIdChain = desktop.getChildIdChain().toJS();
+		if (childIdChain.length > 0) {
+			// Put focused window on top of siblings
+			windowIdStackMiddle.push(childIdChain.shift());
+			// Put floats above managed windows
+			windowIdStackMiddle.push.apply(windowIdStackMiddle, _.intersection(childIdChain, floatIds));
+			// Then add managed windows
+			windowIdStackMiddle.push.apply(windowIdStackMiddle, _.intersection(childIdChain, childIds));
+		}
+	});
+
+	// Find any windows without parents
+	const windowIdStackOrphaned = _.difference(builder.getWindowIdOrder().toJS(), windowIdStackTop, windowIdStackMiddle, windowIdStackBottom);
+
+	// Set the windowIdStack
+	const windowIdStack = _.flatten([windowIdStackTop, windowIdStackMiddle, windowIdStackBottom, windowIdStackOrphaned]);
+	builder._update(
+		['windowIdStack'],
+		List(),
+		windowIdStack0 => (_.isEqual(windowIdStack0.toJS(), windowIdStack))
+			? windowIdStack0
+			: List(windowIdStack)
+	);
+}
+
+function layout_floating(builder, desktop, childIds) {
+	// Try to give floating windows their requested size and position
+	childIds.forEach(childId => {
+		const child = builder.windowById(childId);
+		const rc = child.getRc().toJS() || [0, 0, 100, 100];
+
+		const requestedPos = child.getRequestedPos();
+		if (requestedPos) {
+			rc[0] = requestedPos.get(0);
+			rc[1] = requestedPos.get(1);
+		}
+
+		const requestedSize = child.getRequestedSize();
+		if (requestedSize) {
+			rc[2] = requestedSize.get(0);
+			rc[3] = requestedSize.get(1);
+		}
+
+		child.setRc(rc);
+		child.visible = true;
 	});
 }
 
-function layout_tileRight(state, desktopId) {
+function layout_tileRight(state, desktopId, childIds) {
 	const desktop = state.getIn(['widgets', desktopId.toString()]);
-	const childIds = desktop.get('childIdOrder', List());
 	let n = childIds.count();
 	if (n > 0) {
 		let [x, y, w, h] = desktop.get('rc');
@@ -90,13 +153,7 @@ function layout_tileRight(state, desktopId) {
 	return state;
 }
 
-function layout_mainLeft(builder, desktop) {
-	const childIds0 = desktop.getChildIdOrder().toJS();
-	const [childIds, floatIds] = _.partition(childIds0, id => {
-		const w = builder.windowById(id);
-		return (w._get(['state', 'floating'], false) == false);
-	});
-
+function layout_mainLeft(builder, desktop, childIds) {
 	let n = childIds.length;
 	let [x, y, w, h] = desktop.getRc().toJS();
 	if (n == 1) {
@@ -132,25 +189,4 @@ function layout_mainLeft(builder, desktop) {
 			child.visible = true;
 		});
 	}
-
-	// Try to give floating windows their requested size and position
-	floatIds.forEach(childId => {
-		const child = builder.windowById(childId);
-		const rc = child.getRc().toJS() || [0, 0, 100, 100];
-
-		const requestedPos = child.getRequestedPos();
-		if (requestedPos) {
-			rc[0] = requestedPos.get(0);
-			rc[1] = requestedPos.get(1);
-		}
-
-		const requestedSize = child.getRequestedSize();
-		if (requestedSize) {
-			rc[2] = requestedSize.get(0);
-			rc[3] = requestedSize.get(1);
-		}
-
-		child.setRc(rc);
-		child.visible = true;
-	});
 }

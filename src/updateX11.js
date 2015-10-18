@@ -13,6 +13,7 @@ export default function updateX11(builder) {
 	const currentWindowId = builder.currentWindowId;
 	let remainingKeys = Set(builder.state.getIn(['x11', 'windowSettings'], Map()).keys());
 	//console.log({remainingKeys});
+	const windowIdStack = builder.getWindowIdStack().toJS();
 	builder.forEachWindow(w => {
 		//console.log(w.id);
 		remainingKeys = remainingKeys.delete(w.id.toString());
@@ -26,9 +27,12 @@ export default function updateX11(builder) {
 				.set('visible', isVisible)
 				.setIn(['ewmh', 'WM_STATE', 'state'], x11consts.WM_STATE_NormalState) //(isVisible) ? x11consts.WM_STATE_NormalState : x11consts.WM_STATE_IconicState)
 				.setIn(['ewmh', 'WM_STATE', 'icon'], 0);
-			if (isVisible) {
+			// FIXME: probably want to do this whether visible or not,
+			// but beware of use of window screen below, which is only
+			// available for visible windows.
+			if (true || isVisible) {
 				const desktop = w.findDesktop();
-				const screen = w.findScreen();
+				const screenId = w.findScreenId();
 				const screenX11 = builder._get(['x11', 'screens', screen.id.toString()], Map());
 				const windowType = w.type;
 				const borderWidth = _.get({
@@ -48,6 +52,22 @@ export default function updateX11(builder) {
 				}, windowType, x11.eventMask.EnterWindow);
 				const desktopNum = (desktop) ? builder.getDesktopIdOrder().indexOf(desktop.id) : -1;
 
+				let siblingXid = 0;
+				if (screenId >= 0) {
+					const stackIndex = windowIdStack.indexOf(w.id);
+					assert(stackIndex >= 0);
+					//console.log({id: w.id, screenId, stackIndex, windowIdStack})
+					if (stackIndex < windowIdStack.length - 1) {
+						const siblingId = windowIdStack[stackIndex+1];
+						const sibling = builder.windowById(siblingId);
+						const siblingScreenId = sibling.findScreenId();
+						//console.log({id: w.id, screenId, siblingId, siblingScreenId, siblingXid: sibling.xid})
+						if (siblingScreenId === screenId) {
+							siblingXid = sibling.xid;
+						}
+					}
+				}
+
 				info = info
 					.set('desktopNum', desktopNum)
 					.update(
@@ -66,6 +86,7 @@ export default function updateX11(builder) {
 							width: rc[2] - 2*borderWidth,
 							height: rc[3] - 2*borderWidth,
 							borderWidth: borderWidth,
+							sibling: siblingXid,
 							stackMode: (windowType === 'background') ? 1 : 0
 						}))
 					)
@@ -134,18 +155,15 @@ export default function updateX11(builder) {
 			if (xid)
 				builder._set(['x11', 'wmSettings', 'ewmh', '_NET_CLIENT_LIST', i], xid);
 		}
-		/*
+
 		// Window stacking
-		const widgetIdStack = builder.getWidgetIdStack();
-		builder.update(['x11', 'wmSettings', 'ewmh', '_NET_CLIENT_LIST_STACKING'], List(), l => l.setSize(windowIdStack.count()));
-		for (let i = 0; i < widgetIdStack.count(); i++) {
-			const id = widgetIdStack.get(i);
+		const windowIdStack = builder.getWindowIdStack().reverse();
+		builder._update(['x11', 'wmSettings', 'ewmh', '_NET_CLIENT_LIST_STACKING'], List(), l => l.setSize(windowIdStack.count()));
+		for (let i = 0; i < windowIdStack.count(); i++) {
+			const id = windowIdStack.get(i);
 			const xid = builder._get(['widgets', id.toString(), 'xid']);
-			const type = builder._get(['widgets', id.toString(), 'type']);
-			if (xid && type !== 'screen')
-				builder._set(['x11', 'wmSettings', 'ewmh', '_NET_CLIENT_LIST_STACKING', i], xid);
+			builder._set(['x11', 'wmSettings', 'ewmh', '_NET_CLIENT_LIST_STACKING', i], xid);
 		}
-		*/
 	}
 
 	// Delete entries for windows which have been removed

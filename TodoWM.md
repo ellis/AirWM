@@ -24,13 +24,14 @@
 	* [x] pull floating windows out of usual layout
 	* [x] create shortcut to toggle floating (Win-P)
 	* [?] give floating windows a different border
-	* [ ] desktops need a window stack that gets updated by the layout
+	* [?] update window stack intelligently
 	* [ ] in updateX11, set the siblings according to the desktop stack
 	* [ ] in updateX11, set the EWMH window stack appropriately
 	* [ ] Win-leftclick to move floating windows (see <https://github.com/jichu4n/basic_wm>)
 	* [ ] Win-rightclick to resize floating windows
 	* [ ] set requested coordinates from X11 events/messages/attributes
 * [ ] test floating windows
+	* [ ] test window stacking
 * [ ] x11: dialog boxes should be programmed to float over their app window
 * [ ] in gvim, goto File|Open: the dialog should float over it's transient-for window
 * [ ] BUG: in gvim, goto File|Open: shouldn't be allowed to put focus back on the gvim window because of the MODAL dialog
@@ -59,6 +60,7 @@
 * [ ] BUG: start two xterms; click 'xterm' on lxqt-panel's task bar then move mouse to one of the xterms; the popup is then drawn below the windows
 * [ ] for better focus-follows-mouse: detect layout changes and use a timer to limit duration that EnterNotify is ignored.
 * [ ] xfce4-panel: the bottom panel should be centered
+* [ ] updateX11: update window info for non-visible windows too, where possible
 
 Naming:
 * jetwm jetzwm lowmo lightwm flowm flowmo flowmotion
@@ -107,6 +109,7 @@ Later:
 * [ ] look into turning the WM into a compositing WM
 * [ ] for inspiration, lookup videos on Mac's Mission Control, Compiz F12, Ubuntu window management
 * [ ] handle startup notification (<http://www.freedesktop.org/wiki/Software/startup-notification/> and <http://standards.freedesktop.org/startup-notification-spec/startup-notification-latest.txt>)
+* [ ] maybe refactor so that every container (e.g. screen, desktop) also has a childIdStack, and then recursively build the window manager's childIdStack from those.
 
 xfce todos:
 * [ ] it'd be nice if the calendar popup weren't made into a screen

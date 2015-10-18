@@ -78,7 +78,8 @@ export const state111 = fromJS({
 			SetInputFocus: [1001],
 			"ewmh": {
 				"_NET_ACTIVE_WINDOW": [1001],
-				"_NET_CLIENT_LIST": [1001]
+				"_NET_CLIENT_LIST": [1001],
+				"_NET_CLIENT_LIST_STACKING": [1001]
 			}
 		},
 		windowSettings: {
@@ -101,7 +102,8 @@ export const state111 = fromJS({
 						"width": 780,
 						"height": 580,
 						"borderWidth": 5,
-						"stackMode": 0
+						"stackMode": 0,
+						"sibling": 0
 					}
 				],
 				"ewmh": {
@@ -175,6 +177,10 @@ export const state112 = fromJS({
 				"_NET_CLIENT_LIST": [
 					1001,
 					1002
+				],
+				"_NET_CLIENT_LIST_STACKING": [
+					1002,
+					1001
 				]
 			}
 		},
@@ -198,7 +204,8 @@ export const state112 = fromJS({
 						"width": 382,
 						"height": 580,
 						"borderWidth": 5,
-						"stackMode": 0
+						"stackMode": 0,
+						"sibling": 1002
 					}
 				],
 				"ewmh": {
@@ -233,7 +240,8 @@ export const state112 = fromJS({
 						"width": 382,
 						"height": 580,
 						"borderWidth": 5,
-						"stackMode": 0
+						"stackMode": 0,
+						"sibling": 0
 					}
 				],
 				"ewmh": {

@@ -199,6 +199,7 @@ export default class StateWrapper {
 	getScreenIdOrder() { return this.state.getIn(StatePaths.screenIdOrder, List()); }
 	getDesktopIdOrder() { return this.state.getIn(StatePaths.desktopIdOrder, List()); }
 	getWindowIdOrder() { return this.state.getIn(StatePaths.windowIdOrder, List()); }
+	getWindowIdStack() { return this.state.getIn(StatePaths.windowIdStack, List()); }
 	getWidgetIdChain() { return this.state.getIn(StatePaths.widgetIdChain, List()); }
 	//getScreenIdChain() { return this.state.getIn(StatePaths.screenIdChain, List()); }
 	get widgetIdNext() { return this.state.getIn(StatePaths.widgetIdNext, 0); }
@@ -672,7 +673,7 @@ export default class StateWrapper {
 		if (window) {
 			if (_.isUndefined(value))
 				value = !window._get(['state', 'floating']);
-				
+
 			if (value)
 				window._set(['state', 'floating'], true);
 			else
