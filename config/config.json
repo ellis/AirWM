@@ -31,6 +31,8 @@
 		{"key": "k", "modifier" : ["super","shift"], "action": {"type": "moveWindowToIndexPrev"}},
 
 		{"key": "c", "modifier" : ["super","shift"], "action": {"type": "removeWindow"}},
+		{"key": "p", "modifier" : ["super"], "action": {"type": "toggleWindowFloating"}},
+
 		{
 			"key"      : "d",
 			"modifier" : ["super"],

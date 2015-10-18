@@ -93,8 +93,8 @@ function layout_tileRight(state, desktopId) {
 function layout_mainLeft(builder, desktop) {
 	const childIds0 = desktop.getChildIdOrder().toJS();
 	const [childIds, floatIds] = _.partition(childIds0, id => {
-		const w = this.windowById(id);
-		return (w.get(['state', 'floating'], false) == false);
+		const w = builder.windowById(id);
+		return (w._get(['state', 'floating'], false) == false);
 	});
 
 	let n = childIds.length;
@@ -133,7 +133,24 @@ function layout_mainLeft(builder, desktop) {
 		});
 	}
 
-	floatIds.forEach(id => {
-		CONTINUE
+	// Try to give floating windows their requested size and position
+	floatIds.forEach(childId => {
+		const child = builder.windowById(childId);
+		const rc = child.getRc().toJS() || [0, 0, 100, 100];
+
+		const requestedPos = child.getRequestedPos();
+		if (requestedPos) {
+			rc[0] = requestedPos.get(0);
+			rc[1] = requestedPos.get(1);
+		}
+
+		const requestedSize = child.getRequestedSize();
+		if (requestedSize) {
+			rc[2] = requestedSize.get(0);
+			rc[3] = requestedSize.get(1);
+		}
+
+		child.setRc(rc);
+		child.visible = true;
 	});
 }

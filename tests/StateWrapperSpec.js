@@ -21,28 +21,6 @@ const ActionObjects = {
 	},
 };
 
-/*[{
-	actions: b => {
-		const d1 = b.addDesktop({});
-		return {d1}
-	},
-	asserts: x => {
-		'widgetIdNext': x.d1 + 1],
-		'screenIdOrder': [],
-		'desktopIdOrder': [d1],
-		'windowIdOrder': [],
-		'widgetIdChain': [d1],
-		'currentScreenId': -1,
-		'currentDesktopId': -1,
-		'currentWindowId': -1
-	],
-	children: [{
-		actions: b => {
-
-		}
-	}]
-}];*/
-
 describe('StateWrapper', () => {
 	it('empty', () => {
 		const builder = new StateWrapper(initialState);

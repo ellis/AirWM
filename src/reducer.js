@@ -66,7 +66,11 @@ const handlers = {
 	'setX11ScreenColors': (builder, action) => {
 		const screenId = builder.findScreenIdByNum(action.screen);
 		builder.state = builder.state.mergeIn(['x11', 'screens', screenId.toString(), 'colors'], Map(action.colors));
-	}
+	},
+
+	'toggleWindowFloating': (builder, action) => {
+		builder.toggleWindowFloating();
+	},
 };
 
 export default function reducer(state = initialState, action) {

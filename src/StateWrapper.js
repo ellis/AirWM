@@ -35,6 +35,18 @@ class SubWrapper {
 			path = [path];
 		return this.top._set(this.path.concat(path), value);
 	}
+
+	_delete(path) {
+		if (!_.isArray(path))
+			path = [path];
+		return this.top._delete(this.path.concat(path), value);
+	}
+
+	_update(path, dflt, fn) {
+		if (!_.isArray(path))
+			path = [path];
+		return this.top._update(this.path.concat(path), dflt, fn);
+	}
 }
 
 class WidgetWrapper extends SubWrapper {
@@ -141,6 +153,9 @@ class WindowWrapper extends WidgetWrapper {
 	get visible() { return this._get('visible', false); }
 	set visible(visible) { return this._set('visible', (visible) ? true : false); }
 	get xid() { return this._get('xid'); }
+
+	getRequestedSize() { return this._get('requestedSize'); }
+	getRequestedPos() { return this._get('requestedPos'); }
 
 	findDesktopId() { return this.top._findWidgetDekstopIdById(this.id); }
 	findDesktop() { return this.top.desktopById(this.findDesktopId()); }
@@ -644,18 +659,20 @@ export default class StateWrapper {
 
 	/**
 	 * Toggle or set the floating state of a window.
-
+	 *
+	 * @param {number|WindowWrapper} [window] - window ID or window wrapper, or if undefined the current window.
 	 * @param {boolean} [value] - value to force, or toggle if undefined.
 	 */
-	toogleFloating(window, value) {
+	toggleWindowFloating(window, value) {
 		if (_.isUndefined(window))
 			window = this.currentWindow;
 		else if (_.isNumber(window))
 			window = this.windowbyId(window);
 
 		if (window) {
-			if (_.isUndefined(value)) {
+			if (_.isUndefined(value))
 				value = !window._get(['state', 'floating']);
+				
 			if (value)
 				window._set(['state', 'floating'], true);
 			else
@@ -723,6 +740,13 @@ export default class StateWrapper {
 		if (_.isString(path))
 			path = [path];
 		this.state = this.state.setIn(path, value);
+		return this;
+	}
+
+	_delete(path) {
+		if (_.isString(path))
+			path = [path];
+		this.state = this.state.deleteIn(path);
 		return this;
 	}
 
