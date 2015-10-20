@@ -154,8 +154,8 @@ class WindowWrapper extends WidgetWrapper {
 	set visible(visible) { return this._set('visible', (visible) ? true : false); }
 	get xid() { return this._get('xid'); }
 
-	getRequestedSize() { return this._get('requestedSize'); }
-	getRequestedPos() { return this._get('requestedPos'); }
+	getRequestedSize() { return this._get(['requested', 'size']); }
+	getRequestedPos() { return this._get(['requested', 'pos']); }
 
 	findDesktopId() { return this.top._findWidgetDekstopIdById(this.id); }
 	findDesktop() { return this.top.desktopById(this.findDesktopId()); }
@@ -668,7 +668,7 @@ export default class StateWrapper {
 		if (_.isUndefined(window))
 			window = this.currentWindow;
 		else if (_.isNumber(window))
-			window = this.windowbyId(window);
+			window = this.windowById(window);
 
 		if (window) {
 			if (_.isUndefined(value))
@@ -679,6 +679,19 @@ export default class StateWrapper {
 			else
 				window._delete(['state', 'floating']);
 		}
+		return this;
+	}
+
+	setWindowRequestedProperties(window, props) {
+		if (_.isUndefined(window))
+			window = this.currentWindow;
+		else if (_.isNumber(window))
+			window = this.windowById(window);
+
+		if (window) {
+			window._update('requested', Map(), m => m.merge(props));
+		}
+
 		return this;
 	}
 

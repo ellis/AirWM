@@ -77,18 +77,6 @@ var clientCreator = function(err, display) {
 				store.dispatch({type: 'setX11ScreenColors', screen: i, colors: {floating: color.pixel}});
 			});
 
-			/*global.X.GrabButton(
-				screen.root,
-				screen.root, // Don't report events to the window
-				x11.eventMask.ButtonPress | x11.eventMask.ButtonRelease | x11.eventMask.ButtonMotion,
-				1, // GrabModeAsync: async pointer mode
-				1, // GrabModeAsync: async keyboard mode
-				0, //confineTo,
-				0, //cursor,
-				1, // Button1
-				0 // alt (8) + ctrl (4) = 12, "windows" modifier = 64
-			);*/
-
 			global.X.GrabButton(
 				screen.root,
 				0, // Don't report events to the window
@@ -239,6 +227,8 @@ function enqueueEvent(ev) {
 }
 
 const eventHandlers = {
+	'ButtonPress': handleButtonPress,
+	'ButtonRelease': handleButtonRelease,
 	'ClientMessage': handleClientMessage,
 	"ConfigureRequest": handleConfigureRequest,
 	"DestroyNotify": handleDestroyNotify,
@@ -303,6 +293,41 @@ function handleEvent() {
 		logger.error(e.message);
 		logger.error(e.stack);
 	}
+}
+
+let dragStart = null;
+let dragId = null;
+
+function handleButtonPress(ev, id) {
+	id = findWidgetIdForXid(ev.child);
+	console.log("handleButtonPress: "+id+" "+JSON.stringify(ev));
+	if (id >= 0) {
+		const builder = new StateWrapper(store.getState());
+		const w = builder.windowById(id);
+		if ((ev.buttons & 68) === 68 && w._get(['state', 'floating'], false)) {
+			dragStart = ev;
+			dragId = id;
+		}
+	}
+	return Promise.resolve();
+}
+
+function handleButtonRelease(ev) {
+	console.log("handleButtonRelease: "+JSON.stringify(ev));
+	if (dragStart && dragId >= 0) {
+		const builder = new StateWrapper(store.getState());
+		const w = builder.windowById(dragId);
+		if (w) {
+			const dx = ev.rootx - dragStart.rootx;
+			const dy = ev.rooty - dragStart.rooty;
+			const rc = w.getRc().toJS();
+			const pos = [rc[0] + dx, rc[1] + dy];
+			store.dispatch({type: 'setWindowRequestedProperties', window: dragId, props: {pos}});
+		}
+	}
+	dragStart = null;
+	dragId = null;
+	return Promise.resolve();
 }
 
 function handleClientMessage(ev) {
@@ -653,6 +678,21 @@ function handleStateChange() {
 			windowSettingsPrev = windowSettingsPrev.delete(key);
 			const settings0 = statePrev.getIn(['x11', 'windowSettings', key], Map());
 			const xid = settings1.get('xid');
+
+			/*// If window is new:
+			if (!statePrev.hasIn(['widgets', key])) {
+				global.X.GrabButton(
+					xid,
+					0, // Don't report events to the window
+					x11.eventMask.ButtonPress | x11.eventMask.ButtonRelease | x11.eventMask.ButtonMotion,
+					1, // GrabModeAsync: async pointer mode
+					1, // GrabModeAsync: async keyboard mode
+					0, //confineTo,
+					0, //cursor,
+					1, // Button1
+					64 + 4// alt (8) + ctrl (4) = 12, "windows" modifier = 64
+				);
+			}*/
 
 			const ChangeWindowAttributes = settings1.get('ChangeWindowAttributes');
 			if (ChangeWindowAttributes !== settings0.get('ChangeWindowAttributes')) {

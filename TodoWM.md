@@ -71,6 +71,7 @@ Testing:
 * [ ] test floating windows
 * [ ] test window stacking
 * [ ] test `moveWindowToIndex`
+* [ ] test `setWindowRequestedProperties`
 * [ ] test multiple docks and different dock gravities (still need to test left and right docks)
 
 Refactoring:

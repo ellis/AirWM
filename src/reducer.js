@@ -71,6 +71,10 @@ const handlers = {
 	'toggleWindowFloating': (builder, action) => {
 		builder.toggleWindowFloating();
 	},
+
+	'setWindowRequestedProperties': (builder, action) => {
+		builder.setWindowRequestedProperties(action.window, action.props);
+	},
 };
 
 export default function reducer(state = initialState, action) {
