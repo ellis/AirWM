@@ -14,7 +14,10 @@ export default function updateX11(builder) {
 	let remainingKeys = Set(builder.state.getIn(['x11', 'windowSettings'], Map()).keys());
 	//console.log({remainingKeys});
 	const windowIdStack = builder.getWindowIdStack().toJS();
-	builder.forEachWindow(w => {
+	let screenIdPrev = -1;
+	let xidPrev = -1;
+	_.forEach(windowIdStack, (id, stackIndex) => {
+		const w = builder.windowById(id);
 		//console.log(w.id);
 		remainingKeys = remainingKeys.delete(w.id.toString());
 		const xid = w.xid;
@@ -53,31 +56,21 @@ export default function updateX11(builder) {
 				//}, windowType, x11.eventMask.EnterWindow | x11.eventMask.Button1Motion | x11.eventMask.ButtonPress | x11.eventMask.ButtonRelease);
 				const desktopNum = (desktop) ? builder.getDesktopIdOrder().indexOf(desktop.id) : -1;
 
-
 				let stackMode;
 				let siblingXid = 0;
-				if (windowType === 'background') {
-					stackMode = 1; // Below all windows
-				}
-				else if (screenId >= 0) {
-					const stackIndex = windowIdStack.indexOf(w.id);
-					assert(stackIndex >= 0);
-					//console.log({id: w.id, screenId, stackIndex, windowIdStack})
-					if (stackIndex < windowIdStack.length - 1) {
-						const siblingId = windowIdStack[stackIndex+1];
-						const sibling = builder.windowById(siblingId);
-						const siblingScreenId = sibling.findScreenId();
-						//console.log({id: w.id, screenId, siblingId, siblingScreenId, siblingXid: sibling.xid})
-						// Found sibling to place this window above
-						if (siblingScreenId === screenId) {
-							siblingXid = sibling.xid;
-							stackMode = 0;
-						}
-						else {
-							stackMode = 1; // Below everything
-						}
+				if (screenId >= 0) {
+					if (screenId !== screenIdPrev) {
+						stackMode = 0; // On top of everything
+					}
+					else if (stackIndex < windowIdStack.length - 1 && xidPrev >= 0) {
+						siblingXid = xidPrev;
+						stackMode = 1;
+					}
+					else {
+						stackMode = 1; // Below everything
 					}
 				}
+				screenIdPrev = screenId;
 
 				info = info
 					.set('desktopNum', desktopNum)
@@ -131,6 +124,8 @@ export default function updateX11(builder) {
 			//console.log("info: "+xid);
 			//console.log(info);
 			builder._set(['x11', 'windowSettings', w.id.toString()], info);
+
+			xidPrev = xid;
 		}
 	});
 
@@ -147,7 +142,7 @@ export default function updateX11(builder) {
 	});
 
 	// EWMH (Extended window manager hints)
-	if (true) {
+	{
 		// Number of desktops
 		const desktopCount = builder.getDesktopIdOrder().count();
 		builder._update(
