@@ -221,7 +221,14 @@ var errorHandler = function(err){
 let eventQueue = [];
 let eventHandlerRunning = false;
 function enqueueEvent(ev) {
-	eventQueue.push(ev);
+	// Avoid piling up MotionNotify events
+	if (ev.name === 'MotionNotify' && eventQueue.length > 0 && _.last(eventQueue).name === 'MotionNotify') {
+		eventQueue[eventQueue.length - 1] = ev;
+	}
+	// All other events: put them at the back of the queue
+	else {
+		eventQueue.push(ev);
+	}
 	if (!eventHandlerRunning)
 		handleEvent();
 }
@@ -237,7 +244,7 @@ const eventHandlers = {
 	'KeyPress': handleKeyPress,
 	// Show a window
 	'MapRequest': handleMapRequest,
-	//'MotionNotify': handleMotionNotify,
+	'MotionNotify': handleMotionNotify,
 	'UnmapNotify': handleUnmapNotify,
 };
 
@@ -296,7 +303,6 @@ function handleEvent() {
 }
 
 let dragStart = null;
-let dragId = null;
 
 function handleButtonPress(ev, id) {
 	id = findWidgetIdForXid(ev.child);
@@ -305,28 +311,32 @@ function handleButtonPress(ev, id) {
 		const builder = new StateWrapper(store.getState());
 		const w = builder.windowById(id);
 		if ((ev.buttons & 68) === 68 && w._get(['state', 'floating'], false)) {
-			dragStart = ev;
-			dragId = id;
+			dragStart = {
+				id,
+				rc: w.getRc().toJS(),
+				rootx: ev.rootx,
+				rooty: ev.rooty
+			};
 		}
+		store.dispatch({type: "activateWindow", window: id});
+	}
+	return Promise.resolve();
+}
+
+function handleMotionNotify(ev) {
+	if (dragStart) {
+		console.log({dragStart, ev});
+		const dx = ev.rootx - dragStart.rootx;
+		const dy = ev.rooty - dragStart.rooty;
+		const rc = dragStart.rc;
+		const pos = [rc[0] + dx, rc[1] + dy];
+		store.dispatch({type: 'setWindowRequestedProperties', window: dragStart.id, props: {pos}});
 	}
 	return Promise.resolve();
 }
 
 function handleButtonRelease(ev) {
-	console.log("handleButtonRelease: "+JSON.stringify(ev));
-	if (dragStart && dragId >= 0) {
-		const builder = new StateWrapper(store.getState());
-		const w = builder.windowById(dragId);
-		if (w) {
-			const dx = ev.rootx - dragStart.rootx;
-			const dy = ev.rooty - dragStart.rooty;
-			const rc = w.getRc().toJS();
-			const pos = [rc[0] + dx, rc[1] + dy];
-			store.dispatch({type: 'setWindowRequestedProperties', window: dragId, props: {pos}});
-		}
-	}
 	dragStart = null;
-	dragId = null;
 	return Promise.resolve();
 }
 
@@ -632,11 +642,6 @@ function createWidgetForXid(xid, props) {
 	//console.log({coords, ev, handleEnterNotifyCoordsPrev});
 	handleEnterNotifyCoordsPrev = coords;
 }*/
-
-/*
-function handleMotionNotify(ev) {
-}
-*/
 
 function handleUnmapNotify(ev, id) {
 	if (id >= 0) {

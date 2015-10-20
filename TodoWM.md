@@ -31,7 +31,8 @@
 	* [x] BUG: `make init`, move mouse to bottom of clock, Win-P: why is window hidden?
 	* [x] BUG: floating window not being covered by active window underneath
 	* [x] for my Xephyr window, it looks like I can't grab Win+Button1, but need to use Win+Ctrl+Button1
-	* [ ] Win+(Ctrl+)leftclick to move floating windows (see <https://github.com/jichu4n/basic_wm>)
+	* [x] Win+(Ctrl+)leftclick to move floating windows (see <https://github.com/jichu4n/basic_wm>)
+	* [ ] StateWrapper: add dragging properties and handlers
 	* [ ] Win-rightclick to resize floating windows
 	* [ ] set requested coordinates from X11 events/messages/attributes
 * [ ] x11: dialog boxes should be programmed to float over their app window
