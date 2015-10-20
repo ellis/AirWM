@@ -17,7 +17,7 @@ const handlers = {
 	},
 
 	'activateWindow': (builder, action) => {
-		builder.activateWindow(action.id);
+		builder.activateWindow(action.window);
 	},
 
 	'activateWindowNext': (builder, action) => {
@@ -29,7 +29,7 @@ const handlers = {
 	},
 
 	'removeWindow': (builder, action) => {
-		builder.removeWindow(action.id);
+		builder.removeWindow(action.window);
 	},
 
 	'addWindow': (builder, action) => {

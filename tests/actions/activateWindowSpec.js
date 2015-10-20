@@ -10,7 +10,7 @@ import * as ex from '../exampleStates.js';
 describe('activateWindow', () => {
 	it('handles switch to second window', () => {
 		const [d1, s1, w1, w2] = [0, 1, 2, 3];
-		const state = reducer(ex.state112, {type: 'activateWindow', id: w2});
+		const state = reducer(ex.state112, {type: 'activateWindow', window: w2});
 		const builder = new StateWrapper(state);
 		checkList(builder, "activateWindow 2", [
 			`currentWindowId`, w2,

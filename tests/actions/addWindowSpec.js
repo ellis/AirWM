@@ -98,7 +98,7 @@ describe('addWindow', () => {
 
 	it('removing first window, then adding a thrid', () => {
 		const [d1, s1, w1, w2, w3] = [0, 1, 2, 3, 4];
-		const state1 = reducer(ex.state112, {type: 'removeWindow', id: w1});
+		const state1 = reducer(ex.state112, {type: 'removeWindow', window: w1});
 		const state = reducer(state, {type: 'addWindow', window: {type: 'window', xid: 1003}});
 		const builder = new StateWrapper(state);
 		checkList(builder, undefined, () => [

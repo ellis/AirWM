@@ -9,8 +9,8 @@ import * as ex from '../exampleStates.js';
 
 describe('removeWindow', () => {
 	const [d1, s1, w1, w2] = [0, 1, 2, 3];
-	const action1 = {type: 'removeWindow', id: w1};
-	const action2 = {type: 'removeWindow', id: w2};
+	const action1 = {type: 'removeWindow', window: w1};
+	const action2 = {type: 'removeWindow', window: w2};
 
 	it('remove first window, focused window', () => {
 		const state = reducer(ex.state112, action1);
@@ -34,7 +34,7 @@ describe('removeWindow', () => {
 	});
 
 	it('handles removing last, focused widget', () => {
-		const state1 = reducer(ex.state112, {type: 'activateWindow', id: w2});
+		const state1 = reducer(ex.state112, {type: 'activateWindow', window: w2});
 		const state = reducer(state1, action2);
 		//console.log(JSON.stringify(state.toJS(), null, '\t'));
 		//console.log(diff(state, ex.state111));
@@ -42,7 +42,7 @@ describe('removeWindow', () => {
 	});
 
 	it('handles removing first, unfocused widget', () => {
-		const state1 = reducer(ex.state112, {type: 'activateWindow', id: w2});
+		const state1 = reducer(ex.state112, {type: 'activateWindow', window: w2});
 		const state = reducer(state1, action1);
 		const builder = new StateWrapper(state);
 		checkList(builder, undefined, [

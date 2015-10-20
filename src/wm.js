@@ -88,6 +88,18 @@ var clientCreator = function(err, display) {
 				1, // Button1
 				64 + 4// alt (8) + ctrl (4) = 12, "windows" modifier = 64
 			);
+
+			global.X.GrabButton(
+				screen.root,
+				0, // Don't report events to the window
+				x11.eventMask.ButtonPress | x11.eventMask.ButtonRelease | x11.eventMask.ButtonMotion,
+				1, // GrabModeAsync: async pointer mode
+				1, // GrabModeAsync: async keyboard mode
+				0, //confineTo,
+				0, //cursor,
+				3, // Button3 (right button)
+				64 + 4// alt (8) + ctrl (4) = 12, "windows" modifier = 64
+			);
 		});
 
 		const min_keycode = display.min_keycode;
@@ -350,7 +362,7 @@ function handleClientMessage(ev) {
 			case '_NET_ACTIVE_WINDOW': {
 				const id = findWidgetIdForXid(ev.wid);
 				if (id >= 0) {
-					store.dispatch({type: 'activateWindow', id: id});
+					store.dispatch({type: 'activateWindow', window: id});
 				}
 				break;
 			}
@@ -402,7 +414,7 @@ function handleConfigureRequest(ev, id) {
 function handleDestroyNotify(ev) {
 	const id = findWidgetIdForXid(ev.wid);
 	if (id >= 0) {
-		store.dispatch({type: 'removeWindow', id: id});
+		store.dispatch({type: 'removeWindow', window: id});
 	}
 	return Promise.resolve();
 }
@@ -451,7 +463,7 @@ function handleEnterNotify(ev, id) {
 	if (id >= 0) {
 		//console.log({coords, ev, handleEnterNotifyCoordsPrev});
 		if (!ignoreEnterNotify && !_.isEqual(coords, handleEnterNotifyCoordsPrev)) {
-			store.dispatch({type: 'activateWindow', id: id});
+			store.dispatch({type: 'activateWindow', window: id});
 		}
 		else {
 			//console.log("ignored EnterNotify");
@@ -649,7 +661,7 @@ function handleUnmapNotify(ev, id) {
 		const w = builder.windowById(id);
 		if (w) {
 			if (w.visible) {
-				store.dispatch({type: 'removeWindow', id: id});
+				store.dispatch({type: 'removeWindow', window: id});
 			}
 		}
 	}
