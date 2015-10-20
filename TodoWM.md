@@ -32,7 +32,7 @@
 	* [x] BUG: floating window not being covered by active window underneath
 	* [x] for my Xephyr window, it looks like I can't grab Win+Button1, but need to use Win+Ctrl+Button1
 	* [x] Win+(Ctrl+)leftclick to move floating windows (see <https://github.com/jichu4n/basic_wm>)
-	* [ ] Win-rightclick to resize floating windows
+	* [x] Win-rightclick to resize floating windows
 	* [ ] set requested coordinates from X11 events/messages/attributes
 * [ ] x11: dialog boxes should be programmed to float over their app window
 * [ ] in gvim, goto File|Open: the dialog should float over it's transient-for window

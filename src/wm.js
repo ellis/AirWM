@@ -322,12 +322,13 @@ function handleButtonPress(ev, id) {
 	if (id >= 0) {
 		const builder = new StateWrapper(store.getState());
 		const w = builder.windowById(id);
-		if ((ev.buttons & 68) === 68 && w._get(['state', 'floating'], false)) {
+		if ((ev.buttons & 68) === 68 && w._get(['state', 'floating'], false) && (ev.keycode === 1 || ev.keycode === 3)) {
 			dragStart = {
 				id,
 				rc: w.getRc().toJS(),
 				rootx: ev.rootx,
-				rooty: ev.rooty
+				rooty: ev.rooty,
+				keycode: ev.keycode
 			};
 		}
 		store.dispatch({type: "activateWindow", window: id});
@@ -341,8 +342,16 @@ function handleMotionNotify(ev) {
 		const dx = ev.rootx - dragStart.rootx;
 		const dy = ev.rooty - dragStart.rooty;
 		const rc = dragStart.rc;
-		const pos = [rc[0] + dx, rc[1] + dy];
-		store.dispatch({type: 'setWindowRequestedProperties', window: dragStart.id, props: {pos}});
+		// Drag
+		if (dragStart.keycode === 1) {
+			const pos = [rc[0] + dx, rc[1] + dy];
+			store.dispatch({type: 'setWindowRequestedProperties', window: dragStart.id, props: {pos}});
+		}
+		// Resize
+		else {
+			const size = [rc[2] + dx, rc[3] + dy];
+			store.dispatch({type: 'setWindowRequestedProperties', window: dragStart.id, props: {size}});
+		}
 	}
 	return Promise.resolve();
 }
