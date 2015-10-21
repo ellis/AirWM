@@ -150,16 +150,18 @@ var clientCreator = function(err, display) {
 			'_NET_NUMBER_OF_DESKTOPS',
 			'_NET_SUPPORTED',
 			'_NET_WM_ALLOWED_ACTIONS',
-			//'_NET_WM_STATE_FULLSCREEN',
 			//'_NET_SUPPORTING_WM_CHECK',
 			//'_NET_WM_NAME',
 			//'_NET_WM_STRUT',
 			'_NET_WM_STATE',
+			//'_NET_WM_STATE_FULLSCREEN',
+			'_NET_WM_STATE_MODAL',
 			'_NET_WM_STRUT_PARTIAL',
 			'_NET_WM_WINDOW_TYPE',
 			'_NET_WM_WINDOW_TYPE_DESKTOP',
+			'_NET_WM_WINDOW_TYPE_DIALOG',
 			'_NET_WM_WINDOW_TYPE_DOCK',
-			// _NET_WM_WINDOW_TYPE_TOOLBAR, _NET_WM_WINDOW_TYPE_MENU, _NET_WM_WINDOW_TYPE_UTILITY, _NET_WM_WINDOW_TYPE_SPLASH, _NET_WM_WINDOW_TYPE_DIALOG, _NET_WM_WINDOW_TYPE_DROPDOWN_MENU, _NET_WM_WINDOW_TYPE_POPUP_MENU, _NET_WM_WINDOW_TYPE_TOOLTIP, _NET_WM_WINDOW_TYPE_NOTIFICATION, _NET_WM_WINDOW_TYPE_COMBO, _NET_WM_WINDOW_TYPE_DND,
+			// _NET_WM_WINDOW_TYPE_TOOLBAR, _NET_WM_WINDOW_TYPE_MENU, _NET_WM_WINDOW_TYPE_UTILITY, _NET_WM_WINDOW_TYPE_SPLASH, _NET_WM_WINDOW_TYPE_DROPDOWN_MENU, _NET_WM_WINDOW_TYPE_POPUP_MENU, _NET_WM_WINDOW_TYPE_TOOLTIP, _NET_WM_WINDOW_TYPE_NOTIFICATION, _NET_WM_WINDOW_TYPE_COMBO, _NET_WM_WINDOW_TYPE_DND,
 			'_NET_WM_WINDOW_TYPE_NORMAL',
 		];
 		const cb = (err) => { if(err) throw err; };
@@ -616,11 +618,22 @@ function handleMapRequest(ev, id) {
 
 function createWidgetForXid(xid, props) {
 	logger.info(`createWidgetForXid(${xid})`);
-	const widgetType = ({
-		'_NET_WM_WINDOW_TYPE_DOCK': 'dock',
-		'_NET_WM_WINDOW_TYPE_DESKTOP': 'background',
-		//'_NET_WM_WINDOW_TYPE_DESKTOP': 'window',
-	}[props['_NET_WM_WINDOW_TYPE']] || "window");
+	console.log(_.omit(props, '_NET_WM_ICON'));
+	const hints = {
+		windowType: _.get(props, '_NET_WM_WINDOW_TYPE[0]'),
+		state: _.get(props, '_NET_WM_STATE[0]'),
+		transientForXid: _.get(props, 'WM_TRANSIENT_FOR[0]')
+	};
+	console.log({hints})
+	const widgetType = _.get(
+		{
+			'_NET_WM_WINDOW_TYPE_DOCK': 'dock',
+			'_NET_WM_WINDOW_TYPE_DESKTOP': 'background',
+			//'_NET_WM_WINDOW_TYPE_DESKTOP': 'window',
+		},
+		hints.windowType,
+		'window'
+	);
 
 	const action = {
 		type: 'addWindow',
@@ -644,15 +657,16 @@ function createWidgetForXid(xid, props) {
 		}
 	}
 
-	console.log(_.omit(props, '_NET_WM_ICON'));
-	const transientForXid = _.get(props, 'WM_TRANSIENT_FOR[0]');
-	console.log({transientForXid})
-	if (transientForXid > 0) {
-		const transientForId = findWidgetIdForXid(transientForXid);
+	if (hints.transientForXid > 0) {
+		const transientForId = findWidgetIdForXid(hints.transientForXid);
 		console.log({transientForId})
 		if (transientForId >= 0) {
 			action.window.transientForId = transientForId;
 		}
+	}
+
+	if (hints.state === '_NET_WM_STATE_MODAL') {
+		_.set(action.window, 'flags.floating', true);
 	}
 
 	store.dispatch(action);

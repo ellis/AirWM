@@ -56,6 +56,11 @@ export default function updateX11(builder) {
 				//}, windowType, x11.eventMask.EnterWindow | x11.eventMask.Button1Motion | x11.eventMask.ButtonPress | x11.eventMask.ButtonRelease);
 				const desktopNum = (desktop) ? builder.getDesktopIdOrder().indexOf(desktop.id) : -1;
 
+				// Ensure a minimum size of 10x10
+				rc[2] = _.max([rc[2], 10 + 2*borderWidth]);
+				rc[3] = _.max([rc[3], 10 + 2*borderWidth]);
+				console.log({rc})
+
 				let stackMode;
 				let siblingXid = 0;
 				if (screenId >= 0) {

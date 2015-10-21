@@ -33,10 +33,11 @@
 	* [x] for my Xephyr window, it looks like I can't grab Win+Button1, but need to use Win+Ctrl+Button1
 	* [x] Win+(Ctrl+)leftclick to move floating windows (see <https://github.com/jichu4n/basic_wm>)
 	* [x] Win-rightclick to resize floating windows
-* [ ] StateWrapper: rename `widgets.*.state` to `widgets.*.flags`
+* [x] StateWrapper: rename `widgets.*.state` to `widgets.*.flags`
+* [ ] floating windows should always be in front of managed windows
 * [ ] handle dialog boxes
-	* [ ] `_NET_WM_STATE(ATOM) = _NET_WM_STATE_MODAL`
-	* [ ] `_NET_WM_WINDOW_TYPE(ATOM) = _NET_WM_WINDOW_TYPE_DIALOG`
+	* [x] `_NET_WM_STATE(ATOM) = _NET_WM_STATE_MODAL`
+	* [x] `_NET_WM_WINDOW_TYPE(ATOM) = _NET_WM_WINDOW_TYPE_DIALOG`
 	* [ ] set requested coordinates from X11 events/messages/attributes
 	* [ ] x11: dialog boxes should be programmed to float over their app window
 	* [ ] in gvim, goto File|Open: the dialog should float over it's transient-for window
