@@ -84,6 +84,7 @@ describe('updateX11', () => {
 								"width": 780,
 								"height": 580,
 								"borderWidth": 5,
+								stackMode: 0
 							}
 						]
 					}

@@ -322,7 +322,7 @@ function handleButtonPress(ev, id) {
 	if (id >= 0) {
 		const builder = new StateWrapper(store.getState());
 		const w = builder.windowById(id);
-		if ((ev.buttons & 68) === 68 && w._get(['state', 'floating'], false) && (ev.keycode === 1 || ev.keycode === 3)) {
+		if ((ev.buttons & 68) === 68 && w.flagFloating && (ev.keycode === 1 || ev.keycode === 3)) {
 			dragStart = {
 				id,
 				rc: w.getRc().toJS(),

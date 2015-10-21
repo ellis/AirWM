@@ -153,6 +153,10 @@ class WindowWrapper extends WidgetWrapper {
 	get visible() { return this._get('visible', false); }
 	set visible(visible) { return this._set('visible', (visible) ? true : false); }
 	get xid() { return this._get('xid'); }
+	get flagFloating() { return this._get(['flags', 'floating'], false); }
+	set flagFloating(x) { const path = ['flags', 'floating']; return (x) ? this._set(path, true) : this._delete(path); }
+	get flagModal() { return this._get(['flags', 'modal'], false); }
+	set flagModal(x) { const path = ['flags', 'modal']; return (x) ? this._set(path, true) : this._delete(path); }
 
 	getRequestedSize() { return this._get(['requested', 'size']); }
 	getRequestedPos() { return this._get(['requested', 'pos']); }
@@ -672,12 +676,8 @@ export default class StateWrapper {
 
 		if (window) {
 			if (_.isUndefined(value))
-				value = !window._get(['state', 'floating']);
-
-			if (value)
-				window._set(['state', 'floating'], true);
-			else
-				window._delete(['state', 'floating']);
+				value = !window.flagFloating;
+			window.flagFloating = value;
 		}
 		return this;
 	}

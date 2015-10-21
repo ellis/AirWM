@@ -9,7 +9,7 @@
 * [x] BUG: dock needs to take up window space
 * [x] troubleshoot the exisiting shortcut actions
 * [x] save state to console after every change, for debugging
-* [-?] BUG: start firefox; press Ctrl-N; the new window isn't sized properly
+* [-] BUG: start firefox; press Ctrl-N; the new window isn't sized properly
 * [x] display xfce's panel on top
 * [x] BUG: click on time in xfce panel twice: a bad window is left over
 * [x] start xfce session and get xprop on xterm and calendar
@@ -20,7 +20,7 @@
 * [x] rename 'test' folder to 'tests'
 * [x] test adding transient windows (both when the reference has focus and when not)
 * [x] remove old code files
-* [ ] handle floating windows
+* [x] handle floating windows
 	* [x] pull floating windows out of usual layout
 	* [x] create shortcut to toggle floating (Win-P)
 	* [x] give floating windows a different border
@@ -33,10 +33,15 @@
 	* [x] for my Xephyr window, it looks like I can't grab Win+Button1, but need to use Win+Ctrl+Button1
 	* [x] Win+(Ctrl+)leftclick to move floating windows (see <https://github.com/jichu4n/basic_wm>)
 	* [x] Win-rightclick to resize floating windows
+* [ ] StateWrapper: rename `widgets.*.state` to `widgets.*.flags`
+* [ ] handle dialog boxes
+	* [ ] `_NET_WM_STATE(ATOM) = _NET_WM_STATE_MODAL`
+	* [ ] `_NET_WM_WINDOW_TYPE(ATOM) = _NET_WM_WINDOW_TYPE_DIALOG`
 	* [ ] set requested coordinates from X11 events/messages/attributes
-* [ ] x11: dialog boxes should be programmed to float over their app window
-* [ ] in gvim, goto File|Open: the dialog should float over it's transient-for window
-* [ ] BUG: in gvim, goto File|Open: shouldn't be allowed to put focus back on the gvim window because of the MODAL dialog
+	* [ ] x11: dialog boxes should be programmed to float over their app window
+	* [ ] in gvim, goto File|Open: the dialog should float over it's transient-for window
+	* [ ] BUG: in gvim, goto File|Open: shouldn't be allowed to put focus back on the gvim window because of the MODAL dialog
+	* [ ] try to respect window hints for dialog size
 * [ ] xfce4-panel: should display window buttons for task switching
 * [ ] BUG: in Atom, press Ctrl-O: a bad window is created
 * [ ] in Atom, press Ctrl-O: should focus the dialog box
@@ -65,6 +70,7 @@
 * [ ] for better focus-follows-mouse: detect layout changes and use a timer to limit duration that EnterNotify is ignored.
 * [ ] xfce4-panel: the bottom panel should be centered
 * [ ] updateX11: update window info for non-visible windows too, where possible
+* [ ] should probably set the mouse icon explicitly, because otherwise the mouse might not show us (like when we only start gvim in Xephyr)
 
 Naming:
 * jetwm jetzwm lowmo lightwm flowm flowmo flowmotion

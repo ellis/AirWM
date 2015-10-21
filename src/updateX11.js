@@ -45,7 +45,7 @@ export default function updateX11(builder) {
 				}, windowType, 1);
 				const color = (hasFocus)
 					? screenX11.getIn(['colors', 'focus'], 0)
-					: (w._get(['state', 'floating'], false))
+					: (w.flagFloating)
 						? screenX11.getIn(['colors', 'floating'], 0)
 						: screenX11.getIn(['colors', 'normal'], 0);
 				const rc = w.getRc().toJS();

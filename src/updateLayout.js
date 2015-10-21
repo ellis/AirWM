@@ -64,7 +64,7 @@ export default function updateLayout(builder) {
 		const childIds0 = desktop.getChildIdOrder().toJS();
 		const [childIds, floatIds] = _.partition(childIds0, id => {
 			const w = builder.windowById(id);
-			return (w._get(['state', 'floating'], false) == false);
+			return (w.flagFloating !== true);
 		});
 
 		// If this desktop is displayed on a screen, update layout
