@@ -53,8 +53,6 @@
 * [ ] allow for custom handling of specific EWMH flags?
 * [ ] ewmh: set `_NET_WM_STATE` to empty by default
 * [ ] implement more commandHandlers() as actions
-* [ ] state: add floatId lists
-* [ ] ewmh: handle `_NET_WM_WINDOW_TYPE_DIALOG`, sometimes make it floating
 * [ ] state: support hidden/iconified windows
 	* [ ] clientMessage: handle WM_CHANGE_STATE
 	* [ ] ewmh: `_NET_WM_STATE_HIDDEN`, `_NET_WM_STATE_FOCUSED`
@@ -67,7 +65,7 @@
 * [ ] StateWrapper: activateDesktopEarlier/Later (in session)
 * [ ] StateWrapper: add properties and handlers for mouse pointer to manage things like focus and dragging
 * [ ] StateWrapper: add dragging properties and handlers
-* [ ] BUG: start two xterms; click 'xterm' on lxqt-panel's task bar then move mouse to one of the xterms; the popup is then drawn below the windows
+* [ ] BUG: start two xterms; click 'xterm' on lxqt-panel's task bar then move mouse to one of the xterms; the popup is then drawn below the windows -- might need to avoid setting 'stackMode:0,sibling:undefined' so as to avoid making any window absolutely top-most.
 * [ ] for better focus-follows-mouse: detect layout changes and use a timer to limit duration that EnterNotify is ignored.
 * [ ] xfce4-panel: the bottom panel should be centered
 * [ ] updateX11: update window info for non-visible windows too, where possible
