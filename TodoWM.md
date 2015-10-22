@@ -34,7 +34,7 @@
 	* [x] Win+(Ctrl+)leftclick to move floating windows (see <https://github.com/jichu4n/basic_wm>)
 	* [x] Win-rightclick to resize floating windows
 * [x] StateWrapper: rename `widgets.*.state` to `widgets.*.flags`
-* [ ] floating windows should always be in front of managed windows
+* [x] floating windows should always be in front of managed windows
 * [ ] handle dialog boxes
 	* [x] `_NET_WM_STATE(ATOM) = _NET_WM_STATE_MODAL`
 	* [x] `_NET_WM_WINDOW_TYPE(ATOM) = _NET_WM_WINDOW_TYPE_DIALOG`

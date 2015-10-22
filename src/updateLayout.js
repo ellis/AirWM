@@ -83,8 +83,6 @@ export default function updateLayout(builder) {
 		// Update stack
 		const childIdChain = desktop.getChildIdChain().toJS();
 		if (childIdChain.length > 0) {
-			// Put focused window on top of siblings
-			windowIdStackMiddle.push(childIdChain.shift());
 			// Put floats above managed windows
 			windowIdStackMiddle.push.apply(windowIdStackMiddle, _.intersection(childIdChain, floatIds));
 			// Then add managed windows
