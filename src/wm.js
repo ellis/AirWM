@@ -400,10 +400,19 @@ function handleConfigureRequest(ev, id) {
 
 	if (id >= 0) {
 		const state = store.getState();
+		const builder = new StateWrapper(state);
+		const window = builder.windowById(id);
 		const ConfigureWindow = state.getIn(['x11', 'windowSettings', id.toString(), 'ConfigureWindow']);
-		// Ignore request for know windows
 		// This should be changed to allow them on floating windows.
-		if (ConfigureWindow) {
+		if (window.flagFloating) {
+			const borderWidth = 5;
+			store.dispatch({type: 'setWindowRequestedProperties', props: {
+				size: [ev.width + 2*borderWidth, ev.height + 2*borderWidth],
+				pos: [ev.x - borderWidth, ev.y - borderWidth]
+			}});
+		}
+		// Ignore request for other known windows
+		else if (ConfigureWindow) {
 			width = ConfigureWindow.getIn([1, 'width']);
 			height = ConfigureWindow.getIn([1, 'height']);
 			//return Promise.resolve();
@@ -412,11 +421,11 @@ function handleConfigureRequest(ev, id) {
 
 	// Allow requested resize for optimization. Window gets resized
 	// automatically by WM again anyway.
-	console.log({id, wid: ev.wid, width, height, width2: ev.width, height2: ev.height})
-	X.ResizeWindow(ev.wid, ev.width, ev.height);
+	console.log({id, wid: ev.wid, width0: ev.width, height0: ev.height, width, height})
 	// HACK: I'm not sure why, but we need to resize twice in order for some
 	// windows to paint themselves correctly: first to the requested size, then
 	// to the desired size.
+	X.ResizeWindow(ev.wid, ev.width, ev.height);
 	if (id >= 0)
 		X.ResizeWindow(ev.wid, width, height);
 	return Promise.resolve();
@@ -608,6 +617,7 @@ function handleMapRequest(ev, id) {
 		}
 		else {
 			return getWindowProperties(global.X, xid).then(props => {
+				console.log({id, xid, ev: _.omit(ev, 'rawData'), attrs})
 				createWidgetForXid(xid, props);
 				return Promise.resolve();
 			});

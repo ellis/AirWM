@@ -24,7 +24,7 @@
 	* [x] pull floating windows out of usual layout
 	* [x] create shortcut to toggle floating (Win-P)
 	* [x] give floating windows a different border
-	* [?] update window stack intelligently
+	* [x] update window stack intelligently
 	* [x] in updateX11, set the siblings according to the desktop stack
 	* [x] in updateX11, set the EWMH window stack appropriately
 	* [x] BUG: floating window is displayed on all desktops
@@ -35,6 +35,13 @@
 	* [x] Win-rightclick to resize floating windows
 * [x] StateWrapper: rename `widgets.*.state` to `widgets.*.flags`
 * [x] floating windows should always be in front of managed windows
+* [ ] BUG: make testing; open file dialog; open file: shouldn't crash
+	* I think I might be mis-handling UnmapNotify, where the window gets removed, which leads to the window also being destroyed in handleStateChange()
+	* I should only destroy windows when explicitly commanded by the user
+	* This will require some extra state properties
+	* When DestroyNotify is received, make sure the window is removed if still present
+	* When UnmapNotify is received, call removeWindow(), which should maybe add some new state to x11 to unset some ewmh properties
+	* when action closeWindow is received, should add some new state to x11 to destroy the window (the window will then be removed from x11 state by some dispatch from the DestroyNotify handler)
 * [ ] handle dialog boxes
 	* [x] `_NET_WM_STATE(ATOM) = _NET_WM_STATE_MODAL`
 	* [x] `_NET_WM_WINDOW_TYPE(ATOM) = _NET_WM_WINDOW_TYPE_DIALOG`
