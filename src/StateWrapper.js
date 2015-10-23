@@ -173,6 +173,7 @@ export const StatePaths = {
 	desktopIdOrder: ['desktopIdOrder'],
 	windowIdOrder: ['windowIdOrder'],
 	windowIdStack: ['windowIdStack'],
+	windowIdDetached: ['windowIdDetached'],
 	widgetIdChain: ['widgetIdChain'],
 	currentScreenId: ['currentScreenId'],
 	currentDesktopId: ['currentDesktopId'],
@@ -187,6 +188,7 @@ export default class StateWrapper {
 		this._desktopIdOrder = new UniqueListWrapper(this, StatePaths.desktopIdOrder);
 		this._windowIdOrder = new UniqueListWrapper(this, StatePaths.windowIdOrder);
 		this._windowIdStack = new UniqueListWrapper(this, StatePaths.windowIdStack);
+		this._windowIdDetached = new UniqueListWrapper(this, StatePaths.windowIdDetached);
 		this._widgetIdChain = new UniqueListWrapper(this, StatePaths.widgetIdChain);
 	}
 
@@ -204,6 +206,7 @@ export default class StateWrapper {
 	getDesktopIdOrder() { return this.state.getIn(StatePaths.desktopIdOrder, List()); }
 	getWindowIdOrder() { return this.state.getIn(StatePaths.windowIdOrder, List()); }
 	getWindowIdStack() { return this.state.getIn(StatePaths.windowIdStack, List()); }
+	getWindowIdDetached() { return this.state.getIn(StatePaths.windowIdDetached, List()); }
 	getWidgetIdChain() { return this.state.getIn(StatePaths.widgetIdChain, List()); }
 	//getScreenIdChain() { return this.state.getIn(StatePaths.screenIdChain, List()); }
 	get widgetIdNext() { return this.state.getIn(StatePaths.widgetIdNext, 0); }
@@ -431,6 +434,22 @@ export default class StateWrapper {
 		}
 	}
 
+	detachWindow(window) {
+		if (_.isNumber(window))
+			window = this.windowById(window);
+
+		if (window) {
+			this.unparentWindow(window);
+			window._set(['flags', 'detaching'], true);
+			const id = window.id;
+			this._windowIdOrder.remove(id);
+			this._windowIdStack.remove(id);
+			this._windowIdDetached.push(id);
+			this._widgetIdChain.remove(id);
+		}
+
+		return this;
+	}
 
 	/**
 	 * Remove window from desktop.  Window will not be visible.
@@ -655,6 +674,7 @@ export default class StateWrapper {
 		this.unparentWindow(windowId);
 		this._windowIdOrder.remove(windowId);
 		this._windowIdStack.remove(windowId);
+		this._windowIdDetached.remove(windowId);
 		this._widgetIdChain.remove(windowId);
 		this.state = this.state.deleteIn(['widgets', windowId.toString()]);
 		this._setCurrent();

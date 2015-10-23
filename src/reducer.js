@@ -28,15 +28,19 @@ const handlers = {
 		builder.activateWindowPrev();
 	},
 
-	'removeWindow': (builder, action) => {
-		builder.removeWindow(action.window);
-	},
-
 	'attachWindow': (builder, action) => {
 		//console.log({action})
 		builder.attachWindow(action.window);
 		//console.log("after attachWindow:")
 		//builder.print();
+	},
+
+	'detachWindow': (builder, action) => {
+		builder.detachWindow(action.window);
+	},
+
+	'removeWindow': (builder, action) => {
+		builder.removeWindow(action.window);
 	},
 
 	'initialize': (builder, action) => {

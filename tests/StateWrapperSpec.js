@@ -161,6 +161,54 @@ describe('StateWrapper', () => {
 		]);
 	});
 
+	it('detachWindow 1', () => {
+		const builder = new StateWrapper(ex.state110);
+		const d1 = builder.findDesktopIdByNum(0);
+		const w1 = builder.attachWindow({xid: 1000});
+		builder.detachWindow(w1);
+
+		checkList(builder, undefined, [
+			`widgetIdNext`, w1 + 1,
+			`currentWindowId`, -1,
+			`windowIdOrder`, [],
+			`windowIdStack`, [],
+			`windowIdDetached`, [w1],
+		]);
+	});
+
+	it('detachWindow 2', () => {
+		const builder = new StateWrapper(ex.state110);
+		const d1 = builder.findDesktopIdByNum(0);
+		const w1 = builder.attachWindow({xid: 1001});
+		const w2 = builder.attachWindow({xid: 1002});
+		builder.detachWindow(w1);
+
+		checkList(builder, undefined, [
+			`widgetIdNext`, w2 + 1,
+			`currentWindowId`, w2,
+			`windowIdOrder`, [w2],
+			`windowIdStack`, [w2],
+			`windowIdDetached`, [w1],
+		]);
+	});
+
+	it('detachWindow 3', () => {
+		const builder = new StateWrapper(ex.state110);
+		const d1 = builder.findDesktopIdByNum(0);
+		const w1 = builder.attachWindow({xid: 1001});
+		const w2 = builder.attachWindow({xid: 1002});
+		const w3 = builder.attachWindow({xid: 1003});
+		builder.detachWindow(w1);
+
+		checkList(builder, undefined, [
+			`widgetIdNext`, w3 + 1,
+			`currentWindowId`, w2,
+			`windowIdOrder`, [w2, w3],
+			`windowIdStack`, [w2, w3],
+			`windowIdDetached`, [w1],
+		]);
+	});
+
 	it('moveWindowToDesktop 1 (s1d2 + addWindow)', () => {
 		const builder = new StateWrapper(initialState);
 		const d1 = builder.addDesktop({});

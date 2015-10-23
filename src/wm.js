@@ -694,7 +694,7 @@ function handleUnmapNotify(ev, id) {
 		const w = builder.windowById(id);
 		if (w) {
 			if (w.visible) {
-				store.dispatch({type: 'removeWindow', window: id});
+				store.dispatch({type: 'detachWindow', window: id});
 			}
 		}
 	}
@@ -798,13 +798,20 @@ function handleStateChange() {
 			});
 		}
 
+		statePrev = state;
+
 		// Delete windows that have been removed
 		windowSettingsPrev.forEach((settings, key) => {
-			const xid = settings.get('xid');
-			global.X.DestroyWindow(xid);
+			const id = parseInt(key);
+			const window = builder.windowById(id);
+			if (window) {
+				if (window._get(['flags', 'closing'], false) === true) {
+					const xid = settings.get('xid');
+					global.X.DestroyWindow(xid);
+				}
+				store.dispatch({type: 'removeWindow', id});
+			}
 		});
-
-		statePrev = state;
 	} catch (e) {
 		logger.error("handleStateChange: ERROR:")
 		logger.error(e.message);
