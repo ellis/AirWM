@@ -35,7 +35,7 @@
 	* [x] Win-rightclick to resize floating windows
 * [x] StateWrapper: rename `widgets.*.state` to `widgets.*.flags`
 * [x] floating windows should always be in front of managed windows
-* [ ] BUG: `make testing`; open gvim's file dialog; open file: shouldn't crash
+* [x] BUG: `make testing`; open gvim's file dialog; open file: shouldn't crash
 	* I think I might be mis-handling UnmapNotify, where the window gets removed, which leads to the window also being destroyed in handleStateChange()
 	* I should only destroy windows when explicitly commanded by the user
 	* This will require some extra state properties
@@ -43,18 +43,18 @@
 	* When UnmapNotify is received, call removeWindow(), which should maybe add some new state to x11 to unset some ewmh properties
 	* when action closeWindow is received, should add some new state to x11 to destroy the window (the window will then be removed from x11 state by some dispatch from the DestroyNotify handler)
 	* [x] rename `addWindow` to `attachWindow`
-	* [?] create a `detachWindow` action (for no longer managing a window)
-	* [?] dispatch `detachWindow` from UnmapNotify event
-	* [?] `detachWindow`: make sure it's no longer in windowIdStack
-	* [?] handleStateChange(): dispatch `removeWindow` for `flags.detaching` windows
-	* [?] use `removeWindow` action for really removing it from the state
-	* [ ] write test for `detachWindow` -- it's not working properly with `make init`
+	* [x] create a `detachWindow` action (for no longer managing a window)
+	* [x] dispatch `detachWindow` from UnmapNotify event
+	* [x] `detachWindow`: make sure window is no longer in windowIdStack
+	* [x] handleStateChange(): dispatch `removeWindow` for `flags.detaching` windows
+	* [x] use `removeWindow` action for really removing it from the state
+	* [x] write test for `detachWindow` -- it's not working properly with `make init`
+* [ ] rewrite closeWindow approach
 	* [ ] a `closeWindow` action should set `flags.closing: true`
 	* [ ] updateX11: windows with `flags.closing`: add property to call `global.X.DestroyWindow(xid)` or send ClientMessage to close
 	* [ ] handleStateChange: windows with `flags.closing`: either call `global.X.DestroyWindow(xid)`, or send ClientMessage to close
 	* [ ] handleStateChange(): for windows with `flags.closing`, destroy the window and dispatch `removeWindow`
 	* [ ] write test for `closeWindow`
-	* [ ] write test for `detachWindow`
 * [ ] handle dialog boxes
 	* [x] `_NET_WM_STATE(ATOM) = _NET_WM_STATE_MODAL`
 	* [x] `_NET_WM_WINDOW_TYPE(ATOM) = _NET_WM_WINDOW_TYPE_DIALOG`
@@ -64,20 +64,17 @@
 	* [ ] BUG: in gvim, goto File|Open: shouldn't be allowed to put focus back on the gvim window because of the MODAL dialog
 	* [ ] try to respect window hints for dialog size
 * [ ] xfce4-panel: should display window buttons for task switching
-* [ ] BUG: in Atom, press Ctrl-O: a bad window is created
-* [ ] in Atom, press Ctrl-O: should focus the dialog box
+* [ ] figure out how `--replace` flag works in xmonad so that I can use the WM in xfce (see Main.hs:replace)
+
 * [ ] remove unused AirWM files, reorganize AirWM files I still need
 * [ ] create a new repository (flowmo)
 * [ ] activate window on mouse click
-* [ ] figure out how `--replace` flag works in xmonad so that I can use the WM in xfce (see Main.hs:replace)
 * [ ] allow for custom handling of specific EWMH flags?
 * [ ] ewmh: set `_NET_WM_STATE` to empty by default
-* [ ] implement more commandHandlers() as actions
 * [ ] state: support hidden/iconified windows
 	* [ ] clientMessage: handle WM_CHANGE_STATE
 	* [ ] ewmh: `_NET_WM_STATE_HIDDEN`, `_NET_WM_STATE_FOCUSED`
 	* [ ] set `WM_STATE` to iconified for all non-visible windows (e.g. on hidden desktops)
-* [ ] close programs more gracefully, check for 'delete' protocol (or whatever it's called)
 * [ ] properly set X11 sibling above/below relationships
 * [ ] StateWrapper: activateWindowBefore/After (on desktop) (Win-N)
 * [ ] StateWrapper: activateWindowEarlier/Later (in session) (Win-Tab)
@@ -86,13 +83,13 @@
 * [ ] StateWrapper: add properties and handlers for mouse pointer to manage things like focus and dragging
 * [ ] StateWrapper: add dragging properties and handlers
 * [ ] BUG: start two xterms; click 'xterm' on lxqt-panel's task bar then move mouse to one of the xterms; the popup is then drawn below the windows -- might need to avoid setting 'stackMode:0,sibling:undefined' so as to avoid making any window absolutely top-most.
-* [ ] for better focus-follows-mouse: detect layout changes and use a timer to limit duration that EnterNotify is ignored.
 * [ ] xfce4-panel: the bottom panel should be centered
 * [ ] updateX11: update window info for non-visible windows too, where possible
-* [ ] should probably set the mouse icon explicitly, because otherwise the mouse might not show us (like when we only start gvim in Xephyr)
+* [ ] should probably set the mouse icon explicitly, because otherwise the mouse might not be visible (like when we only start gvim in Xephyr)
+* [ ] for better focus-follows-mouse: detect layout changes and use a timer to limit duration that EnterNotify is ignored.
 
 Naming:
-* jetwm jetzwm lowmo lightwm flowm flowmo flowmotion
+* jetwm jetzwm lowmo lightwm flowm flowmo flowmotion dashwm
 
 Testing:
 * [ ] test floating windows
@@ -139,6 +136,7 @@ Later:
 * [ ] for inspiration, lookup videos on Mac's Mission Control, Compiz F12, Ubuntu window management
 * [ ] handle startup notification (<http://www.freedesktop.org/wiki/Software/startup-notification/> and <http://standards.freedesktop.org/startup-notification-spec/startup-notification-latest.txt>)
 * [ ] maybe refactor so that every container (e.g. screen, desktop) also has a childIdStack, and then recursively build the window manager's childIdStack from those.
+* [ ] at some point, rewrite the 'widgetIdNext' handling, and either just use the first available ID, or use the next available ID after the last created/removed window.
 
 xfce todos:
 * [ ] it'd be nice if the calendar popup weren't made into a screen

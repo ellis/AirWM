@@ -809,7 +809,7 @@ function handleStateChange() {
 					const xid = settings.get('xid');
 					global.X.DestroyWindow(xid);
 				}
-				store.dispatch({type: 'removeWindow', id});
+				store.dispatch({type: 'removeWindow', window: id});
 			}
 		});
 	} catch (e) {

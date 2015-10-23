@@ -7,6 +7,7 @@ import diff from 'immutablediff';
 import StateWrapper, {initialState} from '../src/StateWrapper.js';
 import updateLayout from '../src/updateLayout.js';
 import updateX11 from '../src/updateX11.js';
+import * as ex from './exampleStates.js';
 
 const ActionObjects = {
 	screen1: {
@@ -185,5 +186,29 @@ describe('updateX11', () => {
 		expect(builder.getState().hasIn(['widgets', w2.toString()]), 'w2 #2').to.equal(true);
 		expect(builder.getState().hasIn(['x11', 'windowSettings', w1.toString()]), 'x11 w1 #2').to.equal(false);
 		expect(builder.getState().hasIn(['x11', 'windowSettings', w2.toString()]), 'x11 w2 #2').to.equal(true);
+	});
+
+	it('after detachWindow', () => {
+		const builder = new StateWrapper(ex.state110);
+		const d1 = builder.findDesktopIdByNum(0);
+		const w1 = builder.attachWindow({xid: 1001});
+		const w2 = builder.attachWindow({xid: 1002});
+		const w3 = builder.attachWindow({xid: 1003});
+		builder.detachWindow(w1);
+		builder.removeWindow(w1);
+		builder.removeWindow(w1); // superfluous repetition
+		updateLayout(builder);
+		updateX11(builder);
+
+		//builder.print();
+		checkList(builder, undefined, [
+			`widgetIdNext`, w3 + 1,
+			`currentWindowId`, w2,
+			`windowIdOrder`, [w2, w3],
+			`windowIdStack`, [w2, w3],
+			`windowIdDetached`, [],//[w1],
+		]);
+
+		// TODO: should check window widths
 	});
 });

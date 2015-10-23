@@ -667,6 +667,7 @@ export default class StateWrapper {
 	}
 
 	removeWindow(windowId) {
+		assert(_.isNumber(windowId));
 		if (_.isUndefined(windowId))
 			windowId = this.currentWindowId;
 
