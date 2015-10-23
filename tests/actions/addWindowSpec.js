@@ -8,7 +8,7 @@ import StateWrapper from '../../src/StateWrapper.js';
 import * as ex from '../exampleStates.js';
 
 const action1 = {
-	type: 'addWindow',
+	type: 'attachWindow',
 	window: {
 		type: 'window',
 		xid: 1001
@@ -16,14 +16,14 @@ const action1 = {
 };
 
 const action2 = {
-	type: 'addWindow',
+	type: 'attachWindow',
 	window: {
 		type: 'window',
 		xid: 1002
 	}
 };
 
-describe('addWindow', () => {
+describe('attachWindow', () => {
 	let state1, state2;
 	before(() => {
 		state1 = reducer(ex.state110, action1);
@@ -85,9 +85,9 @@ describe('addWindow', () => {
 	it('adding three windows', () => {
 		const [d1, s1, w1, w2, w3] = [0, 1, 2, 3, 4];
 		let state = ex.state120;
-		state = reducer(state, {type: 'addWindow', window: {type: 'window', xid: 1001}});
-		state = reducer(state, {type: 'addWindow', window: {type: 'window', xid: 1002}});
-		state = reducer(state, {type: 'addWindow', window: {type: 'window', xid: 1003}});
+		state = reducer(state, {type: 'attachWindow', window: {type: 'window', xid: 1001}});
+		state = reducer(state, {type: 'attachWindow', window: {type: 'window', xid: 1002}});
+		state = reducer(state, {type: 'attachWindow', window: {type: 'window', xid: 1003}});
 		const builder = new StateWrapper(state);
 		checkList(builder, 'it should have the propert stack order', () => [
 			`widgets.${d1}.childIdOrder`, List.of(w1, w2, w3),
@@ -99,7 +99,7 @@ describe('addWindow', () => {
 	it('removing first window, then adding a thrid', () => {
 		const [d1, s1, w1, w2, w3] = [0, 1, 2, 3, 4];
 		const state1 = reducer(ex.state112, {type: 'removeWindow', window: w1});
-		const state = reducer(state, {type: 'addWindow', window: {type: 'window', xid: 1003}});
+		const state = reducer(state, {type: 'attachWindow', window: {type: 'window', xid: 1003}});
 		const builder = new StateWrapper(state);
 		checkList(builder, undefined, () => [
 			`widgetIdNext`, 5,

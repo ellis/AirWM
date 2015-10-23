@@ -28,7 +28,7 @@ describe('activateDesktop', () => {
 
 	describe("with one screen, one dock, one window", () => {
 		const action1 = {
-			type: 'addWindow',
+			type: 'attachWindow',
 			widget: {
 				type: 'window',
 				xid: 1001
@@ -101,7 +101,7 @@ describe('activateDesktop', () => {
 
 	describe('switch away from desktop with windows', () => {
 		const action1 = {
-			type: 'addWindow',
+			type: 'attachWindow',
 			widget: {
 				type: 'window',
 				xid: 1001

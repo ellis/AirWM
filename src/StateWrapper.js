@@ -402,7 +402,7 @@ export default class StateWrapper {
 		return id;
 	}
 
-	addWindow_user(spec) {
+	attachWindow(spec) {
 		const id = this.addWindow(spec);
 		const w = this.windowById(id);
 		if (w) {

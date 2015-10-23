@@ -137,7 +137,7 @@ describe('StateWrapper', () => {
 		const builder = new StateWrapper(ex.state111);
 		const d1 = builder.findDesktopIdByNum(0);
 		const w1 = builder.findWindowIdOnDesktopByNum(undefined, 0);
-		const w2 = builder.addWindow_user({transientForId: w1, xid: 1002});
+		const w2 = builder.attachWindow({transientForId: w1, xid: 1002});
 
 		checkList(builder, undefined, [
 			`widgetIdNext`, w2 + 1,
@@ -152,7 +152,7 @@ describe('StateWrapper', () => {
 		const w1 = builder.findWindowIdOnDesktopByNum(undefined, 0);
 		const w2 = builder.addWindow({xid: 1002});
 		builder.moveWindowToDesktop(w2, d1);
-		const w3 = builder.addWindow_user({transientForId: w2, xid: 1003});
+		const w3 = builder.attachWindow({transientForId: w2, xid: 1003});
 
 		checkList(builder, undefined, [
 			`widgetIdNext`, w3 + 1,

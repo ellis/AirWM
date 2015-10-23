@@ -59,7 +59,7 @@ export default function updateX11(builder) {
 				// Ensure a minimum size of 10x10
 				rc[2] = _.max([rc[2], 10 + 2*borderWidth]);
 				rc[3] = _.max([rc[3], 10 + 2*borderWidth]);
-				console.log({rc})
+				//console.log({rc})
 
 				let stackMode;
 				let siblingXid = 0;

@@ -32,10 +32,10 @@ const handlers = {
 		builder.removeWindow(action.window);
 	},
 
-	'addWindow': (builder, action) => {
+	'attachWindow': (builder, action) => {
 		//console.log({action})
-		builder.addWindow_user(action.window);
-		//console.log("after addWindow:")
+		builder.attachWindow(action.window);
+		//console.log("after attachWindow:")
 		//builder.print();
 	},
 

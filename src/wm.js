@@ -646,7 +646,7 @@ function createWidgetForXid(xid, props) {
 	);
 
 	const action = {
-		type: 'addWindow',
+		type: 'attachWindow',
 		window: {
 			type: widgetType,
 			xid

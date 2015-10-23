@@ -35,13 +35,16 @@
 	* [x] Win-rightclick to resize floating windows
 * [x] StateWrapper: rename `widgets.*.state` to `widgets.*.flags`
 * [x] floating windows should always be in front of managed windows
-* [ ] BUG: make testing; open file dialog; open file: shouldn't crash
+* [ ] BUG: `make testing`; open gvim's file dialog; open file: shouldn't crash
 	* I think I might be mis-handling UnmapNotify, where the window gets removed, which leads to the window also being destroyed in handleStateChange()
 	* I should only destroy windows when explicitly commanded by the user
 	* This will require some extra state properties
 	* When DestroyNotify is received, make sure the window is removed if still present
 	* When UnmapNotify is received, call removeWindow(), which should maybe add some new state to x11 to unset some ewmh properties
 	* when action closeWindow is received, should add some new state to x11 to destroy the window (the window will then be removed from x11 state by some dispatch from the DestroyNotify handler)
+	* [x] rename `addWindow` to `attachWindow`
+	* [ ] create a `detatchWindow` action (for no longer managing a window) and `removeWindow` action (for really removing it from the state)
+	* [ ] a `closeWindow` action should set `flags.closing: true`
 * [ ] handle dialog boxes
 	* [x] `_NET_WM_STATE(ATOM) = _NET_WM_STATE_MODAL`
 	* [x] `_NET_WM_WINDOW_TYPE(ATOM) = _NET_WM_WINDOW_TYPE_DIALOG`

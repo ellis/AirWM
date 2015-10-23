@@ -12,9 +12,9 @@ describe('moveWindowToDesktop', () => {
 		const [d1, d2, s1, dock1, w1, w2, w3] = [0, 1, 2, 3, 4, 5];
 		let state = ex.state120;
 		// Create three windows
-		state = reducer(state, {type: 'addWindow', window: {type: 'window', xid: 1001}});
-		state = reducer(state, {type: 'addWindow', window: {type: 'window', xid: 1002}});
-		state = reducer(state, {type: 'addWindow', window: {type: 'window', xid: 1003}});
+		state = reducer(state, {type: 'attachWindow', window: {type: 'window', xid: 1001}});
+		state = reducer(state, {type: 'attachWindow', window: {type: 'window', xid: 1002}});
+		state = reducer(state, {type: 'attachWindow', window: {type: 'window', xid: 1003}});
 		// Move window 1 to desktop 2
 		state = reducer(state, {type: 'moveWindowToDesktop', desktop: 1});
 
