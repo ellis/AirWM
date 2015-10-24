@@ -1,9 +1,5 @@
 .PHONY: run run2
 
-runold:
-	Xephyr :1 -ac -screen 800x600 &
-	DISPLAY=:1 node lib/index.js &
-
 init:
 	killall Xephyr || true
 	Xephyr :1 -ac -screen 1024x800 &
@@ -27,6 +23,13 @@ testing:
 	#	sleep 1
 	DISPLAY=:1 ./node_modules/.bin/babel-node src/wm.js
 
+xfce0:
+	killall Xephyr || true
+	Xephyr :1 -ac -screen 800x600 &
+	sleep 0.5
+	#DISPLAY=:1 gvim &
+	DISPLAY=:1 xfce4-panel &
+	DISPLAY=:1 ./node_modules/.bin/babel-node src/wm.js
 
 restart:
 	DISPLAY=:1 ./node_modules/.bin/babel-node src/wm.js

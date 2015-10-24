@@ -67,7 +67,6 @@
 * [x] change border color for windows with modal dialogs open
 * [x] BUG: EnterNotify doesn't always activate the entered window
 * [ ] figure out how `--replace` flag works in xmonad so that I can use the WM in xfce (see Main.hs:replace)
-* [ ] xfce4-panel: should display window buttons for task switching
 
 * [ ] remove unused AirWM files, reorganize AirWM files I still need
 * [ ] create a new repository (flowmo)
@@ -149,9 +148,12 @@ Later:
 * [ ] at some point, rewrite the 'widgetIdNext' handling, and either just use the first available ID, or use the next available ID after the last created/removed window.
 
 xfce todos:
-* [ ] it'd be nice if the calendar popup weren't made into a screen
+* [ ] it'd be nice if the calendar popup weren't made into a managed window
+	* look at ./temp/xprop-xfce-calendar-visible
+	* consider `_NET_WM_STATE(ATOM) = _NET_WM_STATE_STICKY, _NET_WM_STATE_SKIP_PAGER, _NET_WM_STATE_SKIP_TASKBAR, _NET_WM_STATE_ABOVE, _NET_WM_STATE_FOCUSED`
+	* consider `_NET_WM_WINDOW_TYPE(ATOM) = _NET_WM_WINDOW_TYPE_UTILITY`
 * [ ] it'd be nice if clicking the application finder on the bottom panel multiple times didn't open multiple application finder windows
-* [ ] after clicking on a window on the bottom panel, it'd be nice if the window got focus when it pops up
+* [ ] after clicking on a window on the bottom panel, it'd be nice if the window got focus when it pops up (process `_NET_STARTUP_INFO_BEGIN` and `_NET_STARTUP_INFO`)
 
 
 Multi-screen todos:
