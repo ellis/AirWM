@@ -58,8 +58,10 @@
 * [ ] handle dialog boxes
 	* [x] `_NET_WM_STATE(ATOM) = _NET_WM_STATE_MODAL`
 	* [x] `_NET_WM_WINDOW_TYPE(ATOM) = _NET_WM_WINDOW_TYPE_DIALOG`
-	* [ ] set requested coordinates from X11 events/messages/attributes
-	* [ ] x11: dialog boxes should be programmed to float over their app window
+	* [x] cache old ConfigureWindow requests until DestroyNotify is received
+	* [x] set requested coordinates from X11 events/messages/attributes
+	* [ ] ignore request for x=0, y=0
+	* [ ] x11: modal dialog boxes should be automatically positioned over their app window
 	* [ ] in gvim, goto File|Open: the dialog should float over it's transient-for window
 	* [ ] BUG: in gvim, goto File|Open: shouldn't be allowed to put focus back on the gvim window because of the MODAL dialog
 	* [ ] try to respect window hints for dialog size

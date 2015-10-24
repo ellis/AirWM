@@ -392,8 +392,11 @@ function handleClientMessage(ev) {
 	});
 }
 
+const configureRequestCache = {};
 function handleConfigureRequest(ev, id) {
 	let {width, height} = ev;
+
+	configureRequestCache[ev.wid] = ev;
 
 	if (id >= 0) {
 		const state = store.getState();
@@ -429,6 +432,8 @@ function handleConfigureRequest(ev, id) {
 }
 
 function handleDestroyNotify(ev) {
+	delete configureRequestCache[ev.wid];
+
 	const id = findWidgetIdForXid(ev.wid);
 	if (id >= 0) {
 		store.dispatch({type: 'removeWindow', window: id});
@@ -675,6 +680,13 @@ function createWidgetForXid(xid, props) {
 
 	if (_.get(props, 'WM_PROTOCOLS', []).includes('WM_DELETE_WINDOW')) {
 		_.set(window, 'flags.askBeforeClosing', true);
+	}
+
+	if (configureRequestCache.hasOwnProperty(xid)) {
+		const requested = configureRequestCache[xid];
+		const borderWidth = 5;
+		_.set(window, 'requested.size', [requested.width + 2*borderWidth, requested.height + 2*borderWidth]);
+		_.set(window, 'requested.pos', [requested.x - borderWidth, requested.y - borderWidth]);
 	}
 
 	store.dispatch({type: 'attachWindow', window});
