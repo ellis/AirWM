@@ -40,11 +40,15 @@ export default function updateX11(builder) {
 					'dock': 0,
 					'window': 5,
 				}, windowType, 1);
-				const color = (hasFocus)
-					? screenX11.getIn(['colors', 'focus'], 0)
-					: (w.flagFloating)
-						? screenX11.getIn(['colors', 'floating'], 0)
-						: screenX11.getIn(['colors', 'normal'], 0);
+				const hasModal = (w._modalIdOrder.count() > 0);
+				const colorName = (hasFocus && hasModal)
+					? 'modal'
+					: (hasFocus)
+						? 'focus'
+						: (w.flagFloating)
+							? 'floating'
+							: 'normal';
+				const color = screenX11.getIn(['colors', colorName], 0);
 				const rc = w.getRc().toJS();
 				const eventMask = _.get({
 					'background': undefined,

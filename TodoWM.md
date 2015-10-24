@@ -64,7 +64,8 @@
 	* [x] x11: modal dialog boxes should be automatically positioned over their app window
 	* [x] in gvim, goto File|Open: the dialog should float over it's transient-for window
 * [x] BUG: `make init`, start gvim, type some text, close the window, confirm close: there are errors printed on the console
-* [ ] BUG: in gvim, goto File|Open: shouldn't be allowed to put focus back on the gvim window because of the MODAL dialog
+* [x] change border color for windows with modal dialogs open
+* [ ] BUG: EnterNotify isn't always activating the entered window
 * [ ] figure out how `--replace` flag works in xmonad so that I can use the WM in xfce (see Main.hs:replace)
 * [ ] xfce4-panel: should display window buttons for task switching
 
@@ -92,12 +93,14 @@
 * [ ] delete ewmh.js
 * [ ] remove from package.json: node-ewmh, async
 * [ ] handle window hints for sizes, especially for floating windows
+* [ ] in gvim, goto File|Open: shouldn't be allowed to put focus back on the gvim window because of the MODAL dialog (but this is a bit complex: where to put focus if modal dialog is on a different screen?  Also need to take care in handling activate window next/prev)
 
 Naming:
 * jetwm jetzwm lowmo lightwm flowm flowmo flowmotion dashwm
 
 Testing:
 * [ ] test floating windows
+	* [ ] test that transientForId and transientIdOrder are kept in sync
 * [ ] test that modal dialogs are place in the middle over their parent window
 * [ ] test window stacking
 * [ ] test `moveWindowToIndex`

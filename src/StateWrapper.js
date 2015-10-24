@@ -135,6 +135,7 @@ class UniqueListWrapper extends SubWrapper {
 		super(top, path, List());
 	}
 
+	count() { return this._get([], List()).count(); }
 	get(i) { return this._get(i); }
 	push(x) { this.top._update(this.path, List(), l => listRemove(l, x).push(x)); return this; }
 	unshift(x) { this.top._update(this.path, List(), l => listRemove(l, x).unshift(x)); return this; }
@@ -153,6 +154,7 @@ class WindowWrapper extends WidgetWrapper {
 	get visible() { return this._get('visible', false); }
 	set visible(visible) { return this._set('visible', (visible) ? true : false); }
 	get xid() { return this._get('xid'); }
+	get transientForId() { return this._get('transientForId'); }
 	get flagFloating() { return this._get(['flags', 'floating'], false); }
 	set flagFloating(x) { const path = ['flags', 'floating']; return (x) ? this._set(path, true) : this._delete(path); }
 	get flagModal() { return this._get(['flags', 'modal'], false); }
@@ -160,11 +162,14 @@ class WindowWrapper extends WidgetWrapper {
 
 	getRequestedSize() { return this._get(['requested', 'size']); }
 	getRequestedPos() { return this._get(['requested', 'pos']); }
+	getModalIdOrder() { return this._get(['modalIdOrder'], List()); }
 
 	findDesktopId() { return this.top._findWidgetDekstopIdById(this.id); }
 	findDesktop() { return this.top.desktopById(this.findDesktopId()); }
 	findScreenId() { return this.top._findWidgetScreenIdById(this.id); }
 	findScreen() { return this.top.screenById(this.findScreenId()); }
+
+	get _modalIdOrder() { return new UniqueListWrapper(this.top, this.path.concat(['modalIdOrder'])); }
 }
 
 export const StatePaths = {
@@ -413,6 +418,24 @@ export default class StateWrapper {
 			if (transientForId >= 0) {
 				const ref = this.windowById(transientForId);
 				if (ref) {
+					// Add to transient list of parent window
+					if (w.flagModal) {
+						ref._update(
+							'modalIdOrder',
+							List(),
+							l => l.push(id)
+						);
+					}
+					// If not otherwise specified, request x/y to center the dialog on it's parent
+					const requested = w._get(['requested', 'pos'], List([0, 0])).toJS();
+					const size = w._get(['requested', 'size']);
+					if (size && !(requested.x > 0 || requested.y > 0)) {
+						const rc = ref.getRc().toJS();
+						const x = rc[0] + (rc[2] - size.get(0)) / 2;
+						const y = rc[1] + (rc[3] - size.get(1)) / 2;
+						w._set(['requested', 'pos'], List([x, y]));
+					}
+					// Specify desktop and focus
 					const desktop = ref.findDesktop();
 					if (desktop) {
 						// Put the window on the ref's desktop
@@ -420,15 +443,6 @@ export default class StateWrapper {
 						// Put it right after the ref
 						const {num} = this.findWindowNum(ref, desktop, 1);
 						this.moveWindowToIndex(w, num);
-						// If not otherwise specified, request x/y to center the dialog on it's parent
-						const requested = w._get(['requested', 'pos'], List([0, 0])).toJS();
-						const size = w._get(['requested', 'size']);
-						if (size && !(requested.x > 0 || requested.y > 0)) {
-							const rc = ref.getRc().toJS();
-							const x = rc[0] + (rc[2] - size.get(0)) / 2;
-							const y = rc[1] + (rc[3] - size.get(1)) / 2;
-							w._set(['requested', 'pos'], List([x, y]));
-						}
 						// Focus it, if the reference has focus
 						if (desktop.getChildIdChain().get(0) === ref.id) {
 							desktop._childIdChain.unshift(id);
@@ -455,6 +469,15 @@ export default class StateWrapper {
 			this._windowIdStack.remove(id);
 			this._windowIdDetached.push(id);
 			this._widgetIdChain.remove(id);
+
+			// Also remove from modalIdOrder of reference window
+			const transientForId = window.transientForId;
+			if (transientForId >= 0) {
+				const ref = this.windowById(transientForId);
+				if (ref) {
+					ref._modalIdOrder.remove(id);
+				}
+			}
 		}
 
 		return this;
@@ -928,7 +951,10 @@ export default class StateWrapper {
 
 	/**
 	 * Set the current screen.
-	 * This will
+	 * This will update widgetIdChain, currentScreenId, currentDesktopId, and currentWindowId.
+	 * It will also make sure that if the current window has a modal dialog open,
+	 * then that window will be focused if its on the current screen, or no
+	 * window gets focus if the dialog is on another screen.
 	 * @param {(number|ScreenWrapper)} [screen] - the screen to set as current
 	 */
 	_setCurrent(screen) {
@@ -939,18 +965,34 @@ export default class StateWrapper {
 
 		if (screen) {
 			const desktop = screen.currentDesktop;
-			/*
-			if (!desktop) {
-				this.print();
-				console.log({screen})
-			}
-			*/
-			// Update the widgetIdChain
+			// Update the widgetIdChain with respect to screen and desktop
 			this._widgetIdChain
 				.unshift(screen.id)
 				.unshift(desktop.id);
-			if (desktop.currentWindowId >= 0)
+			// If a window is selected:
+			if (desktop.currentWindowId >= 0) {
+				/*// If the window has a modal dialog, switch focus to that window.
+				const w = this.windowById(desktop.currentWindowId);
+				w.getModalIdOrder().forEach(depId => {
+					const dep = this.windowById(depId);
+					console.log({dep: _.omit(dep, 'top'), w: dep._get([])});
+					if (dep.flagModal) {
+						const desktopIdDep = dep.findDesktopId();
+						console.log({desktopIdDep, desktopId: desktop.id})
+						if (desktopIdDep === desktop.id) {
+							// Move dialog to front on desktop's chain
+							desktop._childIdChain.unshift(dep.id);
+						}
+						else {
+							// Force lack of focus
+							desktop._childIdChain.unshift(-1);
+						}
+						return false;
+					}
+				});*/
+				// Update the widgetIdChain with respect to the window
 				this._widgetIdChain.unshift(desktop.currentWindowId);
+			}
 			// Update the current pointers
 			this
 				._set(StatePaths.currentScreenId, screen.id)
@@ -959,4 +1001,4 @@ export default class StateWrapper {
 		}
 		return this;
 	}
-};
+}

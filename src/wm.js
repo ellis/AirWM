@@ -77,6 +77,9 @@ var clientCreator = function(err, display) {
 			global.X.AllocColor(screen.default_colormap, 0xFF00, 0x8000, 0x8000, function(err, color) {
 				store.dispatch({type: 'setX11ScreenColors', screen: i, colors: {floating: color.pixel}});
 			});
+			global.X.AllocColor(screen.default_colormap, 0xFF00, 0xFF00, 0x0000, function(err, color) {
+				store.dispatch({type: 'setX11ScreenColors', screen: i, colors: {modal: color.pixel}});
+			});
 
 			global.X.GrabButton(
 				screen.root,
@@ -681,6 +684,7 @@ function createWidgetForXid(xid, props) {
 
 	if (hints.state === '_NET_WM_STATE_MODAL') {
 		_.set(window, 'flags.floating', true);
+		_.set(window, 'flags.modal', true);
 	}
 
 	if (_.get(props, 'WM_PROTOCOLS', []).includes('WM_DELETE_WINDOW')) {
