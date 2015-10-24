@@ -35,6 +35,10 @@ const handlers = {
 		//builder.print();
 	},
 
+	'closeWindow': (builder, action) => {
+		builder.closeWindow();
+	},
+
 	'detachWindow': (builder, action) => {
 		builder.detachWindow(action.window);
 	},

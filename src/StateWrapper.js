@@ -451,6 +451,26 @@ export default class StateWrapper {
 		return this;
 	}
 
+	closeWindow(window) {
+		if (_.isUndefined(window))
+			window = this.currentWindow;
+		else if (_.isNumber(window))
+			window = this.windowById(window);
+
+		if (window) {
+			if (window._get(['flags', 'askBeforeClosing'], false)) {
+				window._set(['flags', 'requestClose'], true);
+			}
+			else {
+				detachWindow(window);
+				window._delete(['flags', 'detaching']);
+				window._set(['flags', 'closing'], true);
+			}
+		}
+
+		return this;
+	}
+
 	/**
 	 * Remove window from desktop.  Window will not be visible.
 	 *

@@ -30,9 +30,6 @@ export default function updateX11(builder) {
 				.set('visible', isVisible)
 				.setIn(['ewmh', 'WM_STATE', 'state'], x11consts.WM_STATE_NormalState) //(isVisible) ? x11consts.WM_STATE_NormalState : x11consts.WM_STATE_IconicState)
 				.setIn(['ewmh', 'WM_STATE', 'icon'], 0);
-			// FIXME: probably want to do this whether visible or not,
-			// but beware of use of window screen below, which is only
-			// available for visible windows.
 			if (true || isVisible) {
 				const desktop = w.findDesktop();
 				const screenId = w.findScreenId();
@@ -123,6 +120,13 @@ export default function updateX11(builder) {
 					info = info.deleteIn(['ConfigureWindow', 1, 'stackMode']);
 				} else {
 					info = info.setIn(['ConfigureWindow', 1, 'stackMode'], stackMode);
+				}
+
+				if (w._get(['flags', 'closing']) === true) {
+					info = info.setIn(['DestroyWindow'], {});
+				}
+				else if (w._get(['flags', 'requestClose']) === true) {
+					info = info.setIn(['ClientMessages', 'RequestClose'], {});
 				}
 			}
 

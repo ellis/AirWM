@@ -3,7 +3,6 @@ import _ from 'lodash';
 import assert from 'assert';
 import {List, Map, fromJS} from 'immutable';
 var fs = require("fs");
-import EWMH from 'ewmh';
 import x11 from 'x11';
 import x11prop from 'x11-prop';
 var exec   = require('child_process').exec;
@@ -12,6 +11,7 @@ var keysym = require('keysym');
 // Custom libraries
 var conversion = require('../lib/conversion');
 var logger = require('../lib/logger').logger;
+import EWMH from './ewmh.js';
 import StateWrapper from './StateWrapper.js';
 import makeStore from './store.js';
 import getWindowProperties from '../lib/getWindowProperties.js';
@@ -127,11 +127,8 @@ var clientCreator = function(err, display) {
 		logger.info("Registering SeaWM as the current Window Manager.");
 		global.X.ChangeWindowAttributes(display.screen[0].root, eventMask, changeWindowAttributeErrorHandler);
 
-		/*
-		//NOTE: Using EWMH stops the client from receiving a bunch of messages.
-		//I think that it's probably overwriting the eventMask.
-
 		ewmh = new EWMH(display.client, display.screen[0].root);
+		/*
 		ewmh.set_number_of_desktops(action1.desktops.length, function(err) {
 			if (err) {
 				throw err;
@@ -632,7 +629,7 @@ function createWidgetForXid(xid, props) {
 	const hints = {
 		windowType: _.get(props, '_NET_WM_WINDOW_TYPE[0]'),
 		state: _.get(props, '_NET_WM_STATE[0]'),
-		transientForXid: _.get(props, 'WM_TRANSIENT_FOR[0]')
+		transientForXid: _.get(props, 'WM_TRANSIENT_FOR[0]'),
 	};
 	console.log({hints})
 	const widgetType = _.get(
@@ -645,12 +642,9 @@ function createWidgetForXid(xid, props) {
 		'window'
 	);
 
-	const action = {
-		type: 'attachWindow',
-		window: {
-			type: widgetType,
-			xid
-		}
+	const window = {
+		type: widgetType,
+		xid
 	};
 
 	if (widgetType === 'dock') {
@@ -658,12 +652,12 @@ function createWidgetForXid(xid, props) {
 		//console.log("addXwinDock: "+props["_NET_WM_STRUT_PARTIAL"]);
 		//console.log([left, right, top, bottom]);
 		if (top > 0) {
-			action.window.dockGravity = "top";
-			action.window.dockSize = top;
+			window.dockGravity = "top";
+			window.dockSize = top;
 		}
 		else if (bottom > 0) {
-			action.window.dockGravity = "bottom";
-			action.window.dockSize = bottom;
+			window.dockGravity = "bottom";
+			window.dockSize = bottom;
 		}
 	}
 
@@ -671,15 +665,19 @@ function createWidgetForXid(xid, props) {
 		const transientForId = findWidgetIdForXid(hints.transientForXid);
 		console.log({transientForId})
 		if (transientForId >= 0) {
-			action.window.transientForId = transientForId;
+			window.transientForId = transientForId;
 		}
 	}
 
 	if (hints.state === '_NET_WM_STATE_MODAL') {
-		_.set(action.window, 'flags.floating', true);
+		_.set(window, 'flags.floating', true);
 	}
 
-	store.dispatch(action);
+	if (_.get(props, 'WM_PROTOCOLS', []).includes('WM_DELETE_WINDOW')) {
+		_.set(window, 'flags.askBeforeClosing', true);
+	}
+
+	store.dispatch({type: 'attachWindow', window});
 }
 
 /*function handleLeaveNotify(ev) {
@@ -707,9 +705,14 @@ function initLogger(logDir) {
 		fs.mkdirSync(logDir);
 }
 
+let ignoreStateChange = false;
 let statePrev = Map();
 function handleStateChange() {
 	try {
+		if (ignoreStateChange)
+			return;
+		ignoreStateChange = true;
+
 		const state = store.getState();
 		const builder = new StateWrapper(state);
 		fs.writeFileSync('state.json', JSON.stringify(state.toJS(), null, '\t'));
@@ -762,6 +765,18 @@ function handleStateChange() {
 				global.X.ConfigureWindow.apply(global.X, ConfigureWindow.toJS());
 			}
 
+			settings1.get('ClientMessages', Map()).forEach((value1, name) => {
+				const value0 = settings0.getIn(['ClientMessages', name]);
+				if (value1 !== value0) {
+					if (name === 'RequestClose') {
+						sendClientMessage(xid,
+							global.X.atoms.WM_PROTOCOLS,
+							global.X.atoms.WM_DELETE_WINDOW
+						);
+					}
+				}
+			});
+
 			const visible = settings1.get('visible');
 			if (visible !== settings0.get('visible')) {
 				if (visible)
@@ -777,6 +792,12 @@ function handleStateChange() {
 					handleEwmh(xid, name, value2);
 				}
 			});
+
+			const DestroyWindow = settings1.get('DestroyWindow');
+			if (DestroyWindow !== settings0.get('DestroyWindow')) {
+				console.log({DestroyWindow})
+				global.X.DestroyWindow(xid);
+			}
 		});
 
 		// Set the X11 focus
@@ -798,20 +819,19 @@ function handleStateChange() {
 			});
 		}
 
-		statePrev = state;
-
-		// Delete windows that have been removed
+		// Tell state to remove detached windows
 		windowSettingsPrev.forEach((settings, key) => {
 			const id = parseInt(key);
 			const window = builder.windowById(id);
 			if (window) {
-				if (window._get(['flags', 'closing'], false) === true) {
-					const xid = settings.get('xid');
-					global.X.DestroyWindow(xid);
-				}
 				store.dispatch({type: 'removeWindow', window: id});
 			}
 		});
+
+		statePrev = state;
+		ignoreStateChange = false;
+		if (state !== store.getState())
+			handleStateChange();
 	} catch (e) {
 		logger.error("handleStateChange: ERROR:")
 		logger.error(e.message);
@@ -851,6 +871,22 @@ function handleEwmh(xid, name, value) {
 	else {
 		logger.error(`unknown EWMH property: ${name} = ${value}`);
 	}
+}
+
+function sendClientMessage(xid, type, data) {
+	var raw = new Buffer(new Array(32));
+	raw.writeInt8(33, 0); /* ClientMessage code */
+	if (type === global.X.atoms.WM_PROTOCOLS) {
+		raw.writeInt8(32, 1); /* Format */
+		raw.writeUInt32LE(xid, 4);
+		raw.writeUInt32LE(type, 8); /* Message Type */
+		raw.writeUInt32LE(data, 12); /* For WM_PROTOCOLS data === Protocol */
+	}
+	else {
+		assert(false);
+	}
+
+	global.X.SendEvent(xid, false, 0, raw);
 }
 
 function findWidgetIdForXid(xid) {

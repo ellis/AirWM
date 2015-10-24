@@ -50,10 +50,11 @@
 	* [x] use `removeWindow` action for really removing it from the state
 	* [x] write test for `detachWindow` -- it's not working properly with `make init`
 * [ ] rewrite closeWindow approach
-	* [ ] a `closeWindow` action should set `flags.closing: true`
-	* [ ] updateX11: windows with `flags.closing`: add property to call `global.X.DestroyWindow(xid)` or send ClientMessage to close
-	* [ ] handleStateChange: windows with `flags.closing`: either call `global.X.DestroyWindow(xid)`, or send ClientMessage to close
-	* [ ] handleStateChange(): for windows with `flags.closing`, destroy the window and dispatch `removeWindow`
+	* [x] a `closeWindow` action should set `flags.closing` or `flags.requestClose`
+	* [x] updateX11: windows with `flags.closing`: add property to call `global.X.DestroyWindow(xid)`
+	* [x] updateX11: windows with `flags.requestClose`: add property to send ClientMessage to close
+	* [x] handleStateChange: windows with `flags.closing`: either call `global.X.DestroyWindow(xid)`, or send ClientMessage to close
+	* [ ] handleStateChange: once ClientMessage to request close is sent, need to update state to delete `flags.requestClose`.
 	* [ ] write test for `closeWindow`
 * [ ] handle dialog boxes
 	* [x] `_NET_WM_STATE(ATOM) = _NET_WM_STATE_MODAL`
@@ -87,6 +88,8 @@
 * [ ] updateX11: update window info for non-visible windows too, where possible
 * [ ] should probably set the mouse icon explicitly, because otherwise the mouse might not be visible (like when we only start gvim in Xephyr)
 * [ ] for better focus-follows-mouse: detect layout changes and use a timer to limit duration that EnterNotify is ignored.
+* [ ] delete ewmh.js
+* [ ] remove from package.json: node-ewmh, async
 
 Naming:
 * jetwm jetzwm lowmo lightwm flowm flowmo flowmotion dashwm
