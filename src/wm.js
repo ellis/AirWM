@@ -322,7 +322,7 @@ function handleEvent() {
 let dragStart = null;
 
 function handleButtonPress(ev, id) {
-	id = findWidgetIdForXid(ev.child);
+	id = findWindowIdForXid(ev.child);
 	console.log("handleButtonPress: "+id+" "+JSON.stringify(ev));
 	if (id >= 0) {
 		const builder = new StateWrapper(store.getState());
@@ -374,7 +374,7 @@ function handleClientMessage(ev) {
 			logger.info("handleClientMessage: "+name+" "+JSON.stringify(_.omit(ev, 'rawData')));
 			switch (name) {
 			case '_NET_ACTIVE_WINDOW': {
-				const id = findWidgetIdForXid(ev.wid);
+				const id = findWindowIdForXid(ev.wid);
 				if (id >= 0) {
 					store.dispatch({type: 'activateWindow', window: id});
 				}
@@ -442,7 +442,7 @@ function handleConfigureRequest(ev, id) {
 function handleDestroyNotify(ev) {
 	delete configureRequestCache[ev.wid];
 
-	const id = findWidgetIdForXid(ev.wid);
+	const id = findWindowIdForXid(ev.wid);
 	if (id >= 0) {
 		store.dispatch({type: 'removeWindow', window: id});
 	}
@@ -455,15 +455,16 @@ function handleDestroyNotify(ev) {
  * The EnterNotify event is sent whenever the mouse "enters" a window,
  * but that may occur when windows are moved or opened, or the desktop
  * is switched.
- * However, focus-follows-mouse should only occur in response to the
+ * However, our focus-follows-mouse should only occur in response to the
  * MOVEMENT of the mouse cursor into a new window.
  *
  * In order to address this problem, I use a buggy hack:
- * - in handleStateChange(), after the active window changes, set ignoreEnterNotify = true.
- * - This will lead ignoring one EnterNotify event (the next one).
+ * - in handleStateChange(), after the active window changes, set ignoreEnterNotify for 500ms.
+ * - in handleKeyPress(), after a action is triggered, set ignoreEnterNotify for 500ms.
+ * - This will lead ignoring up to one EnterNotify event in the 500ms.
  * - Also check the coordinates of the last EnterNotify event, and
  *   ignore if the coordinates haven't changed.
- * - set ignoreEnterNotify=false at end of handleEnterNotify(),
+ * - set ignoreEnterNotify=0 at end of handleEnterNotify(),
  *
  * Solves:
  * - when the user switches desktops, the window under the mouse
@@ -481,25 +482,27 @@ function handleDestroyNotify(ev) {
  * Possible better solutions:
  * 1. set ignoreEnterNotify=true whenever there is a layout change, and use
  *    a timer to limit how long EnterNotify will be ignored.
- * 2. use XInput to detect mouse movement, and only use EnterNotify it's for
+ * 2. use XInput to detect mouse movement, and only consider EnterNotify if it's for
  *    the window that was under the last mouse movement.
  */
 let handleEnterNotifyCoordsPrev = {};
-let ignoreEnterNotify = true;
+let ignoreEnterNotify = 0;
 function handleEnterNotify(ev, id) {
+	const now = Date.now();
+	console.log(`handleEnterNotify @${id} time: ${ignoreEnterNotify} now: ${now}`)
 	const coords = _.pick(ev, ['rootx', 'rooty']);
 	let state = store.getState();
 	//_focusId = id;
-	if (id >= 0) {
-		//console.log({coords, ev, handleEnterNotifyCoordsPrev});
-		if (!ignoreEnterNotify && !_.isEqual(coords, handleEnterNotifyCoordsPrev)) {
+	if (id >= 0 && state.getIn(['widgets', id.toString(), 'type']) === 'window') {
+		console.log({coords, ev, handleEnterNotifyCoordsPrev});
+		if (now >= ignoreEnterNotify && !_.isEqual(coords, handleEnterNotifyCoordsPrev)) {
 			store.dispatch({type: 'activateWindow', window: id});
 		}
 		else {
-			//console.log("ignored EnterNotify");
+			console.log("ignored EnterNotify");
 		}
-		ignoreEnterNotify = false;
-		//console.log("ignoreEnterNotify = false")
+		ignoreEnterNotify = 0;
+		console.log("ignoreEnterNotify = 0")
 	}
 	handleEnterNotifyCoordsPrev = coords;
 	return Promise.resolve();
@@ -518,8 +521,12 @@ function handleKeyPress(ev){
 					execHandler(binding.program);
 				}
 				else if (binding.hasOwnProperty("action")) {
+					// ignore EnterNotify events for 500ms
+					ignoreEnterNotify = Date.now() + 500;
+					console.log(`handleKeyPress set ignoreEnterNotify = ${ignoreEnterNotify}`);
 					store.dispatch(binding.action);
 				}
+				// ignore EnterNotify events for 500ms
 			}
 		}
 	}
@@ -675,7 +682,7 @@ function createWidgetForXid(xid, props) {
 	}
 
 	if (hints.transientForXid > 0) {
-		const transientForId = findWidgetIdForXid(hints.transientForXid);
+		const transientForId = findWindowIdForXid(hints.transientForXid);
 		console.log({transientForId})
 		if (transientForId >= 0) {
 			window.transientForId = transientForId;
@@ -746,11 +753,12 @@ function handleStateChange() {
 		const builder = new StateWrapper(state);
 		fs.writeFileSync('state.json', JSON.stringify(state.toJS(), null, '\t'));
 		//builder.print();
-		// If the active window has changed, set ignoreEnterNotify = true
+		/*// If the active window has changed, set ignoreEnterNotify = true
 		if (state.getIn(['x11', 'wmSettings', 'ewmh', '_NET_ACTIVE_WINDOW', 0]) !== statePrev.getIn(['x11', 'wmSettings', 'ewmh', '_NET_ACTIVE_WINDOW', 0])) {
-			//console.log("ignoreEnterNotify = true")
-			ignoreEnterNotify = true;
-		}
+			console.log("ignoreEnterNotify = true")
+			// ignore EnterNotify events for 500ms
+			ignoreEnterNotify = Date.now() + 500;
+		}*/
 		// Settings for each window
 		let windowSettingsPrev = statePrev.getIn(['x11', 'windowSettings'], Map());
 		const windowIdStack = state.getIn(['windowIdStack'], List());
@@ -930,6 +938,18 @@ function findWidgetIdForXid(xid) {
 	store.getState().get('widgets').forEach((w, key) => {
 		if (w.get('xid') === xid) {
 			id = parseInt(key);
+			return false;
+		}
+	});
+	return id;
+}
+
+function findWindowIdForXid(xid) {
+	let id;
+	store.getState().get('widgets').forEach((w, key) => {
+		if (w.get('xid') === xid) {
+			if (w.get('type') === 'window')
+				id = parseInt(key);
 			return false;
 		}
 	});

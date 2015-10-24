@@ -65,7 +65,7 @@
 	* [x] in gvim, goto File|Open: the dialog should float over it's transient-for window
 * [x] BUG: `make init`, start gvim, type some text, close the window, confirm close: there are errors printed on the console
 * [x] change border color for windows with modal dialogs open
-* [ ] BUG: EnterNotify isn't always activating the entered window
+* [x] BUG: EnterNotify doesn't always activate the entered window
 * [ ] figure out how `--replace` flag works in xmonad so that I can use the WM in xfce (see Main.hs:replace)
 * [ ] xfce4-panel: should display window buttons for task switching
 
