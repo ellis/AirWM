@@ -1,6 +1,7 @@
 // External libraries
 import _ from 'lodash';
 import assert from 'assert';
+import diff from 'immutablediff';
 import {List, Map, fromJS} from 'immutable';
 var fs = require("fs");
 import x11 from 'x11';
@@ -291,6 +292,7 @@ function handleEvent() {
 			}
 			else {
 				eventHandlerRunning = false;
+				handleStateChange();
 				return Promise.resolve();
 			}
 		}).catch(err => {
@@ -302,6 +304,7 @@ function handleEvent() {
 			}
 			else {
 				eventHandlerRunning = false;
+				handleStateChange();
 				return Promise.resolve();
 			}
 		});
@@ -726,11 +729,16 @@ let ignoreStateChange = false;
 let statePrev = Map();
 function handleStateChange() {
 	try {
-		if (ignoreStateChange)
+		// Avoid handling state changes until all pending event have been processed
+		if (ignoreStateChange || eventHandlerRunning)
 			return;
-		ignoreStateChange = true;
 
 		const state = store.getState();
+		if (state === statePrev)
+			return;
+
+		ignoreStateChange = true;
+
 		const builder = new StateWrapper(state);
 		fs.writeFileSync('state.json', JSON.stringify(state.toJS(), null, '\t'));
 		//builder.print();
@@ -749,6 +757,11 @@ function handleStateChange() {
 			const settings0 = statePrev.getIn(['x11', 'windowSettings', key], Map());
 			const xid = settings1.get('xid');
 
+			if (settings1 === settings0)
+				return;
+
+			console.log({id, xid, diff: diff(settings0, settings1)});
+
 			/*// If window is new:
 			if (!statePrev.hasIn(['widgets', key])) {
 				global.X.GrabButton(
@@ -766,6 +779,7 @@ function handleStateChange() {
 
 			const ChangeWindowAttributes = settings1.get('ChangeWindowAttributes');
 			if (ChangeWindowAttributes !== settings0.get('ChangeWindowAttributes')) {
+				//console.log({id, xid, ChangeWindowAttributes})
 				global.X.ChangeWindowAttributes.apply(global.X, ChangeWindowAttributes.toJS(), (err) => {
 					if (err) {
 						console.log(1)
@@ -778,7 +792,7 @@ function handleStateChange() {
 
 			const ConfigureWindow = settings1.get('ConfigureWindow');
 			if (ConfigureWindow !== settings0.get('ConfigureWindow')) {
-				console.log({ConfigureWindow})
+				//console.log({ConfigureWindow})
 				global.X.ConfigureWindow.apply(global.X, ConfigureWindow.toJS());
 			}
 

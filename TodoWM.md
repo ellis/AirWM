@@ -63,7 +63,7 @@
 	* [x] ignore request for x=0, y=0
 	* [x] x11: modal dialog boxes should be automatically positioned over their app window
 	* [x] in gvim, goto File|Open: the dialog should float over it's transient-for window
-* [ ] BUG: `make init`, start gvim, type some text, close the window, confirm close: there are errors printed on the console
+* [x] BUG: `make init`, start gvim, type some text, close the window, confirm close: there are errors printed on the console
 * [ ] BUG: in gvim, goto File|Open: shouldn't be allowed to put focus back on the gvim window because of the MODAL dialog
 * [ ] figure out how `--replace` flag works in xmonad so that I can use the WM in xfce (see Main.hs:replace)
 * [ ] xfce4-panel: should display window buttons for task switching
