@@ -406,10 +406,12 @@ function handleConfigureRequest(ev, id) {
 		// This should be changed to allow them on floating windows.
 		if (window.flagFloating) {
 			const borderWidth = 5;
-			store.dispatch({type: 'setWindowRequestedProperties', props: {
-				size: [ev.width + 2*borderWidth, ev.height + 2*borderWidth],
-				pos: [ev.x - borderWidth, ev.y - borderWidth]
-			}});
+			const props = {
+				size: [ev.width + 2*borderWidth, ev.height + 2*borderWidth]
+			};
+			if (ev.x > 0 || ev.y > 0)
+				props.pos = [ev.x - borderWidth, ev.y - borderWidth];
+			store.dispatch({type: 'setWindowRequestedProperties', props});
 		}
 		// Ignore request for other known windows
 		else if (ConfigureWindow) {
@@ -685,8 +687,11 @@ function createWidgetForXid(xid, props) {
 	if (configureRequestCache.hasOwnProperty(xid)) {
 		const requested = configureRequestCache[xid];
 		const borderWidth = 5;
-		_.set(window, 'requested.size', [requested.width + 2*borderWidth, requested.height + 2*borderWidth]);
-		_.set(window, 'requested.pos', [requested.x - borderWidth, requested.y - borderWidth]);
+		const size = [requested.width + 2*borderWidth, requested.height + 2*borderWidth];
+		_.set(window, 'requested.size', size);
+		if (requested.x > 0 || requested.y > 0) {
+			_.set(window, 'requested.pos', [requested.x - borderWidth, requested.y - borderWidth]);
+		}
 	}
 
 	store.dispatch({type: 'attachWindow', window});

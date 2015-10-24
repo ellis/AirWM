@@ -55,18 +55,18 @@
 	* [x] updateX11: windows with `flags.requestClose`: add property to send ClientMessage to close
 	* [x] handleStateChange: windows with `flags.closing`: either call `global.X.DestroyWindow(xid)`, or send ClientMessage to close
 	* [x] handleStateChange: once ClientMessage to request close is sent, need to update state to delete `flags.requestClose`.
-* [ ] handle dialog boxes
+* [x] handle dialog boxes
 	* [x] `_NET_WM_STATE(ATOM) = _NET_WM_STATE_MODAL`
 	* [x] `_NET_WM_WINDOW_TYPE(ATOM) = _NET_WM_WINDOW_TYPE_DIALOG`
 	* [x] cache old ConfigureWindow requests until DestroyNotify is received
 	* [x] set requested coordinates from X11 events/messages/attributes
-	* [ ] ignore request for x=0, y=0
-	* [ ] x11: modal dialog boxes should be automatically positioned over their app window
-	* [ ] in gvim, goto File|Open: the dialog should float over it's transient-for window
-	* [ ] BUG: in gvim, goto File|Open: shouldn't be allowed to put focus back on the gvim window because of the MODAL dialog
-	* [ ] try to respect window hints for dialog size
-* [ ] xfce4-panel: should display window buttons for task switching
+	* [x] ignore request for x=0, y=0
+	* [x] x11: modal dialog boxes should be automatically positioned over their app window
+	* [x] in gvim, goto File|Open: the dialog should float over it's transient-for window
+* [ ] BUG: `make init`, start gvim, type some text, close the window, confirm close: there are errors printed on the console
+* [ ] BUG: in gvim, goto File|Open: shouldn't be allowed to put focus back on the gvim window because of the MODAL dialog
 * [ ] figure out how `--replace` flag works in xmonad so that I can use the WM in xfce (see Main.hs:replace)
+* [ ] xfce4-panel: should display window buttons for task switching
 
 * [ ] remove unused AirWM files, reorganize AirWM files I still need
 * [ ] create a new repository (flowmo)
@@ -91,12 +91,14 @@
 * [ ] for better focus-follows-mouse: detect layout changes and use a timer to limit duration that EnterNotify is ignored.
 * [ ] delete ewmh.js
 * [ ] remove from package.json: node-ewmh, async
+* [ ] handle window hints for sizes, especially for floating windows
 
 Naming:
 * jetwm jetzwm lowmo lightwm flowm flowmo flowmotion dashwm
 
 Testing:
 * [ ] test floating windows
+* [ ] test that modal dialogs are place in the middle over their parent window
 * [ ] test window stacking
 * [ ] test `moveWindowToIndex`
 * [ ] test `setWindowRequestedProperties`

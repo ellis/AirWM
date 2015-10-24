@@ -420,6 +420,15 @@ export default class StateWrapper {
 						// Put it right after the ref
 						const {num} = this.findWindowNum(ref, desktop, 1);
 						this.moveWindowToIndex(w, num);
+						// If not otherwise specified, request x/y to center the dialog on it's parent
+						const requested = w._get(['requested', 'pos'], List([0, 0])).toJS();
+						const size = w._get(['requested', 'size']);
+						if (size && !(requested.x > 0 || requested.y > 0)) {
+							const rc = ref.getRc().toJS();
+							const x = rc[0] + (rc[2] - size.get(0)) / 2;
+							const y = rc[1] + (rc[3] - size.get(1)) / 2;
+							w._set(['requested', 'pos'], List([x, y]));
+						}
 						// Focus it, if the reference has focus
 						if (desktop.getChildIdChain().get(0) === ref.id) {
 							desktop._childIdChain.unshift(id);
