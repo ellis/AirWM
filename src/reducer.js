@@ -83,6 +83,10 @@ const handlers = {
 	'setWindowRequestedProperties': (builder, action) => {
 		builder.setWindowRequestedProperties(action.window, action.props);
 	},
+
+	'unsetWindowFlag': (builder, action) => {
+		builder.unsetWindowFlag(action.window, action.flag);
+	},
 };
 
 export default function reducer(state = initialState, action) {

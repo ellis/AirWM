@@ -736,6 +736,19 @@ export default class StateWrapper {
 		return this;
 	}
 
+	unsetWindowFlag(window, name) {
+		if (_.isUndefined(window))
+			window = this.currentWindow;
+		else if (_.isNumber(window))
+			window = this.windowById(window);
+
+		if (window) {
+			window._delete(['flags', name]);
+		}
+
+		return this;
+	}
+
 	forEachScreen(fn) {
 		//this.print();
 		this.getScreenIdOrder().forEach(screenId => {

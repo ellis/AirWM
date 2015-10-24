@@ -773,6 +773,7 @@ function handleStateChange() {
 							global.X.atoms.WM_PROTOCOLS,
 							global.X.atoms.WM_DELETE_WINDOW
 						);
+						store.dispatch({type: 'unsetWindowFlag', flag: 'requestClose'});
 					}
 				}
 			});

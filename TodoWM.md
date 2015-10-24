@@ -49,13 +49,12 @@
 	* [x] handleStateChange(): dispatch `removeWindow` for `flags.detaching` windows
 	* [x] use `removeWindow` action for really removing it from the state
 	* [x] write test for `detachWindow` -- it's not working properly with `make init`
-* [ ] rewrite closeWindow approach
+* [x] rewrite closeWindow approach
 	* [x] a `closeWindow` action should set `flags.closing` or `flags.requestClose`
 	* [x] updateX11: windows with `flags.closing`: add property to call `global.X.DestroyWindow(xid)`
 	* [x] updateX11: windows with `flags.requestClose`: add property to send ClientMessage to close
 	* [x] handleStateChange: windows with `flags.closing`: either call `global.X.DestroyWindow(xid)`, or send ClientMessage to close
-	* [ ] handleStateChange: once ClientMessage to request close is sent, need to update state to delete `flags.requestClose`.
-	* [ ] write test for `closeWindow`
+	* [x] handleStateChange: once ClientMessage to request close is sent, need to update state to delete `flags.requestClose`.
 * [ ] handle dialog boxes
 	* [x] `_NET_WM_STATE(ATOM) = _NET_WM_STATE_MODAL`
 	* [x] `_NET_WM_WINDOW_TYPE(ATOM) = _NET_WM_WINDOW_TYPE_DIALOG`
@@ -100,6 +99,7 @@ Testing:
 * [ ] test `moveWindowToIndex`
 * [ ] test `setWindowRequestedProperties`
 * [ ] test multiple docks and different dock gravities (still need to test left and right docks)
+* [ ] write test for `closeWindow`
 
 Refactoring:
 * [ ] consider switching from Immutable to <https://github.com/rtfeldman/seamless-immutable>
