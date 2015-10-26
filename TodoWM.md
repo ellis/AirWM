@@ -142,6 +142,7 @@ Later:
 * [ ] hot-reloading for changes to source files?
 * [ ] look into compatibility with various pagers and launchers (e.g. dockbarx, docky, candybar, lemonbar)
 * [ ] look into turning the WM into a compositing WM
+	* <http://projects.mini-dweeb.org/attachments/download/3/report.pdf>
 * [ ] for inspiration, lookup videos on Mac's Mission Control, Compiz F12, Ubuntu window management
 * [ ] handle startup notification (<http://www.freedesktop.org/wiki/Software/startup-notification/> and <http://standards.freedesktop.org/startup-notification-spec/startup-notification-latest.txt>)
 * [ ] maybe refactor so that every container (e.g. screen, desktop) also has a childIdStack, and then recursively build the window manager's childIdStack from those.
