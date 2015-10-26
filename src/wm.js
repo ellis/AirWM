@@ -12,7 +12,7 @@ var keysym = require('keysym');
 // Custom libraries
 var conversion = require('../lib/conversion');
 var logger = require('../lib/logger').logger;
-import EWMH from './ewmh.js';
+//import EWMH from './ewmh.js';
 import StateWrapper from './StateWrapper.js';
 import makeStore from './store.js';
 import getWindowProperties from '../lib/getWindowProperties.js';
@@ -21,7 +21,7 @@ import x11consts from './x11consts.js';
 const store = makeStore();
 
 // The workspaces currently available
-let ewmh = undefined;
+//let ewmh = undefined;
 
 // The available key shortcuts that are known
 var config	  = require("../config/config");
@@ -29,8 +29,92 @@ var programs	= config.startup_applications;
 var keybindings = config.keybindings;
 var ks2kc;
 
-var clientCreator = function(err, display) {
-	initLogger('logs');
+function replace(err, display) {
+	logger.info("try to replace current window manager");
+	if (err) return;
+	try {
+		global.X = display.client;
+		console.log({screen: display.screen[0]});
+		global.X.InternAtom(false, 'WM_S0', function(err, composite_atom) {
+			if (err) return;
+			global.X.GetSelectionOwner(composite_atom, function(err, xid) {
+				console.log({err, xid});
+				if (err) return;
+				if (xid > 0) {
+					// prepare to receive destroyNotify for old WM
+					global.X.ChangeWindowAttributes(xid, {eventMask: x11.eventMask.StructureNotify});
+
+					// Create off-screen window
+					const fid = global.X.AllocID();
+					const root = display.screen[0].root;
+					global.X.CreateWindow(fid, root, -100, -100, 1, 1, 0, 0, 0, 0,
+						{
+							eventMask: x11.eventMask.PropertyChange,
+							overrideRedirect: true
+						}
+					);
+
+					// Try to acquire wmSnAtom, this should signal the old WM to terminate
+					 global.X.SetSelectionOwner(fid, composite_atom);
+					 console.log("Waiting for current window manager to exit");
+
+					 const waitForDestroy = function(ev) {
+						 console.log({ev})
+						 if (ev.name === "DestroyNotify") {
+						 	global.X.removeListener('event', waitForDestroy);
+						 	clientCreator(null, display);
+						}
+					};
+
+					 global.X.on('event', waitForDestroy);
+				}
+				else {
+					clientCreator(null, display);
+				}
+			});
+	    });
+	}
+	catch (e) {
+
+	}
+/*
+-- | @replace@ to signals compliant window managers to exit.
+replace :: Display -> ScreenNumber -> Window -> IO ()
+replace dpy dflt rootw = do
+    -- check for other WM
+    wmSnAtom <- internAtom dpy ("WM_S" ++ show dflt) False
+    currentWmSnOwner <- xGetSelectionOwner dpy wmSnAtom
+    when (currentWmSnOwner /= 0) $ do
+        -- prepare to receive destroyNotify for old WM
+        selectInput dpy currentWmSnOwner structureNotifyMask
+
+        -- create off-screen window
+        netWmSnOwner <- allocaSetWindowAttributes $ \attributes -> do
+            set_override_redirect attributes True
+            set_event_mask attributes propertyChangeMask
+            let screen = defaultScreenOfDisplay dpy
+                visual = defaultVisualOfScreen screen
+                attrmask = cWOverrideRedirect .|. cWEventMask
+            createWindow dpy rootw (-100) (-100) 1 1 0 copyFromParent copyFromParent visual attrmask attributes
+
+        -- try to acquire wmSnAtom, this should signal the old WM to terminate
+        xSetSelectionOwner dpy wmSnAtom netWmSnOwner currentTime
+
+        -- SKIPPED: check if we acquired the selection
+        -- SKIPPED: send client message indicating that we are now the WM
+
+        -- wait for old WM to go away
+        fix $ \again -> do
+            evt <- allocaXEvent $ \event -> do
+                windowEvent dpy currentWmSnOwner structureNotifyMask event
+                get_EventType event
+
+            when (evt /= destroyNotify) again
+
+ */
+}
+
+function clientCreator(err, display, xidRoot) {
 	logger.info("Initializing WM client.");
 	try {
 		// Set the connection to the X server in global namespace
@@ -81,6 +165,7 @@ var clientCreator = function(err, display) {
 				store.dispatch({type: 'setX11ScreenColors', screen: i, colors: {modal: color.pixel}});
 			});
 
+			// Win+Left-Click for moving floating window
 			global.X.GrabButton(
 				screen.root,
 				0, // Don't report events to the window
@@ -93,6 +178,7 @@ var clientCreator = function(err, display) {
 				64 + 4// alt (8) + ctrl (4) = 12, "windows" modifier = 64
 			);
 
+			// Win+Right-Click for resizing floating window
 			global.X.GrabButton(
 				screen.root,
 				0, // Don't report events to the window
@@ -131,8 +217,8 @@ var clientCreator = function(err, display) {
 		logger.info("Registering SeaWM as the current Window Manager.");
 		global.X.ChangeWindowAttributes(display.screen[0].root, eventMask, changeWindowAttributeErrorHandler);
 
-		ewmh = new EWMH(display.client, display.screen[0].root);
 		/*
+		ewmh = new EWMH(display.client, display.screen[0].root);
 		ewmh.set_number_of_desktops(action1.desktops.length, function(err) {
 			if (err) {
 				throw err;
@@ -175,6 +261,7 @@ var clientCreator = function(err, display) {
 		});
 
 		store.subscribe(handleStateChange);
+		global.X.on('error', errorHandler).on('event', enqueueEvent);
 
 		// Load the programs that should get started and start them
 		logger.info("Launching startup applications.");
@@ -957,4 +1044,6 @@ function findWindowIdForXid(xid) {
 }
 
 
-x11.createClient({debug: true}, clientCreator).on('error', errorHandler).on('event', enqueueEvent);
+initLogger('logs');
+//x11.createClient({debug: true}, clientCreator).on('error', errorHandler).on('event', enqueueEvent);
+x11.createClient({debug: true}, replace);

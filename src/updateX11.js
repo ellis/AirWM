@@ -65,7 +65,10 @@ export default function updateX11(builder) {
 				let stackMode;
 				let siblingXid = 0;
 				if (screenId >= 0) {
-					if (screenId !== screenIdPrev) {
+					if (windowType === 'background') {
+						stackMode = 1; // Below everything
+					}
+					else if (screenId !== screenIdPrev) {
 						stackMode = 0; // On top of everything
 					}
 					else if (stackIndex < windowIdStack.length - 1 && xidPrev >= 0) {
