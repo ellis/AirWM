@@ -66,7 +66,7 @@
 * [x] BUG: `make init`, start gvim, type some text, close the window, confirm close: there are errors printed on the console
 * [x] change border color for windows with modal dialogs open
 * [x] BUG: EnterNotify doesn't always activate the entered window
-* [ ] figure out how `--replace` flag works in xmonad so that I can use the WM in xfce (see xmonad:Main.hs:replace and xfwm4:screen.c:myScreenSetWMAtom)
+* [ ] figure out how `--replace` flag works in xmonad so that I can use the WM in xfce (see Main.hs:replace)
 	* see section 2.8 of <https://tronche.com/gui/x/icccm/sec-2.html>
 
 ```haskell
@@ -119,7 +119,6 @@ replace dpy dflt rootw = do
 * [ ] StateWrapper: activateDesktopNext/Prev
 * [ ] StateWrapper: activateDesktopEarlier/Later (in session)
 * [ ] StateWrapper: add properties and handlers for mouse pointer to manage things like focus and dragging
-* [ ] use `nomnom` package to handle `--replace` option on command line
 * [ ] StateWrapper: add dragging properties and handlers
 * [ ] BUG: start two xterms; click 'xterm' on lxqt-panel's task bar then move mouse to one of the xterms; the popup is then drawn below the windows -- might need to avoid setting 'stackMode:0,sibling:undefined' so as to avoid making any window absolutely top-most.
 * [ ] xfce4-panel: the bottom panel should be centered
