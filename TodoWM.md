@@ -66,9 +66,9 @@
 * [x] BUG: `make init`, start gvim, type some text, close the window, confirm close: there are errors printed on the console
 * [x] change border color for windows with modal dialogs open
 * [x] BUG: EnterNotify doesn't always activate the entered window
-* [x] figure out how `--replace` flag works in xmonad so that I can use the WM in xfce (see Main.hs:replace)
-	* see section 2.8 of <https://tronche.com/gui/x/icccm/sec-2.html>
 * [ ] xfce: xfce popup windows shouldn't be managed (such as the application menu and the volume change indicator)
+* [ ] figure out how `--replace` flag works in xmonad so that I can use the WM in xfce (see Main.hs:replace)
+	* see section 2.8 of <https://tronche.com/gui/x/icccm/sec-2.html>
 * [ ] remove unused AirWM files, reorganize AirWM files I still need
 * [ ] create a new repository (flowmo)
 * [ ] activate window on mouse click
