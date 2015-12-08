@@ -66,44 +66,9 @@
 * [x] BUG: `make init`, start gvim, type some text, close the window, confirm close: there are errors printed on the console
 * [x] change border color for windows with modal dialogs open
 * [x] BUG: EnterNotify doesn't always activate the entered window
-* [ ] figure out how `--replace` flag works in xmonad so that I can use the WM in xfce (see Main.hs:replace)
+* [x] figure out how `--replace` flag works in xmonad so that I can use the WM in xfce (see Main.hs:replace)
 	* see section 2.8 of <https://tronche.com/gui/x/icccm/sec-2.html>
-
-```haskell
--- | @replace@ to signals compliant window managers to exit.
-replace :: Display -> ScreenNumber -> Window -> IO ()
-replace dpy dflt rootw = do
-    -- check for other WM
-    wmSnAtom <- internAtom dpy ("WM_S" ++ show dflt) False
-    currentWmSnOwner <- xGetSelectionOwner dpy wmSnAtom
-    when (currentWmSnOwner /= 0) $ do
-        -- prepare to receive destroyNotify for old WM
-        selectInput dpy currentWmSnOwner structureNotifyMask
-
-        -- create off-screen window
-        netWmSnOwner <- allocaSetWindowAttributes $ \attributes -> do
-            set_override_redirect attributes True
-            set_event_mask attributes propertyChangeMask
-            let screen = defaultScreenOfDisplay dpy
-                visual = defaultVisualOfScreen screen
-                attrmask = cWOverrideRedirect .|. cWEventMask
-            createWindow dpy rootw (-100) (-100) 1 1 0 copyFromParent copyFromParent visual attrmask attributes
-
-        -- try to acquire wmSnAtom, this should signal the old WM to terminate
-        xSetSelectionOwner dpy wmSnAtom netWmSnOwner currentTime
-
-        -- SKIPPED: check if we acquired the selection
-        -- SKIPPED: send client message indicating that we are now the WM
-
-        -- wait for old WM to go away
-        fix $ \again -> do
-            evt <- allocaXEvent $ \event -> do
-                windowEvent dpy currentWmSnOwner structureNotifyMask event
-                get_EventType event
-
-            when (evt /= destroyNotify) again
-```
-
+* [ ] xfce: xfce popup windows shouldn't be managed (such as the application menu and the volume change indicator)
 * [ ] remove unused AirWM files, reorganize AirWM files I still need
 * [ ] create a new repository (flowmo)
 * [ ] activate window on mouse click
