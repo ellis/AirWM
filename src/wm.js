@@ -743,6 +743,7 @@ function createWidgetForXid(xid, props) {
 		{
 			'_NET_WM_WINDOW_TYPE_DOCK': 'dock',
 			'_NET_WM_WINDOW_TYPE_DESKTOP': 'background',
+			'_NET_WM_WINDOW_TYPE_NOTIFICATION': 'notification',
 			//'_NET_WM_WINDOW_TYPE_DESKTOP': 'window',
 		},
 		hints.windowType,
@@ -766,6 +767,9 @@ function createWidgetForXid(xid, props) {
 			window.dockGravity = "bottom";
 			window.dockSize = bottom;
 		}
+	}
+	else if (windowType === 'notification') {
+		_.set(window, 'flags.floating', true);
 	}
 
 	if (hints.transientForXid > 0) {

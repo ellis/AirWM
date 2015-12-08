@@ -38,6 +38,7 @@ export default function updateX11(builder) {
 				const borderWidth = _.get({
 					'background': 0,
 					'dock': 0,
+					'notification': 0,
 					'window': 5,
 				}, windowType, 1);
 				const hasModal = (w._modalIdOrder.count() > 0);
@@ -53,6 +54,7 @@ export default function updateX11(builder) {
 				const eventMask = _.get({
 					'background': undefined,
 					'dock': undefined,
+					'notification': undefined,
 				}, windowType, x11.eventMask.EnterWindow);
 				//}, windowType, x11.eventMask.EnterWindow | x11.eventMask.Button1Motion | x11.eventMask.ButtonPress | x11.eventMask.ButtonRelease);
 				const desktopNum = (desktop) ? builder.getDesktopIdOrder().indexOf(desktop.id) : -1;
@@ -67,6 +69,9 @@ export default function updateX11(builder) {
 				if (screenId >= 0) {
 					if (windowType === 'background') {
 						stackMode = 1; // Below everything
+					}
+					else if (windowType === 'notification') {
+						stackMode = 0; // On top of everything
 					}
 					else if (screenId !== screenIdPrev) {
 						stackMode = 0; // On top of everything
@@ -145,7 +150,7 @@ export default function updateX11(builder) {
 		}
 	});
 
-	// TODO Stacking order: for each screen, docks at top, desktop windows in stack order, then background
+	// TODO Stacking order: for each screen, notifications at very top, docks at top, desktop windows in stack order, then background
 
 	// If no widget is focused, set focus to the root window of the current screen
 	const focusXid = (currentWindowId >= 0)
