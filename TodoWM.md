@@ -66,6 +66,7 @@
 * [x] BUG: `make init`, start gvim, type some text, close the window, confirm close: there are errors printed on the console
 * [x] change border color for windows with modal dialogs open
 * [x] BUG: EnterNotify doesn't always activate the entered window
+* [ ] rewrite README.md and include how to build on nixos (``nix-shell flowmo.nix; npm install``)
 * [ ] figure out how `--replace` flag works in xmonad so that I can use the WM in xfce (see Main.hs:replace)
 	* see section 2.8 of <https://tronche.com/gui/x/icccm/sec-2.html>
 
