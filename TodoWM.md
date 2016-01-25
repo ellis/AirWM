@@ -69,6 +69,7 @@
 * [ ] rewrite README.md and include how to build on nixos (``nix-shell flowmo.nix; npm install``)
 * [ ] figure out how `--replace` flag works in xmonad so that I can use the WM in xfce (see Main.hs:replace)
 	* see section 2.8 of <https://tronche.com/gui/x/icccm/sec-2.html>
+* [ ] BUG: got a crash on xubuntu 15.10 lorax when I started rdesktop to xrdp, and right-clicked on the rdesktop icon in the programs bar and selected [Close]
 
 ```haskell
 -- | @replace@ to signals compliant window managers to exit.
