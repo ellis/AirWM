@@ -69,6 +69,47 @@
 * [x] figure out how `--replace` flag works in xmonad so that I can use the WM in xfce (see Main.hs:replace)
 	* see section 2.8 of <https://tronche.com/gui/x/icccm/sec-2.html>
 * [ ] xfce: xfce popup windows shouldn't be managed (such as the application menu and the volume change indicator)
+* [ ] BUG: after I start GcEad, no GcEad window is shown and I can't switch to other desktops anymore
+* [ ] rewrite README.md and include how to build on nixos (``nix-shell flowmo.nix; npm install``)
+* [ ] figure out how `--replace` flag works in xmonad so that I can use the WM in xfce (see Main.hs:replace)
+	* see section 2.8 of <https://tronche.com/gui/x/icccm/sec-2.html>
+* [ ] BUG: got a crash on xubuntu 15.10 lorax when I started rdesktop to xrdp, and right-clicked on the rdesktop icon in the programs bar and selected [Close]
+
+```haskell
+-- | @replace@ to signals compliant window managers to exit.
+replace :: Display -> ScreenNumber -> Window -> IO ()
+replace dpy dflt rootw = do
+    -- check for other WM
+    wmSnAtom <- internAtom dpy ("WM_S" ++ show dflt) False
+    currentWmSnOwner <- xGetSelectionOwner dpy wmSnAtom
+    when (currentWmSnOwner /= 0) $ do
+        -- prepare to receive destroyNotify for old WM
+        selectInput dpy currentWmSnOwner structureNotifyMask
+
+        -- create off-screen window
+        netWmSnOwner <- allocaSetWindowAttributes $ \attributes -> do
+            set_override_redirect attributes True
+            set_event_mask attributes propertyChangeMask
+            let screen = defaultScreenOfDisplay dpy
+                visual = defaultVisualOfScreen screen
+                attrmask = cWOverrideRedirect .|. cWEventMask
+            createWindow dpy rootw (-100) (-100) 1 1 0 copyFromParent copyFromParent visual attrmask attributes
+
+        -- try to acquire wmSnAtom, this should signal the old WM to terminate
+        xSetSelectionOwner dpy wmSnAtom netWmSnOwner currentTime
+
+        -- SKIPPED: check if we acquired the selection
+        -- SKIPPED: send client message indicating that we are now the WM
+
+        -- wait for old WM to go away
+        fix $ \again -> do
+            evt <- allocaXEvent $ \event -> do
+                windowEvent dpy currentWmSnOwner structureNotifyMask event
+                get_EventType event
+
+            when (evt /= destroyNotify) again
+```
+
 * [ ] remove unused AirWM files, reorganize AirWM files I still need
 * [ ] create a new repository (flowmo)
 * [ ] activate window on mouse click
