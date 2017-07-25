@@ -139,7 +139,10 @@ function clientCreator(err, display, xidRoot) {
 				{name: "text", layout: "tile-right"},
 				{name: "cli", layout: "tile-right"},
 				{name: "prog", layout: "tile-right"},
-				{name: "other", layout: "tile-right"},
+				{name: "other1", layout: "tile-right"},
+				{name: "other2", layout: "tile-right"},
+				{name: "other3", layout: "tile-right"},
+				{name: "other4", layout: "tile-right"},
 			],
 			screens: _.map(display.screen, (screen) => { return {
 				xid: screen.root,
