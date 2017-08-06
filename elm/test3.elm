@@ -74,11 +74,12 @@ view model =
 makeSvgViewH : Model -> Html Msg
 makeSvgViewH model =
     svg
-      [ version "1.1", x "0", y "0", viewBox "0 0 600 400", style "width: 15em; float: left" ]
+      [ version "1.1", x "0", y "0", viewBox "0 0 2000 2000", style "width: 15em" ]
       (List.concat (List.map makeSvgDesktop model.desktops))
 
 makeSvgDesktop : DesktopWidget -> List (Svg.Svg Msg)
 makeSvgDesktop desktop =
-    [ rect [width (toString desktop.rc.w), height (toString desktop.rc.h)] []
-    , Svg.text_ [] [Svg.text desktop.name]
+    [ rect [fill "blue", width (toString desktop.rc.w), height (toString desktop.rc.h)] []
+    -- x="0" y="35" font-family="Verdana" font-size="35"
+    , Svg.text_ [y (toString (desktop.rc.h // 2)), stroke "white", fill "black", fontSize "200", strokeWidth "4"] [Svg.text desktop.name]
     ]
