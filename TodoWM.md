@@ -68,6 +68,15 @@
 * [x] BUG: EnterNotify doesn't always activate the entered window
 * [x] figure out how `--replace` flag works in xmonad so that I can use the WM in xfce (see Main.hs:replace)
 	* see section 2.8 of <https://tronche.com/gui/x/icccm/sec-2.html>
+* [ ] BUG: mouse clicks on desktop selector has stopped working
+* [ ] allow for minimizing window to had it
+* [ ] new idea for a my personal setup:
+    * each desktop is a separate workspace for such activities as: personal, thesis, finances, IT admin, programming, firevive artwork, ockenfels, etc
+    * each desktop has all the programs for that particular activity
+    * typical programs: browser, todos, wiki, file manager, terminal, editor (e.g. vim, atom, rstudio, affinity designer), viewer (e.g. images, pdf, running program)
+    * the workspaces have "perspectives" that the user can switch between for pre-defined multi-program view
+    * when not using a specific "perspective", layouts can be applied to the currently visible windows
+    * the user can save the currently selected layout and visible programs as a perspective
 * [ ] xfce: xfce popup windows shouldn't be managed (such as the application menu and the volume change indicator)
 * [ ] BUG: after I start GcEad, no GcEad window is shown and I can't switch to other desktops anymore
 * [ ] rewrite README.md and include how to build on nixos (``nix-shell flowmo.nix; npm install``)
